@@ -560,6 +560,30 @@ Tezos is the blockchain the whole Purranchise calls home. It runs on proof of st
 
 The currency is tez (\ua729). In the Wild Ride story, Tezos is home base: a new block laid every few seconds, like stepping stones across a river that never ends, and every adventure comes home.
 
+## Getting tez
+keys: buy tezos, buy tez, how do i buy tezos, where can i buy tezos, get tez, get tezos, send tezos, send tez, transfer tez, tezos into my wallet, fund my wallet, exchange, on ramp, cash out
+ask: Wallets | Seed phrase | How do I mint?
+Tez (\ua729) is sold on most major exchanges and inside some wallets. Buy it there, then withdraw it to your own wallet address (it starts with tz1, tz2 or tz3, or use a .tez name). Always send a small test amount first, and double-check the address, because transfers on chain cannot be reversed.
+
+I cannot recommend a particular exchange or help with money moves themselves, so please follow each service's official instructions.
+
+## Baking and staking
+keys: baking, bakers, bake, staking, stake, stake tezos, delegate, delegation, rewards, how do i stake tezos, what is baking, validators, proof of stake
+ask: Tezos | Wallets
+Tezos blocks are baked, not mined. Bakers lock up tez to produce and check blocks, and anyone can delegate or stake their tez with a baker from their wallet to share in the rewards, keeping custody of their own coins. Choose a baker carefully and read your wallet's own guide before you start. This is general information, never financial advice.
+
+## Tezos basics
+keys: who founded tezos, who made tezos, when did tezos launch, how old is tezos, what does tezos mean, is tezos eco friendly, energy, green, environment, upgrades, amendments, hard fork, what can i do on tezos
+ask: Tezos | Baking and staking | Hic et Nunc and Teia
+Tezos launched its main network in 2018. It runs on proof of stake, so a transaction uses a tiny fraction of the energy of older proof-of-work chains, and it upgrades itself through on-chain votes instead of hard forks, with each upgrade named after an ancient city.
+
+On Tezos you can collect and make art, hold a .tez name, play games, join DAOs and much more. For the art side, ask me about Hic et Nunc, objkt or the Purranchise.
+
+## Tezos domains
+keys: tezos domain, tez domain, .tez, dot tez, tez name, tezos name, yoeshilabs.tez, register a name
+ask: Wallets | Where to follow
+A .tez name is a readable name for a Tezos address, registered through Tezos Domains, so friends can send to "yoeshilabs.tez" instead of a long tz1 string. Many wallets and marketplaces show it in place of your address.
+
 ## Fully on-chain
 keys: on-chain, onchain, on chain, fully on chain, where does the art live, ipfs, permanent, stored, forever, sealed
 ask: Aleatory | What is inside the zip?

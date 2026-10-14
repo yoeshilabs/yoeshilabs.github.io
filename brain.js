@@ -250,7 +250,7 @@ function respond(raw) {
     if (!q || /\b(around|somewhere|anywhere|everything|tour)\b/.test(q)) { const d = byTitle("Where can I go"); if (d) return fromEntry(d); } }
   /* 7. precise facts, then everything he knows (with typos mended) */
   const nf = mend(n), fa = attrAnswer(nf); if (fa) { MEM.lastList = null; return fa; }
-  { const w = workIn(n), top = search(nf)[0];   /* a work named by its title wins, unless the question names one of his entries outright */
+  { const w = /^(how|where|can|should|when|why|is|are|do|does)\b/.test(n) && !/\b(song|piece|work|track)\b/.test(n) ? null : workIn(n), top = search(nf)[0];   /* a how-to question is not a work title */   /* a work named by its title wins, unless the question names one of his entries outright */
     if (w && !(top && top.s >= 12 && (" " + nf + " ").includes(" " + norm(top.e.title) + " "))) { MEM.lastList = null; return workAnswer(w); } }
   const r = search(nf), best = r[0], second = r[1];
   if (best && best.s >= 3.2) { MEM.last = best.e; MEM.lastMore = false; MEM.lastList = null; { const c1 = COLLS.find((c) => c.name === best.e.title); if (c1) MEM.coll = c1; }
