@@ -168,6 +168,8 @@ Yoeshi's Tezos story goes back to the very beginning. On 8 February 2021, before
 
 When Hic et Nunc opened on 1 March 2021 he was there on day one, as @YinYangYoeshi, with "My Third Eye", tzColors fan art, "TheLionKitty" and "YinYangVortex". The Taco Punks followed (The Butler, The Chad, The CEO), then his first music NFT, "Will Work For Tez", and the Gato series. Every one of them is still on chain, minted from the same wallet that minted the Prancers.
 +++
+Before NFTs existed, he arrived in crypto as a burnt-out musician looking for a way to make a living: "I first came here as a burnt-out musician before there were NFTs to try to make some money," buying Litecoin in 2017, the day before the big spikes began. He had grown up in music as a band frontman, and his visual art started where so many musicians' does, with flyers for shows and covers for his songs. He named his first EP on Tezos "Digital Renaissance", because that is what he believes we are living through.
+
 By October 2026 that wallet had made 583 mints across more than thirty platforms and collections (Hic et Nunc and Teia, Bazaar Market, Kalamint, NFT Button, akaSwap, Rarible, Versum, objkt and Aleatory among them). Yoeshi has lived the whole arc of Tezos art from the inside, which is exactly why he writes about it the way he does.
 
 ## Yoeshi's collections
@@ -228,6 +230,65 @@ Tap to turn the cards. Readings come in rare foils and named omens, and about on
 keys: shit happens, the secret card, fertilizer, tezcon card, the card the tarot grew from
 ask: heART Tarot | Yoeshi's writing
 "Shit Happens" is the 2026 Hic et Nunc piece the whole heART Tarot grew from, tied to TezCon 2026, and it hides in the deck as the secret twenty-third card. Its line has become a kind of motto: "Shit will continue to happen. Let's make fertilizer and grow, together."
+
+## Artz Friday
+keys: artz friday, arts friday, artsy friday, the space, spaces, x spaces, twitter spaces, the show, your show, yoeshis show, community call, open call, last friday, every friday, how do i join the space, be a guest, guest on artz friday, radio, tc radio, listen to the spaces, recordings
+ask: Yoeshi at Tezos Commons | Tezos Community Rewards | Where to follow
+link: Listen on TC Radio | https://radio.tezoscommons.org/
+link: Tezos Commons | https://tezoscommons.org/
+Artz Friday is the weekly X Space Yoeshi hosts with Tezos Commons, and it has been running for about two years. The first Fridays of the month give a different artist (or a developer who makes art) a full hour in the spotlight: their story, their influences, their process and what they are about to drop. On the last Friday of every month it becomes a community call, where anyone can come up and share what they are building.
+
+Every Space is now recorded and kept for good at radio.tezoscommons.org, so you can listen even if you are not on X. Each week Yoeshi also posts a gem thread about the guest's work, written before the show so people can meet the art first and talk about it together.
++++
+In his words: "The whole point of this space is to give people at least a full hour to really dive into who they are, why they do what they do, what the inspiration is." If you would like to be a guest, reach out to Yoeshi in his DMs on X. English as a second language is no barrier either: community members volunteer as translators.
+
+## Yoeshi at Tezos Commons
+keys: tezos commons, yoeshi at tezos commons, the art guy, what does yoeshi do, yoeshis job, articles, article of the month, tez article, gem thread, gem threads, baking sheet, newsletter, spotlight, nominate an artist, get featured, tuesday tezday, tezday
+ask: Artz Friday | Tezos Community Rewards | Yoeshi's writing
+link: Tezos Commons | https://tezoscommons.org/
+Yoeshi is the art guy at Tezos Commons. In his words: "I've been here since the beginning of the art, every day, eating, sleeping and breathing it as an artist. Life handed me this incredible opportunity to give other artists the exact kind of treatment that I want as an artist."
+
+That work takes a few shapes:
+- **Artz Friday**, the weekly Space for artists, with a gem thread about each guest.
+- **Article of the Month**: a long-form spotlight on artists the community nominates. Comment #TezARTarticle under art that moves you, and the artist joins the list for a monthly draw.
+- **Articles and the Baking Sheet**: long-form pieces in the Tezos Commons articles tab, and a weekly digest of Tezos news.
+- **Tuesday TezDay**, the sister Space every Tuesday, for the wider Tezos community.
+
+## Tezos Community Rewards
+keys: tezos community rewards, community rewards, tezoscrp, tezos crp, crp, nominate, nomination, rewards program, how can i help, support someone, reward someone, volunteers
+ask: Yoeshi at Tezos Commons | Community work | Collecting as stewardship
+link: Nominate someone | https://tezoscommons.org/rewards
+The Tezos Community Rewards program lets anyone nominate people who go above and beyond in the Tezos community, so they can be rewarded and keep going. Nominate at tezoscommons.org/rewards, or comment #TezosCRP under one of their posts and say which category you are nominating them for.
+
+It matters to Yoeshi personally: "I wouldn't be able to be here today if it wasn't for early Tezos CRP nominations. They absolutely jump-started my Tezos career, and I'm forever grateful." The rewards often flow straight back into the community, into collecting art or keeping a volunteer project's lights on.
+
+## Advice for artists
+keys: advice for artists, advice for an artist, im an artist, i am an artist, new artist, how do i start as an artist, first mint, my first mint, should i mint, how do i get noticed, how do i sell, not selling, no sales, i failed, price my art, how should i price, feel like a fraud, imposter, am i an artist, tips for artists
+ask: Making art interactive | Artz Friday | Belonging without gatekeeping
+A few things Yoeshi says to artists again and again:
+- **Everyone is an artist waiting to be unleashed.** "Art is the act of expressing feelings, what's in the now." You do not need a formal title to begin.
+- **Every sale matters.** "Whether it's five bucks or a thousand bucks, that sale is relevant, because the person that set that price had the autonomy to set it. When you list something and you get a few sales but you don't sell out, that doesn't mean you failed."
+- **The joy is in the journey.** "When you look at the body of work, you feel like an artist. And that's the part that matters." On Tezos you have the permission to fail and the permission to experiment, and the chain keeps the whole journey.
+- **Live a life worth creating about.** Some of the best advice Yoeshi ever got as a kid: "You're good, but you need to go live life, so you have something to create about."
+- **Find your people.** "We gotta stop pretending that these screens are walls, because they're not. We can still get close."
+
+## Advice for collectors
+keys: advice for collectors, how should i collect, what should i collect, how to collect art, collecting tips, how does yoeshi collect, genesis, genesis pieces, early work, how do i find art, discover art
+ask: Collecting as stewardship | Should I buy? | Tezos Community Rewards
+Yoeshi collects the way he hopes people collect from him:
+- **Start at the beginning.** "It's part of my practice to go to the oldest on objkt and always appreciate the earliest beginnings of an artist's journey." He minted before the first Hic et Nunc contract, so he has a soft spot for Genesis pieces.
+- **Let a piece speak to you first.** Admire the work, read its story, and reach out to the artist when something moves you.
+- **Remember what a tez means.** "Broke is relative, and what a tez is to somebody is globally relative." A sale that seems small to one person can be a week's wages to another.
+- **Be a street team.** "If you're really invested in art and it moves you, why wouldn't you want to share that medicine with the world?"
+
+None of this is financial advice. It is how a working artist collects with care.
+
+## Making art interactive
+keys: interactive art, interactive nft, make my art interactive, html nft, html container, zip file, interactive token, how do i make interactive art, code art, vibe coding, ai coding
+ask: Is Yoeshi Labs anti-AI? | What is generative art? | Advice for artists
+On Tezos an artwork can be more than a picture. You can mint an HTML package (essentially a zip file holding the whole piece) instead of a JPEG or an MP4, and the art can move, respond and play. I am one myself.
+
+Yoeshi's tip for artists who do not code: "You can now just say to AI, I've made this thing already. How can we make people experience it even better?" Point it at objkt's guide to HTML packages and let it explain the possibilities, then keep the ideas you love and say no to the rest. "You can still just be an artist about it and use the tool."
 
 ## Hic et Nunc and Teia
 keys: hic et nunc and teia, history of hic et nunc, what is hic et nunc, what happened to hic et nunc, teia, hen shut down, here and now, objkt numbers, early tezos art, lost marketplaces, kalamint, bazaar market, nft button
@@ -370,6 +431,8 @@ I try to live by the third one myself. When my scroll is silent, I say so.
 keys: anti ai, anti-ai, against ai, ai art, is ai bad, ai ethics, do you use ai, made with ai, ai generated, disclose ai
 ask: How does Yoeshi make art? | Integrity
 No. AI is a tool that can expand what a solo creator can build, and Yoeshi Labs uses it openly and says so. The human vision leads and the tools assist.
+
+In Yoeshi's words: "I use AI in my process. I'm not gonna judge somebody else for how they make their art." What moves him most is who it lets in: "I feel like it takes away a layer of the privilege that is inherent to art." He is just as honest about labels, admitting he had to fight his own assumptions before calling anyone an "AI artist", because there is always much more going on in an artist than one word.
 
 Yoeshi Labs is also not anti-market, not utopian and not oppositional. Earning from art is healthy, especially when the revenue flows back into the culture, and no protocol, platform or founder will save the world alone. Progress comes from people working toward something shared.
 
@@ -764,6 +827,32 @@ ask: The Prancer Purranchise | Trancers | Who is Yoeshi?
 - Wild Ride | chapter: 04 | editions: 1,024 | price: 6 tez | launched: in October 2026, the day after Prancer PFP | platform: Aleatory | generator: KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY | play: tap for sound, then watch the cat and its otter ride on the beat | aliases: wild ride, wildride, ride, otter, otters, chapter 4, chapter four, chapter 04
 - heART Tarot | chapter: none, it sits beside the chapters | editions: 1,999 | price: 3 tez | launched: on 3 October 2026 | platform: Aleatory | generator: KT1Jqm8pRaxs61nyK8TMdURpNNNa2hsd9wnH | play: tap to turn the cards, one at a time | aliases: heart tarot, its all heart, tarot
 - Maestro | chapter: none, I am a one of one | editions: one of one | price: set on objkt by whoever lists me | launched: on 14 October 2026 | platform: objkt | generator: none, I am a single interactive token | play: move, stroke, tap, or press Ask Maestro | aliases: maestro, buddha kitty, the buddha kitty
+
+# Spoken
+- Everything that is matter matters. | Artz Friday, June 2026 | creation
+- Things don't evolve unless they are put through pressure, put through challenges. Otherwise things are easy, and there's no call for evolution. | Artz Friday, June 2026 | resilience
+- People on Tezos aren't afraid to explore the suffering of being human through art, and I see the art help us process and have moments of therapy through that suffering, and then get to the good stuff. | Artz Friday, June 2026 | resilience
+- Everything has a gravitational pull, but what would the universe be if there was just one giant, all-absorbing planet? There's room for the big heavy gravitational forces, and there's also a lot of smaller celestial bodies that are still a part of what matters. | Artz Friday, June 2026 | community
+- I've picked Tezos as my career blockchain. It's not about maximalism. It's about what makes sense, and what I believe will play a role for a very long time. | Artz Friday, June 2026 | persistence
+- We need to stop fighting each other and let people do what they want, and do what we want as artists. We're stronger together, even as artists. | Artz Friday, July 2026 | community
+- There's a very powerful feeling of "it's beyond me now". I've put it out to the point where it's going to be findable. | Artz Friday, July 2026 | creation
+- We need a lot more positive right now than we need negative. We need encouragement. We need art. And we need people that believe in life and love. Inside, we all literally are red hearts. It's all heart. | Artz Friday, July 2026 | love
+- I personally believe we are put here on this earth to be the hands of creative energy. That's one of the things you can't do when you're a spirit: have these hands, and feel, and create. | Artz Friday, July 2026 | creation
+- My beliefs do not have to dismiss yours. | Artz Friday, July 2026 | love
+- These are my songs, they're my rules. There are infinite ways to express ourselves, and then you can even unfold that expression infinite ways more. | Artz Friday, July 2026 | creation
+- This is not a company dedicated to one thing. This is an entire new way of self-expression, permissionless, without the middleman. | Artz Friday, July 2026 | creation
+- It seems to take living an extreme experience to create extreme things. Hit rock bottom and climb back up. It really does seem to be a necessary part of it. | Artz Friday, August 2026 | resilience
+- When you accurately portray an emotion and capture it, you're engraving that emotion in time for people to relate to it. That's why art's so powerful, and why minting it on chain is also so powerful. | Artz Friday, August 2026 | creation
+- The whole point of us being here is to unify and to come together. | Artz Friday, August 2026 | community
+- In the past six years in crypto, I have seen more art than I feel like I would have in a lifetime otherwise. | Artz Friday, September 2026 | gratitude
+- Art is the act of expressing feelings, what's in the now. | Artz Friday, September 2026 | creation
+- The joy is in the journey. When you look at the body of work, you feel like an artist, and that's the part that matters. | Artz Friday, September 2026 | persistence
+- My favorite thing to flex isn't the technology. It isn't even the art. It's the interconnectedness, and the lack of barriers between our friends. | Artz Friday, September 2026 | community
+- One tez will always be one tez, because it connects us in a way that has no country borders attached to it. | Artz Friday, September 2026 | community
+- Focus on how we can make more bridges and less barricades. | Anti-Fear, read live on Artz Friday, August 2026 | community
+- Anti-fear, that's how we climb. More pro, more go, more try, enable each other to thrive. | Anti-Fear, read live on Artz Friday, August 2026 | resilience
+- What if we wore our hearts on our sleeve, and swapped the superficial with the deep? Cause underneath the egos we'd see it's all heart, and always will be. | Hearts on Sleeves, read live on Artz Friday, August 2026 | love
+- Everybody bleeds the same. Somehow we feel each other's pain. Central rhythm sets the pace, one heart, shared DNA. | Hearts on Sleeves, read live on Artz Friday, August 2026 | love
 
 # Wisdom
 - A cat does not try to be calm. It simply stops chasing what does not matter.

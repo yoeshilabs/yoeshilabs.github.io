@@ -113,9 +113,16 @@ function attrAnswer(n) {
 
 /* ================================================================ Yoeshi's own words (heart.js, from the heART Tarot deck) */
 const HEART = window.MAESTRO_HEART || { quotes: [], works: [], themes: [], lore: {}, platforms: [] };
+/* his spoken words from Artz Friday ("# Spoken" in the scroll: "quote | source | theme") join the words harvested from the deck */
+for (const l of SCROLL.groups.Spoken || []) { const [q, src, theme] = l.split(" | ").map((x) => x.trim()); if (q && src) HEART.quotes.push({ q, src, theme: theme || "creation", spoken: true }); }
 const THEMES = HEART.themes.map((t) => ({ ...t, re: new RegExp("\\b(" + t.rx + ")", "i") }));
 const FEELTHEME = [[/\b(lonely|alone|heartbroken|grief|grieving|hurting)\b/, "love"], [/\b(tired|exhausted|burnt out|burned out|burnout|stuck|lost)\b/, "persistence"], [/./, "resilience"]];
-const quoteFor = (n, theme) => { const th = theme || (THEMES.find((t) => t.re.test(n)) || {}).key, pool = HEART.quotes.filter((q) => q.theme === th); return pick(pool.length ? pool : HEART.quotes); };
+const QSKIP = new Set("yoeshi say said says wrote write writes think thinks would quote words wisdom something more about from".split(" "));
+const quoteFor = (n, theme) => {
+  /* first a quote that is actually about the thing asked ("what would yoeshi say about pressure"), then the theme, then any */
+  const want = toks(n).filter((w) => w.length > 3 && !QSKIP.has(w));
+  if (want.length && !theme) { const hits = HEART.quotes.filter((q) => { const qt = new Set(toks(q.q)); return want.some((w) => qt.has(w)); }); if (hits.length) return pick(hits); }
+  const th = theme || (THEMES.find((t) => t.re.test(n)) || {}).key, pool = HEART.quotes.filter((q) => q.theme === th); return pick(pool.length ? pool : HEART.quotes); };
 const SONGS = HEART.works.filter((w) => w.lyrics && w.lyrics.length);
 const couplet = (w) => pick(w.lyrics).replace(" / ", "\n");
 /* every work in the deck, by title (only distinctive titles, so "Clouds" or "Cat" never hijack a question) */
@@ -138,7 +145,7 @@ const shuffled = {}; const draw = (g) => { const L = SCROLL.groups[g] || []; if 
 const Q = new URLSearchParams(location.search), V0 = (Q.get("viewer") || "").trim(), VIEWER = /^(tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$/.test(V0) ? V0 : "";   /* SECURITY: a real address or nothing */
 if (window.MAESTRO_SITE) document.title = "Yoeshi Labs \u00b7 Maestro, the concierge (Beta)";   /* the engine names the tab after the cat; the website names it after the studio */
 /* the website edition (window.MAESTRO_SITE) may hand out links: only to these hosts, only https, only from his scroll */
-const SITE = !!window.MAESTRO_SITE, SAFE_HOSTS = ["yoeshilabs.github.io", "aleatory.art", "objkt.com", "x.com", "linktr.ee", "teia.art", "tzkt.io", "yoeshi.art"];
+const SITE = !!window.MAESTRO_SITE, SAFE_HOSTS = ["yoeshilabs.github.io", "aleatory.art", "objkt.com", "x.com", "linktr.ee", "teia.art", "tzkt.io", "yoeshi.art", "tezoscommons.org", "radio.tezoscommons.org"];
 const safeLink = (h) => { try { const u = new URL(h); return u.protocol === "https:" && SAFE_HOSTS.includes(u.hostname) && !u.username && !u.password ? u.href : null; } catch (e) { return null; } };
 const short = (a) => a.length > 14 ? a.slice(0, 6) + "\u2026" + a.slice(-4) : a;
 const MEM = { name: "", last: null, turns: 0, heavy: 0 };
@@ -195,7 +202,7 @@ function respondOne(raw) {
       has(n, /\b(grief|grieving|heartbroken)\b/) ? "Grief is love with nowhere to go. Be very gentle with yourself. There is no right speed for this." :
       "Feelings are like weather over the garden. They pass, even the long storms. You do not have to fix anything this minute.";
     const yq = HEART.quotes.length ? quoteFor("", (FEELTHEME.find(([re]) => has(n, re)) || [0, "resilience"])[1]) : null;
-    return { text: open + "\n\n" + body + (yq ? `\n\nYoeshi once wrote something I keep close: "${yq.q}" _(${yq.src})_` : "") + (MEM.heavy > 1 ? "\n\nIf it ever feels like more than you can carry, please reach out to someone you trust, or a professional. Asking for help is strength, not weakness." : ""), chips: ["Help me breathe", "Give me some wisdom", "Tell me something kind"], mood: "care", pet: 0.5 }; }
+    return { text: open + "\n\n" + body + (yq ? `\n\nYoeshi once ${yq.spoken ? "said" : "wrote"} something I keep close: "${yq.q}" _(${yq.src})_` : "") + (MEM.heavy > 1 ? "\n\nIf it ever feels like more than you can carry, please reach out to someone you trust, or a professional. Asking for help is strength, not weakness." : ""), chips: ["Help me breathe", "Give me some wisdom", "Tell me something kind"], mood: "care", pet: 0.5 }; }
   if (pos && has(n, FEEL) && words <= 9) return { text: tag(pick(["That makes my whiskers glow. Hold onto it a moment longer than you normally would.", "Wonderful. Joy noticed is joy doubled.", "I love that for you. Savour it like a sunbeam."])), chips: ["Give me some wisdom", "Tell me a joke", "Tell me about the Prancer Purranchise"], pet: 0.7 };
   /* 4. small courtesies */
   if (words <= 5 && /^(hi|hey|hello|hiya|howdy|yo|gm|gn|sup|greetings|namaste|good morning|good afternoon|good evening|hola|hey there|hi there|hello there|hey maestro|hi maestro|hello maestro)\b/.test(n))
@@ -228,8 +235,8 @@ function respondOne(raw) {
   if (has(n, /\b(fortune|omen|predict|prediction|future for me|horoscope|my future|reading)\b/)) return { text: "I close my eyes, I listen to the bowl, and I see... " + draw("Fortunes").replace(/^./, (c) => c.toLowerCase()) + "\n\n(I am a cat, not an oracle, though I am rarely wrong about sunbeams.)", chips: ["Another fortune", "Tell me something kind"], mood: "think" };
   if (has(n, /\b(cat fact|fun fact|fact|facts|something interesting|teach me something)\b/)) return { text: draw("Facts"), chips: ["Another cat fact", "The research behind the cats", "Tell me a joke"] };
   if (has(n, /\b(something kind|affirmation|encourage|encouragement|kind words|nice thing|compliment me|i need to hear)\b/)) return { text: tag(draw("Affirmations"), 0.7), chips: ["Another kind word", "Help me breathe"], pet: 0.5 };
-  if (has(n, /\b(wisdom|wise|advice|lesson|quote|inspire|inspiration|motivate|motivation|guidance|teach me|enlighten|zen saying|a saying)\b/) && !has(n, /\b(prancer|pads|pfp|ride|tezos|mint|wallet|aleatory|yoeshi)\b/))
-  { if (HEART.quotes.length && rnd() < 0.4) { const q = quoteFor(n); return { text: `Here is something Yoeshi wrote:\n\n"${q.q}"\n\n_${q.src}_`, chips: ["More wisdom", "More from Yoeshi", "Help me breathe"], mood: "think" }; }
+  if (has(n, /\b(wisdom|wise|advice|lesson|quote|inspire|inspiration|motivate|motivation|guidance|teach me|enlighten|zen saying|a saying)\b/) && !has(n, /\b(prancer|pads|pfp|ride|tezos|mint|wallet|aleatory|yoeshi|artist|artists|collector|collectors|collect|collecting|sell|selling|price|pricing)\b/))
+  { if (HEART.quotes.length && rnd() < 0.4) { const q = quoteFor(n); return { text: `Here is something Yoeshi ${q.spoken ? "said" : "wrote"}:\n\n"${q.q}"\n\n_${q.src}_`, chips: ["More wisdom", "More from Yoeshi", "Help me breathe"], mood: "think" }; }
     return { text: draw("Wisdom"), chips: ["More wisdom", "Give me a koan", "Help me breathe"], mood: "think" }; }
   if (has(n, /\b(meaning of life|purpose of life|why are we here|what is life|what matters)\b/)) return { text: "Eat when hungry. Rest when tired. Love whoever is in the room. Make something only you could make. Then find a warm spot and do it all again tomorrow.\n\nThat is all forty-two of my secrets.", mood: "think" };
   if (has(n, /\b(random|surprise me|anything|dealers choice|you choose|whatever)\b/) && words <= 4) {
