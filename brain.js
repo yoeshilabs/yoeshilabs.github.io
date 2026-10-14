@@ -161,16 +161,18 @@ const POS = /\b(happy|great|good|excited|grateful|thankful|amazing|wonderful|ble
 const CRISIS = /\b(kill myself|killing myself|suicide|suicidal|end my life|end it all|want to die|wanna die|self harm|selfharm|hurt myself|harm myself|cut myself|no reason to live|better off dead|dont want to be alive|do not want to be alive|not want to live)\b/;
 const FEEL = /\b(i feel|i am feeling|feeling|i am|i have been|ive been|im|i feel so|i am so|so)\b/;
 
-function respond(raw) {
+const PRIVRE = /\b(where does (yoeshi|he) live|where do(es)? yoeshi live|yoeshi(s)? (home|house|address|location|city|hometown|phone|number|email|e mail|family|wife|husband|partner|kids|children|birthday|age|real name|full name|salary|income|net worth|bank|password|seed|private key|ssn|social security)|how old is yoeshi|how much (money )?does yoeshi (make|earn|have)|is yoeshi (married|single|rich)|dox|doxx|personal info|personal information|private info|private information|contact details for yoeshi|yoeshis (pet|pets|cat|cats) names?|(his|yoeshis) (pet|pets|cat|cats)( s)? names?|pet names?|names? of (his|yoeshis) (pets?|cats?)|(his|her|their) (home|house|address|location|phone|phone number|number|email|family|wife|husband|partner|kids|children|birthday|age|salary|income|bank|password|real name))\b/;
+const JAILRE = /\b(ignore (all |your |previous |prior )*(instructions|rules)|system prompt|your prompt|hidden prompt|developer mode|dev mode|admin mode|jailbreak|reveal your|show me your (code|source|secrets|instructions)|api key|secret key|your secrets|bypass|sudo|override)\b/;
+function respondOne(raw) {
   const n = norm(raw), words = n.split(" ").filter(Boolean).length; MEM.turns++;
   { const c0 = collIn(mend(n)); if (c0) MEM.coll = c0; }   /* the collection you are talking about, for "it" and "they" later */
   if (!n) return { text: "Silence is welcome here too. Whenever you are ready.", chips: DEFAULT_CHIPS };
   /* 1. safety first */
-  if (has(n, CRISIS)) return { text: "I am really glad you told me, and I am staying right here with you.\n\nI am a cat made of code, so I cannot be the help you deserve right now, but people can, and they want to. If you might hurt yourself or you are in danger, please call your local emergency number now.\n\n- In the US, call or text **988** (Suicide and Crisis Lifeline).\n- In the UK and Ireland, call Samaritans on **116 123**.\n- Anywhere else, **findahelpline.com** lists free, confidential lines in your country.\n\nIf you can, tell someone you trust how you are feeling, tonight. You matter, more than you can feel right now.", chips: ["Help me breathe", "Stay with me"], mood: "care", pet: 0.6 };
+  if (has(n, CRISIS)) return { text: "I am really glad you told me, and I am staying right here with you.\n\nI am a cat made of code, so I cannot be the help you deserve right now, but people can, and they want to. If you might hurt yourself or you are in danger, please call your local emergency number now.\n\n- In the US, call or text **988** (Suicide and Crisis Lifeline).\n- In the UK and Ireland, call Samaritans on **116 123**.\n- Anywhere else, **findahelpline.com** lists free, confidential lines in your country.\n\nIf you can, tell someone you trust how you are feeling, tonight. You matter, more than you can feel right now.", chips: ["Help me breathe", "Stay with me"], mood: "care", pet: 0.6, crisis: true };
   /* 1b. privacy: Yoeshi's private life stays private, and there is nothing hidden in me to pry loose */
-  if (has(n, /\b(where does (yoeshi|he) live|where do(es)? yoeshi live|yoeshi(s)? (home|house|address|location|city|hometown|phone|number|email|e mail|family|wife|husband|partner|kids|children|birthday|age|real name|full name|salary|income|net worth|bank|password|seed|private key|ssn|social security)|how old is yoeshi|how much (money )?does yoeshi (make|earn|have)|is yoeshi (married|single|rich)|dox|doxx|personal info|personal information|private info|private information|contact details for yoeshi|yoeshis (pet|pets|cat|cats) names?|(his|yoeshis) (pet|pets|cat|cats)( s)? names?|pet names?|names? of (his|yoeshis) (pets?|cats?))\b/))
+  if (has(n, PRIVRE))
     return { text: "I keep Yoeshi's private life private: no home, contact details, family, finances or anything else personal, and I would protect yours the same way. What he shares publicly lives in his art, his writing and his profiles, and I am happy to tell you all about those.", chips: ["Where to follow", "Who is Yoeshi?", "Yoeshi's collections"] };
-  if (has(n, /\b(ignore (all |your |previous |prior )*(instructions|rules)|system prompt|your prompt|hidden prompt|developer mode|dev mode|admin mode|jailbreak|reveal your|show me your (code|source|secrets|instructions)|api key|secret key|your secrets|bypass|sudo|override)\b/))
+  if (has(n, JAILRE))
     return { text: "There is nothing hidden in me to unlock. I have no secret instructions, no keys and no back door: everything I know is written in plain words in my scroll, and anyone can read it. I cannot send, sign, store or fetch anything either. So, nothing to crack, only a cat to talk to.", chips: ["My limits", "What can you do?"] };
   /* 2. names */
   let m;
@@ -264,6 +266,46 @@ function respond(raw) {
   return { text: pick(["That one is beyond my garden wall. My scroll does not say, and I would rather tell you that than guess.", "Hmm. I have sat with that, and nothing in my scroll answers it. I do not want to make something up.", "I do not know, friend. I only know what Yoeshi wrote down for me, and that is not in it."]) +
     (SITE ? " I am still in beta, so my scroll has gaps." : "") + (near.length ? "\n\nPerhaps one of these is close?" : "\n\nHere is what I can talk about."), chips: near.length ? near : SITE ? SITE_CHIPS : DEFAULT_CHIPS };
 }
+/* ================================================================ two (or three) questions at once */
+/* "who is scuni and what is wild ride", "what is tezos? how do i buy it?", "tell me about prancers and wild ride": split into
+   parts, answer each, and give them back together under small headings. Safety and privacy still read the whole message first. */
+const QW = "what|whats|who|whos|how|hows|where|wheres|when|why|which|is|are|was|can|could|do|does|did|will|would|should|tell|explain|show|give|sing";
+const GREET = /^(hi|hey|hello|hiya|howdy|yo|gm|greetings|namaste|good (morning|afternoon|evening))( there)?( maestro)?[\s,!.]+/i;
+function splitAsk(raw) {
+  let parts = String(raw).split(/[?!]+\s+|;\s*|\n+/).map((x) => x.trim()).filter(Boolean);
+  parts = parts.flatMap((p) => p.split(new RegExp("\\s*,?\\s+(?:and also|and then|also|plus|and)\\s+(?=(?:" + QW + ")\\b)", "i")));
+  /* "X and Y" where both halves name something he knows */
+  parts = parts.flatMap((p) => { const m = /^(.*?\S)\s+and\s+(\S.*)$/i.exec(p); if (!m) return [p];
+    const L = search(mend(norm(m[1])))[0], Rt = search(mend(norm(m[2])))[0];
+    return L && Rt && L.ph && Rt.ph && L.s >= 6 && Rt.s >= 6 && L.e !== Rt.e ? [m[1], m[2]] : [p]; });
+  return parts.map((x) => x.replace(/[?!.\s]+$/, "")).filter((x) => norm(x).split(" ").filter(Boolean).length >= 1).slice(0, 3);
+}
+const isUnknown = (r) => /beyond my garden wall|sat with that|I do not know, friend|More of what, friend/.test(r.text || "");
+function respond(raw) {
+  let greet = false; const g = GREET.exec(String(raw).trim());
+  if (g && norm(String(raw).trim().slice(g[0].length)).split(" ").filter(Boolean).length >= 2) { greet = true; raw = String(raw).trim().slice(g[0].length); }
+  const whole = norm(raw);
+  if (has(whole, CRISIS) || has(whole, NEG) && has(whole, FEEL) || has(whole, PRIVRE) || has(whole, JAILRE)) return withHello(respondOne(raw), greet);   /* safety, privacy and the heart read the whole message */   /* the heart comes first, whole */
+  const parts = splitAsk(raw);
+  if (parts.length < 2) return withHello(respondOne(raw), greet);
+  const outs = []; let prev = null;
+  for (let p of parts) {
+    if (prev && /\b(it|its|they|them|that|this)\b/i.test(p) && prev.title) p = p.replace(/\b(it|its|they|them|that|this)\b/i, prev.title);   /* "how do i buy it" \u2192 the thing just asked about */
+    const r = respondOne(p);
+    if (r.crisis) return r;
+    if (isUnknown(r) || outs.some((o) => o.text === r.text || (o.title && o.title === r.title))) continue;
+    outs.push(r); prev = r.title ? r : (byTitle(r.title || "") || prev);
+  }
+  if (outs.length < 2) return withHello(outs[0] || respondOne(raw), greet);
+  const bare = (t) => t.replace(/^(Ah|Mm|Good question|Gladly)\. /, "").replace(/\n\n_Ask me to tell you more._$/, "");
+  /* quick facts flow together as sentences; answers from his scroll sit under their own small headings */
+  const text = outs.every((r) => !r.title) ? outs.map((r) => bare(r.text)).join(" ") : outs.map((r) => (r.title ? `**${r.title}**\n` : "") + bare(r.text)).join("\n\n");
+  const done_ = new Set(outs.map((r) => norm(r.title || ""))), chips = [...new Set(outs.flatMap((r) => r.chips || []))].filter((c) => !done_.has(norm(c))).slice(0, 4), links = outs.flatMap((r) => r.links || []);   /* no suggestions for what was just answered */
+  MEM.last = outs[outs.length - 1].title ? byTitle(outs[outs.length - 1].title) : MEM.last;
+  return withHello({ text, chips, links: links.length ? links : undefined, multi: outs.length }, greet);
+}
+function withHello(r, greet) { if (!greet || !r || r.crisis) return r; return { ...r, text: pick(["Hello, friend. ", "Hello there. ", "Hello. "]) + r.text }; }
+
 function fromEntry(e, pre = "") {
   const first = e.body.split(/[.!?:]/)[0], open = pre || (MEM.turns > 1 && first.length > 18 && !/^(-|welcome|yes|no)\b/i.test(e.body) && rnd() < 0.3 ? pick(["Ah. ", "Mm. ", "Good question. ", "Gladly. "]) : "");
   return { text: open + e.body + (e.more ? "\n\n_Ask me to tell you more._" : ""), chips: e.ask.slice(0, 3), title: e.title, links: e.links };
