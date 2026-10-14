@@ -105,7 +105,7 @@ I can:
 - Explain everything in the **Prancer Purranchise**: Prancers, Prancer Pads, Prancer PFP, Wild Ride, Desk Prancers and the Lab, down to prices, editions, launch dates and how to play each one.
 - Walk you through **Aleatory**, **Tezos**, wallets, minting and staying safe, with plain answers to any jargon.
 - Help you **breathe** for a minute, or offer **wisdom**, a **koan**, a **cat fact**, a **fortune** or a terrible **joke**.
-- Simply **listen**, if your day has been heavy.
+- Keep you **company**, if your day has been heavy.
 
 Just type the way you would talk to a friend.
 

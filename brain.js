@@ -151,8 +151,8 @@ const DEFAULT_CHIPS = ["Who are you?", "Who is Yoeshi?", "Tell me about the Pran
 const SITE_CHIPS = ["Where can I go?", "The Prancer Purranchise", "Who is Yoeshi?", "Yoeshi Labs music"];
 const greeting = () => {
   const who = MEM.name ? `Welcome back, ${MEM.name}.` : VIEWER ? `Welcome, friend from ${short(VIEWER)}.` : "Welcome, friend.";   /* everyone is greeted as a newcomer */
-  if (SITE) return `${hourWord()}, and welcome to Yoeshi Labs. ${MEM.name ? `Welcome back, ${MEM.name}. ` : ""}I am Maestro, the Buddha Kitty, the concierge to everything Yoeshi Labs.\n\nI can walk you to any corner of the studio, from the Prancer Purranchise to Yoeshi's music and art, or simply answer whatever you are wondering. Where would you like to go?\n\n_A quick note: I am in beta. Yoeshi Labs is still being built (so far only the Prancer Purranchise has a room of its own, and yoeshi.art joins the studio soon), so some of my answers may be incomplete or not quite right. Please double-check anything important._`;
-  return `${hourWord()}. ${who} I am Maestro, the Buddha Kitty.\n\nAsk me anything: about Yoeshi and Yoeshi Labs, about the Prancer Purranchise, about Tezos, or about how your day is going. I am listening.`;
+  if (SITE) return `${MEM.name ? `Welcome back to Yoeshi Labs, ${MEM.name}.` : "Welcome to Yoeshi Labs."} I am Maestro, your concierge.\n\nWhere would you like to go?`;   /* short and warm: the beta notice lives in the header and under the input */
+  return `${who} I am Maestro, the Buddha Kitty.\n\nWhat would you like to know?`;
 };
 
 /* ================================================================ understanding */
@@ -282,6 +282,14 @@ const css = `
   left:50%;bottom:max(10px,1.6vmin);width:min(560px,calc(100vw - 20px));height:min(50vh,540px);transform:translateX(-50%) translateY(16px);opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;
   font:15px/1.5 ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",sans-serif}
 body.mz-on #mz{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+body.mz-phone #mz{left:6px;right:6px;width:auto;transform:none;border-radius:16px} body.mz-phone.mz-on #mz{transform:none}
+body.mz-phone #mz header{padding:8px 8px 7px 12px;gap:8px} body.mz-phone #mz header b{font-size:13.5px;line-height:1.2} body.mz-phone #mz header small{font-size:11px}
+body.mz-phone #mz header button{width:30px;height:30px;font-size:16px} body.mz-phone .mz-beta{font-size:10px;padding:3px 7px 2px}
+body.mz-phone #mz-log{padding:10px 10px 4px;gap:8px} body.mz-phone .mz-m{font-size:15.5px;max-width:92%} body.mz-phone .mz-u{font-size:14px}
+body.mz-phone #mz-chips{padding:2px 10px 6px;gap:5px} body.mz-phone #mz-chips button{padding:5px 10px;font-size:12px}
+body.mz-phone #mz .mz-f{padding:7px 8px 6px;gap:6px} body.mz-phone #mz input{padding:9px 12px} body.mz-phone #mz .mz-f button{width:40px;height:40px}
+body.mz-phone .mz-note{font-size:10px;padding:0 10px 6px;margin-top:0} body.mz-phone .mz-more{display:none} body.mz-kb #mz-chips{display:none}
+body.mz-phone > svg{transition:transform .35s ease,opacity .25s ease}
 body.mz-wide #mz{left:auto;right:16px;top:16px;bottom:16px;height:auto;width:var(--mzw);transform:translateX(16px)} body.mz-wide.mz-on #mz{transform:none}
 #mz header{display:flex;align-items:center;gap:10px;padding:12px 12px 10px 16px;border-bottom:1px solid rgba(255,214,140,.16)}
 #mz header .t{flex:1;min-width:0} #mz header b{display:block;font:600 16px/1.2 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;letter-spacing:.3px;color:#ffe3a6}
@@ -314,21 +322,34 @@ const LOTUS = `<svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke
 const open = Object.assign(document.createElement("button"), { id: "mz-open", type: "button", innerHTML: LOTUS + "<span>Ask Maestro</span>" });
 open.setAttribute("aria-label", "Ask Maestro anything");
 const panel = document.createElement("section"); panel.id = "mz"; panel.setAttribute("role", "dialog"); panel.setAttribute("aria-label", "Chat with Maestro");
-panel.innerHTML = `<header><div class="t"><b>${SITE ? "Maestro \u00b7 The concierge to everything Yoeshi Labs" : "Maestro \u00b7 The Buddha Kitty"}</b><small id="mz-st"><i></i><span>listening</span></small></div>${SITE ? '<span class="mz-beta" title="Maestro is in beta: answers may be incomplete or inaccurate">Beta</span>' : ""}<button type="button" id="mz-x" aria-label="Close chat">\u00d7</button></header>
+panel.innerHTML = `<header><div class="t"><b>${SITE ? "Maestro \u00b7 The concierge to everything Yoeshi Labs" : "Maestro \u00b7 The Buddha Kitty"}</b><small id="mz-st"><i></i><span>ready</span></small></div>${SITE ? '<span class="mz-beta" title="Maestro is in beta: answers may be incomplete or inaccurate">Beta</span>' : ""}<button type="button" id="mz-x" aria-label="Close chat">\u00d7</button></header>
 <div id="mz-log" aria-live="polite"></div><div id="mz-chips"></div>
-<div id="mz-f" class="mz-f"><input id="mz-in" type="text" autocomplete="off" maxlength="400" placeholder="Ask Maestro anything\u2026" aria-label="Your message" enterkeyhint="send"><button type="button" id="mz-go" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M4 12h13M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>${SITE ? '<div class="mz-note">Beta: answers may be incomplete or inaccurate. Double-check anything important.</div>' : ""}`;
+<div id="mz-f" class="mz-f"><input id="mz-in" type="text" autocomplete="off" maxlength="400" placeholder="Ask Maestro anything\u2026" aria-label="Your message" enterkeyhint="send"><button type="button" id="mz-go" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M4 12h13M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>${SITE ? '<div class="mz-note">Beta: answers may be incomplete or inaccurate.<span class="mz-more"> Double-check anything important.</span></div>' : ""}`;
 document.body.append(open, panel);
 const $ = (id) => document.getElementById(id), LOG = $("mz-log"), CHIPS = $("mz-chips"), IN = $("mz-in"), ST = $("mz-st");
 ["pointerdown", "pointermove", "wheel", "touchstart"].forEach((ev) => panel.addEventListener(ev, (e) => e.stopPropagation(), { passive: true }));
 
 /* the art makes room for the chat on wide screens */
 const ART = document.querySelector("body > svg");
-function layout() { const w = innerWidth, h = innerHeight, side = (w - h) / 2, pw = Math.min(440, Math.max(300, w - h - 40));
-  const wide = w - h > 300 && w > 760; document.body.classList.toggle("mz-wide", wide); document.documentElement.style.setProperty("--mzw", pw + "px");
-  const on = document.body.classList.contains("mz-on"), need = wide && on ? Math.max(0, pw + 32 - side) : 0, tall = h - w > 160;
+function layout() { const vv = window.visualViewport, w = innerWidth, h = innerHeight, H = vv ? vv.height : h, side = (w - h) / 2, pw = Math.min(440, Math.max(300, w - h - 40));
+  const wide = w - h > 300 && w > 760, on = document.body.classList.contains("mz-on"), phone = !wide && w < 700 && h > w * 1.15;
+  document.body.classList.toggle("mz-wide", wide); document.body.classList.toggle("mz-phone", phone); document.documentElement.style.setProperty("--mzw", pw + "px");
+  if (ART) ART.style.transformOrigin = "";
+  panel.style.top = panel.style.bottom = panel.style.height = "";
+  if (phone && on) {
+    /* on a phone the conversation comes first: the art shrinks to a band across the top (his face stays in view), and
+       when the keyboard is up (the visible height drops) it steps aside so the chat gets everything above the keys */
+    const kb = Math.max(0, h - H - (vv ? vv.offsetTop : 0)), band = H < 560 ? 0 : Math.round(Math.min(w, H * 0.3));
+    if (ART) { ART.style.transformOrigin = "50% 0"; ART.style.transform = `translateY(${-Math.round((h - w) / 2) + (vv ? Math.round(vv.offsetTop) : 0)}px) scale(${(band / w).toFixed(3)})`; ART.style.opacity = band ? "" : "0"; }
+    panel.style.top = (band + (vv ? Math.round(vv.offsetTop) : 0) + 6) + "px"; panel.style.bottom = (kb + 6) + "px"; panel.style.height = "auto";
+    document.body.classList.toggle("mz-kb", !band); return; }   /* keyboard up: the suggestions step aside too */
+  document.body.classList.remove("mz-kb");
+  if (ART) ART.style.opacity = "";
+  const need = wide && on ? Math.max(0, pw + 32 - side) : 0, tall = h - w > 160;
   /* on a tall screen the art rises into the empty space above the chat */
   if (ART) ART.style.transform = need ? `translateX(${-Math.min(need, Math.max(0, side))}px)` : tall && on ? `translateY(${-Math.round((h - w) / 2 - 6)}px)` : "";
   panel.style.height = tall && !wide ? Math.round(Math.max(h * 0.42, h - w - 22)) + "px" : ""; }
+if (window.visualViewport) { visualViewport.addEventListener("resize", layout); visualViewport.addEventListener("scroll", layout); }
 addEventListener("resize", layout); layout();
 
 /* ================================================================ talking */
@@ -349,19 +370,19 @@ const status = (s, th) => { ST.lastChild.textContent = s; ST.classList.toggle("t
 const lookAtChat = () => { const r = (document.activeElement === IN ? IN : LOG).getBoundingClientRect(); M.look(r.left + r.width / 2, r.top + r.height / 2); };
 let busy = false, timers = [], finish = null;   /* finish(): say the rest at once, when you speak over him */
 const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
-function chips(list) { CHIPS.innerHTML = ""; for (const c of (list && list.length ? list : DEFAULT_CHIPS).slice(0, 4)) { const b = document.createElement("button"); b.type = "button"; b.textContent = c; b.onclick = () => send(c); CHIPS.appendChild(b); } }
+function chips(list) { CHIPS.innerHTML = ""; for (const c of (list && list.length ? list : DEFAULT_CHIPS).slice(0, document.body.classList.contains("mz-phone") ? 3 : 4)) { const b = document.createElement("button"); b.type = "button"; b.textContent = c; b.onclick = () => send(c); CHIPS.appendChild(b); } }
 function speak(r, then) {
   const text = r.text || "", think = Math.min(1400, 450 + text.length * 2.2);
-  busy = true; status("reflecting", true); M.think(true); if (r.mood === "think") M.ripple();
+  busy = true; status("thinking", true); M.think(true); if (r.mood === "think") M.ripple();
   const dots = add("mz-m", '<span style="opacity:.7;letter-spacing:3px">\u00b7 \u00b7 \u00b7</span>');
   later(() => { M.think(false); dots.remove(); const el = add("mz-m", ""), P = plain(text);
     const secs = Math.min(9, 0.6 + P.length / 32); M.say(secs); M.chime(); if (r.pet) M.pet(r.pet); if (r.mood === "bow" || r.mood === "care") M.ripple();
-    status("speaking", false); let i = 0; const step = Math.max(2, Math.round(P.length / (secs * 30)));
-    const done = (quiet) => { finish = null; el.innerHTML = fmt(text); if (SITE && r.links) addLinks(el, r.links); keep(el); busy = false; status("listening"); if (quiet) M.hush(); else { chips(r.chips); keep(el); if (then) then(); } };   /* re-anchor once the suggestions take their room */
+    status("replying", false); let i = 0; const step = Math.max(2, Math.round(P.length / (secs * 30)));
+    const done = (quiet) => { finish = null; el.innerHTML = fmt(text); if (SITE && r.links) addLinks(el, r.links); keep(el); busy = false; status("ready"); if (quiet) M.hush(); else { chips(r.chips); keep(el); if (then) then(); } };   /* re-anchor once the suggestions take their room */
     const tick = () => { if (!finish) return; i += step; if (i >= P.length) return done(false);
       el.textContent = P.slice(0, i); keep(el); later(tick, 33); };
     finish = () => done(true); tick(); }, think);
-  if (!finish) finish = () => { timers.forEach(clearTimeout); timers = []; M.think(false); dots.remove(); add("mz-m", fmt(text)); busy = false; finish = null; status("listening"); };
+  if (!finish) finish = () => { timers.forEach(clearTimeout); timers = []; M.think(false); dots.remove(); add("mz-m", fmt(text)); busy = false; finish = null; status("ready"); };
 }
 function send(raw) {
   raw = String(raw || "").trim(); if (/^again$/i.test(raw)) raw = "help me breathe";
