@@ -18,12 +18,28 @@ ask: The Prancer Purranchise | Yoeshi Labs music | Who is Yoeshi?
 link: The Prancer Purranchise | https://yoeshilabs.github.io/prancers-site/
 link: heART Tarot | https://aleatory.art/generator/KT1Jqm8pRaxs61nyK8TMdURpNNNa2hsd9wnH
 link: Yoeshi on objkt | https://objkt.com/@yoeshilabs
+link: yoeshi.art (coming soon) | https://yoeshi.art/
 Welcome to the lobby. Here is what is open right now:
 - **The Prancer Purranchise**: four chapters of living cats on Tezos, with the Lab and Desk Prancers.
 - **heART Tarot**: a generative reading dealt from 583 of Yoeshi's real mints.
 - **Yoeshi's art and music on objkt**: five years of collections, from the first Hic et Nunc mints to HeArt Strong.
 
-Dedicated rooms for Yoeshi's music, writing and art are being built now, and I will show you to each one as it opens. Until then, ask me about any of them and I will tell you what I know.
+Coming soon: **yoeshi.art**, Yoeshi's own home on the web, joins the studio, along with dedicated rooms for his music, writing and art. I will show you to each one as it opens. Until then, ask me about any of them and I will tell you what I know.
+
+## yoeshi.art
+keys: yoeshi.art, yoeshi art, yoeshiart, yoeshis website, yoeshis site, his website, personal website, other website, art website
+ask: Where can I go? | Yoeshi's collections | Beta
+link: yoeshi.art | https://yoeshi.art/
+yoeshi.art is Yoeshi's own home on the web, built on its own domain. It is coming into the studio soon, and once it does I will be able to walk you through it room by room. For now you can visit it directly, and I can tell you about the art and music it will hold.
+
+## Beta
+keys: beta, is this accurate, are you accurate, is that right, is that true, are you sure, you are wrong, thats wrong, that is wrong, wrong answer, mistake, incorrect, error, bug, report a bug, feedback, are you finished, is this finished, work in progress, still building
+ask: Where can I go? | Where to follow | My limits
+only: site
+link: Send feedback to @YinYangYoeshi | https://x.com/YinYangYoeshi
+I am in beta, and so is this website. Yoeshi Labs is still being built: so far only the Prancer Purranchise has a room of its own, and yoeshi.art joins the studio soon. My scroll was written with care, yet it has gaps, and now and then I will get something wrong.
+
+Please double-check anything important, especially prices, editions and dates, against the source itself. If I said something that was off, Yoeshi would love to hear about it on X at @YinYangYoeshi, and every correction makes me a better concierge.
 
 ## Who is Maestro
 keys: who are you, your name, maestro, what are you, introduce yourself, about you, buddha kitty, tell me about yourself
@@ -597,7 +613,7 @@ link: linktr.ee/Yoeshi | https://linktr.ee/Yoeshi
 - **X**: @YinYangYoeshi
 - **objkt**: Yoeshi (@yoeshilabs)
 - **Links**: linktr.ee/Yoeshi
-- **Website**: yoeshilabs.github.io
+- **Website**: yoeshilabs.github.io, with yoeshi.art joining soon
 
 Collectors sharing their cats and their GIFs is the heart of the community. Tag Yoeshi when you post.
 

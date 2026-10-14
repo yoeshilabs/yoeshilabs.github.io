@@ -22,13 +22,14 @@ const SCROLL = (() => {
       if (!cur) continue;
       if ((m = /^keys:\s*(.+)$/i.exec(line))) { cur.keys = m[1].split(",").map((k) => k.trim()).filter(Boolean); continue; }
       if ((m = /^ask:\s*(.+)$/i.exec(line))) { cur.ask = m[1].split("|").map((k) => k.trim()).filter(Boolean); continue; }
+      if (/^only:\s*site\s*$/i.test(line)) { cur.siteOnly = true; continue; }
       if ((m = /^link:\s*(.+?)\s*\|\s*(\S+)\s*$/i.exec(line))) { (cur.links = cur.links || []).push({ label: m[1], href: m[2] }); continue; }
       if (line.trim() === "+++") { cur.inMore = true; continue; }
       (cur.inMore ? cur.moreLines : cur.lines).push(line);
     } else if (group && (m = /^- (.+)$/.exec(line))) groups[group].push(m[1].trim());
   }
   close();
-  return { groups, kb };
+  return { groups, kb: kb.filter((e) => !e.siteOnly || window.MAESTRO_SITE) };
 })();
 
 /* ================================================================ words */
@@ -136,7 +137,7 @@ const shuffled = {}; const draw = (g) => { const L = SCROLL.groups[g] || []; if 
   if (!q || !q.length) { q = shuffled[g] = L.slice().sort(() => rnd() - 0.5); } return q.pop(); };
 const Q = new URLSearchParams(location.search), V0 = (Q.get("viewer") || "").trim(), VIEWER = /^(tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$/.test(V0) ? V0 : "";   /* SECURITY: a real address or nothing */
 /* the website edition (window.MAESTRO_SITE) may hand out links: only to these hosts, only https, only from his scroll */
-const SITE = !!window.MAESTRO_SITE, SAFE_HOSTS = ["yoeshilabs.github.io", "aleatory.art", "objkt.com", "x.com", "linktr.ee", "teia.art", "tzkt.io"];
+const SITE = !!window.MAESTRO_SITE, SAFE_HOSTS = ["yoeshilabs.github.io", "aleatory.art", "objkt.com", "x.com", "linktr.ee", "teia.art", "tzkt.io", "yoeshi.art"];
 const safeLink = (h) => { try { const u = new URL(h); return u.protocol === "https:" && SAFE_HOSTS.includes(u.hostname) && !u.username && !u.password ? u.href : null; } catch (e) { return null; } };
 const short = (a) => a.length > 14 ? a.slice(0, 6) + "\u2026" + a.slice(-4) : a;
 const MEM = { name: "", last: null, turns: 0, heavy: 0 };
@@ -149,7 +150,7 @@ const DEFAULT_CHIPS = ["Who are you?", "Who is Yoeshi?", "Tell me about the Pran
 const SITE_CHIPS = ["Where can I go?", "The Prancer Purranchise", "Who is Yoeshi?", "Yoeshi Labs music"];
 const greeting = () => {
   const who = MEM.name ? `Welcome back, ${MEM.name}.` : VIEWER ? `Welcome, friend from ${short(VIEWER)}.` : "Welcome, friend.";   /* everyone is greeted as a newcomer */
-  if (SITE) return `${hourWord()}, and welcome to Yoeshi Labs. ${MEM.name ? `Welcome back, ${MEM.name}. ` : ""}I am Maestro, the Buddha Kitty, the concierge to everything Yoeshi Labs.\n\nI can walk you to any corner of the studio, from the Prancer Purranchise to Yoeshi's music and art, or simply answer whatever you are wondering. Where would you like to go?`;
+  if (SITE) return `${hourWord()}, and welcome to Yoeshi Labs. ${MEM.name ? `Welcome back, ${MEM.name}. ` : ""}I am Maestro, the Buddha Kitty, the concierge to everything Yoeshi Labs.\n\nI can walk you to any corner of the studio, from the Prancer Purranchise to Yoeshi's music and art, or simply answer whatever you are wondering. Where would you like to go?\n\n_A quick note: I am in beta. Yoeshi Labs is still being built (so far only the Prancer Purranchise has a room of its own, and yoeshi.art joins the studio soon), so some of my answers may be incomplete or not quite right. Please double-check anything important._`;
   return `${hourWord()}. ${who} I am Maestro, the Buddha Kitty.\n\nAsk me anything: about Yoeshi and Yoeshi Labs, about the Prancer Purranchise, about Tezos, or about how your day is going. I am listening.`;
 };
 
@@ -258,7 +259,7 @@ function respond(raw) {
   /* 8. honest not-knowing */
   const near = r.filter((x) => x.s > 0.8).slice(0, 3).map((x) => x.e.title);
   return { text: pick(["That one is beyond my garden wall. My scroll does not say, and I would rather tell you that than guess.", "Hmm. I have sat with that, and nothing in my scroll answers it. I do not want to make something up.", "I do not know, friend. I only know what Yoeshi wrote down for me, and that is not in it."]) +
-    (near.length ? "\n\nPerhaps one of these is close?" : "\n\nHere is what I can talk about."), chips: near.length ? near : DEFAULT_CHIPS };
+    (SITE ? " I am still in beta, so my scroll has gaps." : "") + (near.length ? "\n\nPerhaps one of these is close?" : "\n\nHere is what I can talk about."), chips: near.length ? near : SITE ? SITE_CHIPS : DEFAULT_CHIPS };
 }
 function fromEntry(e, pre = "") {
   const first = e.body.split(/[.!?:]/)[0], open = pre || (MEM.turns > 1 && first.length > 18 && !/^(-|welcome|yes|no)\b/i.test(e.body) && rnd() < 0.3 ? pick(["Ah. ", "Mm. ", "Good question. ", "Gladly. "]) : "");
@@ -293,6 +294,8 @@ body.mz-wide #mz{left:auto;right:16px;top:16px;bottom:16px;height:auto;width:var
 .mz-m{align-self:flex-start;background:rgba(255,236,200,.08);border:1px solid rgba(255,214,140,.16);border-top-left-radius:5px;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-size:16px;line-height:1.5}
 .mz-u{align-self:flex-end;background:linear-gradient(135deg,#e58a2f,#c96a1e);color:#1d1207;border-top-right-radius:5px;font-weight:600}
 .mz-m p{margin:0 0 .55em} .mz-m p:last-child{margin:0} .mz-m ul{margin:.2em 0 .55em;padding-left:1.15em} .mz-m li{margin:.15em 0} .mz-m b{color:#ffe3a6;font-weight:700} .mz-m em{color:#d8c6a6}
+.mz-beta{flex:none;padding:4px 9px 3px;border-radius:999px;border:1px solid #f0b44a;color:#f0b44a;font:700 11px/1 ui-rounded,system-ui,sans-serif;letter-spacing:1.5px;text-transform:uppercase}
+.mz-note{padding:0 14px 10px;margin-top:-4px;font-size:11.5px;line-height:1.35;color:#bda98a;text-align:center}
 .mz-links{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.mz-links a{display:inline-block;padding:7px 13px;border-radius:999px;background:#f0b44a;color:#2a1704;font:600 13px/1.1 ui-rounded,system-ui,sans-serif;text-decoration:none}.mz-links a:hover{background:#ffc75e}.mz-links a:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .mz-b{font-size:24px;letter-spacing:2px;text-align:center;padding:6px 0;color:#ffe3a6}
 #mz-chips{display:flex;flex-wrap:wrap;gap:7px;padding:4px 14px 10px;flex:none}   /* they wrap: every suggestion visible, no hidden scrolling */
@@ -310,9 +313,9 @@ const LOTUS = `<svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke
 const open = Object.assign(document.createElement("button"), { id: "mz-open", type: "button", innerHTML: LOTUS + "<span>Ask Maestro</span>" });
 open.setAttribute("aria-label", "Ask Maestro anything");
 const panel = document.createElement("section"); panel.id = "mz"; panel.setAttribute("role", "dialog"); panel.setAttribute("aria-label", "Chat with Maestro");
-panel.innerHTML = `<header><div class="t"><b>${SITE ? "Maestro \u00b7 The concierge to everything Yoeshi Labs" : "Maestro \u00b7 The Buddha Kitty"}</b><small id="mz-st"><i></i><span>listening</span></small></div><button type="button" id="mz-x" aria-label="Close chat">\u00d7</button></header>
+panel.innerHTML = `<header><div class="t"><b>${SITE ? "Maestro \u00b7 The concierge to everything Yoeshi Labs" : "Maestro \u00b7 The Buddha Kitty"}</b><small id="mz-st"><i></i><span>listening</span></small></div>${SITE ? '<span class="mz-beta" title="Maestro is in beta: answers may be incomplete or inaccurate">Beta</span>' : ""}<button type="button" id="mz-x" aria-label="Close chat">\u00d7</button></header>
 <div id="mz-log" aria-live="polite"></div><div id="mz-chips"></div>
-<div id="mz-f" class="mz-f"><input id="mz-in" type="text" autocomplete="off" maxlength="400" placeholder="Ask Maestro anything\u2026" aria-label="Your message" enterkeyhint="send"><button type="button" id="mz-go" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M4 12h13M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`;
+<div id="mz-f" class="mz-f"><input id="mz-in" type="text" autocomplete="off" maxlength="400" placeholder="Ask Maestro anything\u2026" aria-label="Your message" enterkeyhint="send"><button type="button" id="mz-go" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M4 12h13M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>${SITE ? '<div class="mz-note">Beta: answers may be incomplete or inaccurate. Double-check anything important.</div>' : ""}`;
 document.body.append(open, panel);
 const $ = (id) => document.getElementById(id), LOG = $("mz-log"), CHIPS = $("mz-chips"), IN = $("mz-in"), ST = $("mz-st");
 ["pointerdown", "pointermove", "wheel", "touchstart"].forEach((ev) => panel.addEventListener(ev, (e) => e.stopPropagation(), { passive: true }));
