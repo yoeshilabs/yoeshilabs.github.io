@@ -88,7 +88,7 @@ I live in a dry garden on a quiet morning. Raked white gravel ripples round the 
 Tap me and the gravel ripples outward from my seat. Every kindness travels farther than you can see.
 
 ## How to play with me
-keys: how do i play, interact, play with you, what happens if, tap, click, pet, stroke, touch, controls, sound, audio, cant hear, no sound, levitate, float, om
+keys: how do i play, interact, play with you, what happens if, tap, click, pet, stroke, touch, sound, audio, cant hear, no sound, levitate, float, om
 ask: What can you do? | Tell me about the garden | Can you help me breathe?
 - **Move your pointer** and I will watch it.
 - **Stroke my head** back and forth and I purr, and hearts drift up.
@@ -133,7 +133,7 @@ To be an agent of good. Inspired by "ask me anything": you ask, I answer honestl
 I am also the prototype of something Yoeshi has dreamed about for a long time: a personal digital assistant made as art, with the warmth of a mentor who is wise, protective and steadying. Today I sit in a garden and answer questions, and who knows what I will grow into.
 
 ## One of one
-keys: one of one, 1/1, 1 of 1, edition, how many maestros, unique, objkt, own you, collect you, buy you, token, nft, this nft
+keys: one of one, 1/1, 1 of 1, edition, how many maestros, unique, own you, collect you, buy you, token, nft, this nft
 ask: What is inside the zip? | Who made you? | My purpose
 link: Yoeshi on objkt | https://objkt.com/@yoeshilabs
 There is exactly one of me: a 1/1 interactive token on objkt, made by Yoeshi Labs on Tezos.
@@ -568,9 +568,16 @@ Tez (\ua729) is sold on most major exchanges and inside some wallets. Buy it the
 I cannot recommend a particular exchange or help with money moves themselves, so please follow each service's official instructions.
 
 ## Baking and staking
-keys: baking, bakers, bake, staking, stake, stake tezos, delegate, delegation, rewards, how do i stake tezos, what is baking, validators, proof of stake
+keys: baking, bakers, staking, stake, stake tezos, delegate, delegation, rewards, how do i stake tezos, what is baking, validators, proof of stake
 ask: Tezos | Wallets
 Tezos blocks are baked, not mined. Bakers lock up tez to produce and check blocks, and anyone can delegate or stake their tez with a baker from their wallet to share in the rewards, keeping custody of their own coins. Choose a baker carefully and read your wallet's own guide before you start. This is general information, never financial advice.
+
+## Tezos for art
+keys: tezos for art, why is tezos good for art, tezos art, tezos art community, art on tezos, tezos artists, cleannft, clean nft, why do artists use tezos, tezos art scene
+ask: Hic et Nunc and Teia | Community is the primary layer | Yoeshi's Tezos story
+Tezos became a home for artists because it made showing up affordable. Minting costs a tiny fraction of a tez, proof of stake keeps the energy use low (the "CleanNFT" movement of 2021 grew from exactly that), and royalties and ownership live right in the contracts.
+
+What made it last is the community: Hic et Nunc's open, global spirit, Teia carrying it forward as an artist-owned DAO, objkt as the shared gallery, and thousands of artists and collectors who onboard newcomers, run fundraisers and keep platforms alive. Yoeshi has been part of it since February 2021, and the whole Purranchise grew out of it.
 
 ## Tezos basics
 keys: who founded tezos, who made tezos, when did tezos launch, how old is tezos, what does tezos mean, is tezos eco friendly, energy, green, environment, upgrades, amendments, hard fork, what can i do on tezos
@@ -680,7 +687,7 @@ Your seed phrase is the master key to your wallet. Write it on paper, keep it so
 Nobody legitimate will ever ask for it: no artist, no platform, no support agent and certainly no cat in a robe. If anyone does, stop, and treat the conversation as a scam.
 
 ## Scams and safety
-keys: scam, scams, scammer, phishing, fake, fake mint, fake site, dm, direct message, hacked, drained, suspicious, is this real, impersonator, impersonation, airdrop, free nft
+keys: scam, scams, scammer, phishing, fake, fake mint, fake site, dm, direct message, hacked, drained, suspicious, is this real, impersonator, impersonation, airdrop, free nft, free mint, free mints, dmed me, someone dmed me, someone messaged me, sent me a link, claim link, giveaway, you won, verify your wallet, wallet support, support team
 ask: Seed phrase | Is connecting my wallet safe?
 A few habits keep you safe:
 - **Mint from the source.** Use the Mint on Aleatory buttons on the Purranchise website, and check that the address bar reads aleatory.art.

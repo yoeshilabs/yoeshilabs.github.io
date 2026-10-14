@@ -55,17 +55,17 @@ const has = (n, re) => re.test(" " + n + " ");
 const DF = {}, N = SCROLL.kb.length;
 for (const e of SCROLL.kb) {
   e.keyN = e.keys.map(norm).filter(Boolean);
-  e.keyT = new Set(e.keys.flatMap(toks)); e.titleT = new Set(toks(e.title)); e.bodyT = new Set(toks(e.body + " " + e.more));
+  e.keyT = new Set(e.keys.flatMap(toks)); e.key1 = new Set(e.keys.filter((k) => toks(k).length === 1).flatMap(toks));   /* key1: words that are keys on their own */ e.titleT = new Set(toks(e.title)); e.bodyT = new Set(toks(e.body + " " + e.more));
   for (const w of new Set([...e.keyT, ...e.titleT, ...e.bodyT])) DF[w] = (DF[w] || 0) + 1;
 }
 const idf = (w) => Math.log(1 + N / (DF[w] || 0.5));
 const byTitle = (t) => SCROLL.kb.find((e) => e.title.toLowerCase() === String(t).toLowerCase());
 function search(q) {
   const n = " " + norm(q) + " ", qt = toks(q);
-  const scored = SCROLL.kb.map((e) => { let s = 0;
-    for (const k of e.keyN) if (k && n.includes(" " + k + " ")) s += 3 + 2.2 * k.split(" ").length;
-    for (const w of new Set(qt)) { const i = idf(w); if (e.keyT.has(w)) s += 2.2 * i; else if (e.titleT.has(w)) s += 1.6 * i; else if (e.bodyT.has(w)) s += 0.45 * i; }
-    return { e, s }; }).sort((a, b) => b.s - a.s);
+  const scored = SCROLL.kb.map((e) => { let s = 0, ph = false;
+    for (const k of e.keyN) if (k && n.includes(" " + k + " ")) { s += 3 + 2.2 * k.split(" ").length; ph = true; }
+    for (const w of new Set(qt)) { const i = idf(w); if (e.key1.has(w)) s += 2.2 * i; else if (e.keyT.has(w)) s += 1.1 * i;   /* one word of a key phrase counts half */ else if (e.titleT.has(w)) s += 1.6 * i; else if (e.bodyT.has(w)) s += 0.45 * i; }
+    return { e, s, ph }; }).sort((a, b) => b.s - a.s);
   return scored;
 }
 
@@ -100,7 +100,7 @@ const SAY = {
   platform: (c) => ME(c) ? "I live on objkt." : `${c.name} mints on ${c.platform}, through the Mint on Aleatory buttons on the website.`,
   chapter: (c) => ME(c) ? "I sit outside the chapters, a one of one." : `${c.name} is Chapter ${c.chapter} of the Prancer Purranchise.` };
 function attrAnswer(n) {
-  const at = ATTR.filter(([, re]) => has(n, re)).map(([k]) => k); if (!at.length) return null;
+  const at = ATTR.filter(([, re]) => has(n, re)).map(([k]) => k); if (!at.length || SCROLL.kb.some((e) => norm(e.title) === n)) return null;   /* an entry named outright wins */
   let c = collIn(n); const all = has(n, /\b(all|each|every|collections|chapters|projects)\b/), words = n.split(" ").length;
   if (!c && !all && has(n, /\b(you|your|yourself)\b/)) { if (at.some((k) => k === "play" || k === "platform")) return null; c = COLLS.find(ME); }   /* "when were you made?" (how to play with him has its own entry) */
   const other = (() => { const top = search(n)[0]; return top && top.s >= 7 && !COLLS.some((x) => x.name === top.e.title) && !/^(Prices and editions|How do I mint|Fees)$/.test(top.e.title); })();
@@ -243,17 +243,19 @@ function respond(raw) {
     if (MEM.last) return { text: "That is all my scroll says about " + MEM.last.title.toLowerCase() + ". Ask me about something next to it?", chips: MEM.last.ask.slice(0, 3) };
     return { text: "More of what, friend? Ask me anything.", chips: DEFAULT_CHIPS }; }
   /* 6b. the concierge (website edition): "take me to the music", "where is the tarot" */
-  if (SITE && has(n, /\b(take me to|bring me to|go to|open|visit|link to|link for|where is|where are|wheres|show me|directions to|how do i get to|lead me to|guide me to)\b/)) {
-    const q = mend(n.replace(/\b(take me to|bring me to|go to|open|visit|link to|link for|where is|where are|wheres|show me|directions to|how do i get to|lead me to|guide me to|the|please)\b/g, " ").replace(/\s+/g, " ").trim()), r = q ? search(q) : [];
+  if (SITE && has(n, /\b(take me to|bring me to|go to|open the|visit|link to|link for|where is|where are|wheres|show me|directions to|how do i get to|lead me to|guide me to)\b/)) {
+    const q = mend(n.replace(/\b(take me to|bring me to|go to|open the|visit|link to|link for|where is|where are|wheres|show me|directions to|how do i get to|lead me to|guide me to|the|please)\b/g, " ").replace(/\s+/g, " ").trim()), r = q ? search(q) : [];
     const hit = r.find((x) => x.s >= 3 && x.e.links && x.e.links.length);
-    if (hit) { MEM.last = hit.e; return { text: pick(["Right this way.", "Of course. This way, please.", "Follow me."]) + " " + hit.e.body.split("\n")[0].split(/(?<=[.!?])\s/)[0], links: hit.e.links, chips: hit.e.ask.slice(0, 3) }; }
+    if (hit) { MEM.last = hit.e; return { text: pick(["Right this way.", "Of course. This way, please.", "Follow me."]) + " " + hit.e.body.split("\n")[0].split(/(?<=[.!?])\s/)[0], links: hit.e.links, chips: hit.e.ask.slice(0, 3), title: hit.e.title }; }
     if (!q || /\b(around|somewhere|anywhere|everything|tour)\b/.test(q)) { const d = byTitle("Where can I go"); if (d) return fromEntry(d); } }
   /* 7. precise facts, then everything he knows (with typos mended) */
   const nf = mend(n), fa = attrAnswer(nf); if (fa) { MEM.lastList = null; return fa; }
   { const w = /^(how|where|can|should|when|why|is|are|do|does)\b/.test(n) && !/\b(song|piece|work|track)\b/.test(n) ? null : workIn(n), top = search(nf)[0];   /* a how-to question is not a work title */   /* a work named by its title wins, unless the question names one of his entries outright */
     if (w && !(top && top.s >= 12 && (" " + nf + " ").includes(" " + norm(top.e.title) + " "))) { MEM.lastList = null; return workAnswer(w); } }
   const r = search(nf), best = r[0], second = r[1];
-  if (best && best.s >= 3.2) { MEM.last = best.e; MEM.lastMore = false; MEM.lastList = null; { const c1 = COLLS.find((c) => c.name === best.e.title); if (c1) MEM.coll = c1; }
+  /* a word he has never met (and no phrase he knows) means the question is probably elsewhere: ask for a stronger match */
+  const stranger = toks(nf).some((w) => w.length >= 4 && !DF[w] && !VOCAB.has(w)), need = stranger && !(best && best.ph) ? 6 : 3.2;
+  if (best && best.s >= need) { MEM.last = best.e; MEM.lastMore = false; MEM.lastList = null; { const c1 = COLLS.find((c) => c.name === best.e.title); if (c1) MEM.coll = c1; }
     const out = fromEntry(best.e);
     if (second && second.s >= 3.2 && second.s > best.s * 0.82 && !out.chips.includes(second.e.title)) out.chips = [second.e.title, ...out.chips].slice(0, 3);
     return out; }
