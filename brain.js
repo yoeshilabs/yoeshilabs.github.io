@@ -136,6 +136,7 @@ const pick = (a) => a[Math.floor(rnd() * a.length)];
 const shuffled = {}; const draw = (g) => { const L = SCROLL.groups[g] || []; if (!L.length) return ""; let q = shuffled[g];
   if (!q || !q.length) { q = shuffled[g] = L.slice().sort(() => rnd() - 0.5); } return q.pop(); };
 const Q = new URLSearchParams(location.search), V0 = (Q.get("viewer") || "").trim(), VIEWER = /^(tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$/.test(V0) ? V0 : "";   /* SECURITY: a real address or nothing */
+if (window.MAESTRO_SITE) document.title = "Yoeshi Labs \u00b7 Maestro, the concierge (Beta)";   /* the engine names the tab after the cat; the website names it after the studio */
 /* the website edition (window.MAESTRO_SITE) may hand out links: only to these hosts, only https, only from his scroll */
 const SITE = !!window.MAESTRO_SITE, SAFE_HOSTS = ["yoeshilabs.github.io", "aleatory.art", "objkt.com", "x.com", "linktr.ee", "teia.art", "tzkt.io", "yoeshi.art"];
 const safeLink = (h) => { try { const u = new URL(h); return u.protocol === "https:" && SAFE_HOSTS.includes(u.hostname) && !u.username && !u.password ? u.href : null; } catch (e) { return null; } };
