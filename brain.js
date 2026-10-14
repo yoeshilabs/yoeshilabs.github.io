@@ -146,6 +146,11 @@ const Q = new URLSearchParams(location.search), V0 = (Q.get("viewer") || "").tri
 if (window.MAESTRO_SITE) document.title = "Yoeshi Labs \u00b7 Maestro, the concierge (Beta)";   /* the engine names the tab after the cat; the website names it after the studio */
 /* the website edition (window.MAESTRO_SITE) may hand out links: only to these hosts, only https, only from his scroll */
 const SITE = !!window.MAESTRO_SITE, SAFE_HOSTS = ["yoeshilabs.github.io", "aleatory.art", "objkt.com", "x.com", "linktr.ee", "teia.art", "tzkt.io", "yoeshi.art", "tezoscommons.org", "radio.tezoscommons.org"];
+/* companion mode: opened inside another wing (companion.js) as a panel; he knows which wing he followed you to */
+const COMPANION = SITE && Q.get("companion") === "1" && window.parent !== window;
+const WINGS = { prancers: ["the Prancer Purranchise", ["Tell me about Prancers", "How do I mint?", "Where can I go?"]] };
+const WING = WINGS[Q.get("from")] || ["this wing of Yoeshi Labs", ["Where can I go?", "Who is Yoeshi?"]];
+const SITE_HOME = "yoeshilabs.github.io";
 const safeLink = (h) => { try { const u = new URL(h); return u.protocol === "https:" && SAFE_HOSTS.includes(u.hostname) && !u.username && !u.password ? u.href : null; } catch (e) { return null; } };
 const short = (a) => a.length > 14 ? a.slice(0, 6) + "\u2026" + a.slice(-4) : a;
 const MEM = { name: "", last: null, turns: 0, heavy: 0 };
@@ -158,6 +163,7 @@ const DEFAULT_CHIPS = ["Who are you?", "Who is Yoeshi?", "Tell me about the Pran
 const SITE_CHIPS = ["Where can I go?", "The Prancer Purranchise", "Who is Yoeshi?", "Yoeshi Labs music"];
 const greeting = () => {
   const who = MEM.name ? `Welcome back, ${MEM.name}.` : VIEWER ? `Welcome, friend from ${short(VIEWER)}.` : "Welcome, friend.";   /* everyone is greeted as a newcomer */
+  if (COMPANION) return `${MEM.name ? `Hello again, ${MEM.name}.` : "Hello again."} I followed you to ${WING[0]}. Ask me anything about it, or anything else in Yoeshi Labs.`;
   if (SITE) return `${MEM.name ? `Welcome back to Yoeshi Labs, ${MEM.name}.` : "Welcome to Yoeshi Labs."} I am Maestro, your concierge.\n\nWhere would you like to go?`;   /* short and warm: the beta notice lives in the header and under the input */
   return `${who} I am Maestro, the Buddha Kitty.\n\nWhat would you like to know?`;
 };
@@ -356,6 +362,7 @@ body.mz-wide #mz{left:auto;right:16px;top:16px;bottom:16px;height:auto;width:var
 .mz-m p{margin:0 0 .55em} .mz-m p:last-child{margin:0} .mz-m ul{margin:.2em 0 .55em;padding-left:1.15em} .mz-m li{margin:.15em 0} .mz-m b{color:#ffe3a6;font-weight:700} .mz-m em{color:#d8c6a6}
 .mz-beta{flex:none;padding:4px 9px 3px;border-radius:999px;border:1px solid #f0b44a;color:#f0b44a;font:700 11px/1 ui-rounded,system-ui,sans-serif;letter-spacing:1.5px;text-transform:uppercase}
 .mz-note{padding:0 14px 10px;margin-top:-4px;font-size:11.5px;line-height:1.35;color:#bda98a;text-align:center}
+body.mz-companion #mz-open{display:none} body.mz-companion #mz{left:0!important;right:0!important;bottom:0!important;width:auto!important;border-radius:0;border:0;border-top:1px solid rgba(255,214,140,.25)}   /* edge to edge inside the wing's panel */
 .mz-links{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.mz-links a{display:inline-block;padding:7px 13px;border-radius:999px;background:#f0b44a;color:#2a1704;font:600 13px/1.1 ui-rounded,system-ui,sans-serif;text-decoration:none}.mz-links a:hover{background:#ffc75e}.mz-links a:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .mz-b{font-size:24px;letter-spacing:2px;text-align:center;padding:6px 0;color:#ffe3a6}
 #mz-chips{display:flex;flex-wrap:wrap;gap:7px;padding:4px 14px 10px;flex:none}   /* they wrap: every suggestion visible, no hidden scrolling */
@@ -413,8 +420,13 @@ const fmt = (t) => t.split(/\n{2,}/).map((blk) => { let h = "", para = [], list 
 const plain = (t) => t.replace(/\*\*(.+?)\*\*/g, "$1").replace(/(^|\s)_(.+?)_/g, "$1$2").replace(/^- /gm, "\u2022 ");
 const add = (cls, html) => { const d = document.createElement("div"); d.className = cls; d.innerHTML = html; LOG.appendChild(d); LOG.scrollTop = LOG.scrollHeight; return d; };
 function addLinks(el, links) { const row = document.createElement("div"); row.className = "mz-links";
-  for (const l of links) { const href = safeLink(l.href); if (!href) continue; const a = document.createElement("a"); a.href = href; a.textContent = l.label + " \u2197";
-    if (new URL(href).hostname !== location.hostname) { a.target = "_blank"; a.rel = "noopener noreferrer"; } a.referrerPolicy = "no-referrer"; row.appendChild(a); }
+  for (const l of links) { let href = safeLink(l.href); if (!href) continue; const u = new URL(href), here = u.hostname === SITE_HOME || u.hostname === location.hostname;
+    if (here) { if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) { u.protocol = location.protocol; u.host = location.host; }   /* a local copy keeps its links local */
+      if (u.pathname !== new URL("./", location.href).pathname || COMPANION) u.searchParams.set("maestro", "1"); href = u.href; }
+    const a = document.createElement("a"); a.href = href; a.textContent = l.label + " \u2197";
+    if (!here) { a.target = "_blank"; a.rel = "noopener noreferrer"; } else if (COMPANION) a.target = "_top";
+    if (here) a.addEventListener("click", () => { try { sessionStorage.setItem("maestro.follow", "1"); } catch (e) {} });   /* he follows you there */
+    a.referrerPolicy = "no-referrer"; row.appendChild(a); }
   if (row.children.length) el.appendChild(row); }
 const keep = (el) => { LOG.scrollTop = Math.min(el.offsetTop - 10, LOG.scrollHeight - LOG.clientHeight); };   /* a long answer keeps its first line in view */
 const status = (s, th) => { ST.lastChild.textContent = s; ST.classList.toggle("th", !!th); };
@@ -462,9 +474,10 @@ function stopBreath() { BREATH.on = false; timers.forEach(clearTimeout); timers 
 /* ================================================================ opening and closing */
 let greeted = false;
 function show() { document.body.classList.add("mz-on"); layout(); M.sound();
-  if (!greeted) { greeted = true; speak({ text: greeting(), chips: SITE ? SITE_CHIPS : DEFAULT_CHIPS }); }
+  if (!greeted) { greeted = true; speak({ text: greeting(), chips: COMPANION ? WING[1] : SITE ? SITE_CHIPS : DEFAULT_CHIPS }); }
   if (matchMedia("(pointer: fine)").matches) setTimeout(() => IN.focus(), 360); }
-function hide() { document.body.classList.remove("mz-on"); layout(); open.focus({ preventScroll: true }); }
+function hide() { if (COMPANION) { parent.postMessage({ type: "maestro:close" }, location.origin); return; }   /* the wing folds the panel away */
+  document.body.classList.remove("mz-on"); layout(); open.focus({ preventScroll: true }); }
 open.addEventListener("click", show); $("mz-x").addEventListener("click", hide);
 /* no <form>: objkt's sandbox may block form submission, so Enter and the button send directly */
 $("mz-go").addEventListener("click", () => send(IN.value));
@@ -473,6 +486,7 @@ IN.addEventListener("input", lookAtChat); IN.addEventListener("focus", lookAtCha
 addEventListener("keydown", (e) => { if (e.key === "Escape" && document.body.classList.contains("mz-on")) hide();
   else if ((e.key === "/" || e.key === "Enter") && !document.body.classList.contains("mz-on") && document.activeElement === document.body) { e.preventDefault(); show(); } });
 /* on the website the concierge greets you himself on wide screens, after a breath */
-if (SITE && innerWidth - innerHeight > 300 && innerWidth > 1100) setTimeout(() => { if (!document.body.classList.contains("mz-on")) show(); }, 1600);
+if (COMPANION) { document.body.classList.add("mz-companion"); show(); }
+else if (SITE && innerWidth - innerHeight > 300 && innerWidth > 1100) setTimeout(() => { if (!document.body.classList.contains("mz-on")) show(); }, 1600);
 window.MAESTRO_BRAIN = { respond, search, mend, COLLS, HEART, SCROLL, send, open: show, close: hide };
 })();

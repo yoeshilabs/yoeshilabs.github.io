@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-Q7y/CEVWK0csiiGNl6ZVQsm433ziDZmlOG2Az+ZQqD4=' 'sha256-+Gw2Id/gc+wpGp2ze+ycNQ2nGSWzewIQNsonKsOxDJI=' 'sha256-vDeMCShT2Nr6RhwkXPqri18I24nqrH9S2NBwRoaWrqM='; style-src 'unsafe-inline'; img-src 'self' data: blob:; media-src 'none'; connect-src 'none'; font-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-Q7y/CEVWK0csiiGNl6ZVQsm433ziDZmlOG2Az+ZQqD4=' 'sha256-f8M32nVDa4oJtFzBzyG/Vf24Kd7FCKzxTnyS1OiXPM8=' 'sha256-vDeMCShT2Nr6RhwkXPqri18I24nqrH9S2NBwRoaWrqM='; style-src 'unsafe-inline'; img-src 'self' data: blob:; media-src 'none'; connect-src 'none'; font-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Yoeshi Labs &middot; Maestro, the concierge (Beta)</title>
@@ -1911,7 +1911,7 @@ const OUTLINE = "Ink";
 if (OUTLINE === "Ink") {
   const lum = (c) => { if (!c || !c.startsWith("#")) return 0.5; const [r, g, b] = [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16) / 255); return 0.3 * r + 0.59 * g + 0.11 * b; };
   const dark = NEON || CIB || lum(bodyFill) < 0.22;
-  const f = E("filter", { id: "ink", filterUnits: "userSpaceOnUse", x: -1500, y: -1500, width: 4000, height: 4000 }, defs);   /* MAESTRO: never clips a raised arm */
+  const f = E("filter", { id: "ink", x: "-50%", y: "-50%", width: "200%", height: "200%" }, defs);   /* MAESTRO: room for a raised arm, small enough for phones */
   if (dark) { E("feMorphology", { in: "SourceAlpha", operator: "dilate", radius: 5, result: "l" }, f); E("feFlood", { "flood-color": "#e9e2f2", "flood-opacity": 0.55 }, f); E("feComposite", { in2: "l", operator: "in", result: "lo" }, f); }
   E("feMorphology", { in: "SourceAlpha", operator: "dilate", radius: 3, result: "d" }, f); E("feFlood", { "flood-color": "#120d16" }, f); E("feComposite", { in2: "d", operator: "in", result: "o" }, f);
   const m = E("feMerge", {}, f); for (const i of dark ? ["lo", "o", "SourceGraphic"] : ["o", "SourceGraphic"]) E("feMergeNode", { in: i }, m);
