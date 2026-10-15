@@ -7,6 +7,11 @@
  *   ask: q1 | q2       follow-up questions offered as buttons after he answers.
  *   (text)             his answer, in his own voice. Blank lines make paragraphs; "- " makes a list; **bold** works.
  *   +++                anything after this line is what he adds when you say "tell me more".
+ *   # Meanings         "- phrase | other phrase => @Entry Title": different ways people say the same thing. Each phrase is compared
+ *                      word by word (endings trimmed, one filler word allowed), so write it the way a visitor would type it.
+ *                      "=> @unknown" marks questions from outside the garden (sports, news, weather).
+ *   # Tones            "- tone: phrase | phrase": how a question feels (discouraged, alarmed, frustrated, skeptical, newcomer,
+ *                      excited). He meets the feeling first, then answers.
  * Facts are as of October 2026, when Maestro was made. Never put back-ticks in this file.
  */
 window.MAESTRO_CONTEXT = `
@@ -723,6 +728,15 @@ An NFT is a one-of-a-kind record on a blockchain that says who holds a particula
 
 Every Prancer is an NFT whose artwork is the generator code itself, stored on chain, so holding one means holding a living piece that draws itself fresh every time it opens.
 
+## Is this legit
+keys: is this legit, legit, is this a scam, is it a scam, scam project, rug, rug pull, rugpull, can i trust this, trustworthy, ponzi, cash grab, is this real, is it real
+ask: Fully on-chain | Should I buy? | Is connecting my wallet safe
+A fair thing to ask of any project, and a healthy habit. Here is what you can check for yourself instead of taking my word for it:
+- **Yoeshi has been here since the beginning.** His first mints were OBJKT #18 to #25 on Hic et Nunc in February 2021, and five years of his work sit on the same public wallet, yoeshilabs.tez.
+- **The art lives on chain.** Every chapter's generator is a Tezos contract you can look up on tzkt.io. If every website vanished, the cats would still be drawn from the chain.
+- **No price talk, ever.** I will never tell you a cat will go up in value. You are collecting a piece of art, and the art is yours.
+- **You never hand over your keys.** Minting happens on Aleatory, from your own wallet. Mint only from the official links, and treat any DM offering a mint, a claim or a prize as a scam.
+
 ## What is generative art
 keys: generative art, generative, what is generative, long form, algorithmic art, code art, random, seed, hash, mint hash, how is my cat chosen, how is it random
 ask: Aleatory | What is an NFT? | Fully on-chain
@@ -819,6 +833,66 @@ ask: The Prancer Purranchise | Trancers | Who is Yoeshi?
 - **8 October 2026**: the first laser-eyed Prancer is found and the secret comes out.
 - **October 2026**: Prancer PFP, then Wild Ride with scuni the very next day.
 - **14 October 2026**: I am made, a one of one for objkt.
+
+# Meanings
+- what is this place | what is this site | what is all this | what is this website | where do i start | first time here | new here | where am i | im lost here | what is this place even | whats this place => @Where can I go
+- what are you | who are you | what are you exactly => @Who is Maestro
+- see my wallet | access my wallet | read my wallet | take my tez | touch my wallet => @Is connecting my wallet safe
+- real person | a human | someone typing | person typing | chatbot | robot | language model | llm => @Are you an AI
+- how smart | understand me | do you learn | do you remember | can you think | how do you work | how do you know things => @My limits
+- background | bio | biography | guy who made | person behind | behind this | runs yoeshi labs | founder | who built this | who made this | about the artist => @Who is Yoeshi
+- how long has yoeshi | when did yoeshi start | when did he start | early hic et nunc | hen artist | first nft | og artist => @Yoeshi's Tezos story
+- what has yoeshi minted | his collections | what has he minted | list his work | everything he minted => @Yoeshi's collections
+- album | albums | musician | hear his | his song | yoeshis song | hear yoeshi | listen to yoeshi | his music | spotify | soundcloud | producer | beats | rapper | songs by yoeshi => @Yoeshi Labs music
+- tarot | tarot card | tarot reading | card reading => @heART Tarot
+- podcast | twitter space | x space | weekly space | episode | episodes | live show | radio show | old episodes | recordings => @Artz Friday
+- sell my art | nobody buys | no one buys | no sales | cant sell | cannot sell | not selling | never sell | quit making art | give up on art | stop making art | new artist | feel like a fraud | imposter | my mints never | starting as an artist => @Advice for artists
+- start collecting | new collector | how to collect | collecting tips | what should i collect | first time collecting | tips for collectors => @Advice for collectors
+- dancing cat | dance cat | cat that dance | walking cat | living cat | cat alive | cat move | special about these cat | about these cat => @Prancers
+- cat color | cat colour | coat color | orange cat | some cat orange | cat pattern | stripes | calico | tabby | colors decided | colour decided => @Prancers traits and genetics
+- rare | rarest | rarity | legendary | uncommon | rare trait => @Rarity
+- little house | little houses | cat house | dollhouse | cat home | doll house => @Prancer Pads
+- profile picture | profile pic | my pfp | as my avatar | make it my pfp => @Prancer PFP
+- otter collab | cat and otter | cat with the otter | otter ride => @Wild Ride
+- made the otter | drew the otter | otter artist | who made otter => @Who is scuni
+- desktop | computer screen | on my screen | desk pet | on my computer | cat on my desk => @Desk Prancers
+- turn my cat into a gif | make a gif | gif of my cat | animated gif => @The Lab
+- post my gif | share the gif | share my gif | gif on x | gif on instagram | post the gif => @Sharing a GIF
+- buy one | get a cat | get one | where to buy | where do i buy | how to buy | buy a prancer | mint one | get a prancer => @How do I mint
+- marketplace | which platform | where is it sold | where are they sold | sold on => @Aleatory
+- blockchain is this | which chain | what chain | which blockchain | what blockchain => @Tezos
+- get tez | some tez | buy tez | buy xtz | buy tezos | exchange | coinbase | kraken | binance | onramp => @Getting tez
+- earn interest | passive income | yield | apy | stake | staking | delegate | delegation | earn reward => @Baking and staking
+- site goes down | website goes down | site dies | site disappear | cat disappear | on a server | image on a server | ipfs | stored | storage | hosted | where is the art | forever | permanent => @Fully on-chain
+- upcoming | next drop | roadmap | coming soon | future plans | next for yoeshi labs | whats next | anything new => @What is next
+- twitter | instagram | socials | social media | follow yoeshi | his handle | x account | discord | contact yoeshi | reach yoeshi | dm yoeshi => @Where to follow
+- ape in | worth buying | worth it | good investment | investment | go up in value | flip | profit | moon | roi | make money => @Should I buy
+- dont get nft | even is an nft | explain nft | nft mean | nft stand for => @What is an NFT
+- temple | kukai | umami | which wallet | what wallet | best wallet | wallet should i use => @Wallets
+- asked for my seed | asked for my 12 | asked for my recovery | asked for my private key | ask for my seed | drained | hacked | stolen | scammed | got scammed | phishing | verify my wallet | support agent | i won a | says i won | connect to claim | free mint dm => @Scams and safety
+- recovery words | secret words | backup phrase | recovery phrase | keep my recovery => @Seed phrase
+- gas | gas fee | transaction cost | network fee | expensive to mint => @Fees
+- where are my | cant find my | cannot find my | dont see my | not showing | i bought one where | my prancers gone => @Finding your cats
+- screen reader | blind | deaf | colorblind | color blind | reduced motion | keyboard only | disability | disabled => @Accessibility
+- use ai | uses ai | made with ai | ai made | did ai make | ai generated | ai art | made by ai | written by ai => @Is Yoeshi Labs anti-AI
+- values | believe in | beliefs | principles | ethos | mission | stand for => @What does Yoeshi Labs believe
+- hen | hic et nunc | teia | what happened to hen => @Hic et Nunc and Teia
+- collab with | collaborate | work with other artists | collab with other => @Collaborations
+- project timeline | history of the project | when did each | key dates => @Timeline
+- science | scientific | research behind | how they walk | gait | real cat movement | studied cats => @The research behind the cats
+- no sound | hear nothing | cant hear | cannot hear | muted | silent | no audio | sound not working => @How to play with me
+- tez domain | dot tez | tez name | tez address name => @Tezos domains
+- generative | just random | made by code | algorithmic art => @What is generative art
+- objkt | objkt com | sell on objkt | list on objkt => @objkt
+- super bowl | world cup | weather | president | election | bitcoin price | btc price | stock market | movie | recipe | sports score | football | basketball | celebrity | news today => @unknown
+
+# Tones
+- discouraged: nobody buys | no one buys | no sales | not selling | never sell | cant sell | cannot sell | i failed | failure | give up | giving up | want to quit | quit making | no one care | nobody care | not good enough | feel like a fraud | imposter | worthless | pointless | whats the point
+- alarmed: drained | hacked | stolen | scammed | compromised | asked for my seed | asked for my 12 | asked for my recovery | asked for my private key | says i won | i won a | verify my wallet | connect to claim
+- frustrated: cant find | cannot find | doesnt work | does not work | not working | broken | bug | glitch | confusing | confused | makes no sense | ugh | wtf | annoying | hear nothing
+- skeptical: scam | rug | rugpull | legit | ponzi | cash grab | trust this | worth it | why should i
+- newcomer: new here | first time | im new | i am new | new to | beginner | noob | never used | dont understand | dont get | even is | where do i start
+- excited: love this | so cool | amazing | awesome | cant wait | omg | wow | obsessed | this is beautiful
 
 # Collections
 - Prancers | chapter: 01 | editions: 256 | price: 10 tez | launched: on 1 October 2026 | platform: Aleatory | generator: KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw | play: tap the cat and it reacts and sings; M mutes and I shows its card | aliases: prancers, prancer, original prancers, chapter 1, chapter one, chapter 01, the first collection, walking cats

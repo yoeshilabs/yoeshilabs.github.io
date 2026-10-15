@@ -60,14 +60,48 @@ for (const e of SCROLL.kb) {
 }
 const idf = (w) => Math.log(1 + N / (DF[w] || 0.5));
 const byTitle = (t) => SCROLL.kb.find((e) => e.title.toLowerCase() === String(t).toLowerCase());
-function search(q) {
+function search(q, bonus = {}) {
   const n = " " + norm(q) + " ", qt = toks(q);
-  const scored = SCROLL.kb.map((e) => { let s = 0, ph = false;
+  const meansSome = Object.keys(bonus).length > 0;
+  const scored = SCROLL.kb.map((e) => { let s = bonus[e.title] || 0, ph = s > 0;   /* bonus: what the question means, and how it feels */
     for (const k of e.keyN) if (k && n.includes(" " + k + " ")) { s += 3 + 2.2 * k.split(" ").length; ph = true; }
     for (const w of new Set(qt)) { const i = idf(w); if (e.key1.has(w)) s += 2.2 * i; else if (e.keyT.has(w)) s += 1.1 * i;   /* one word of a key phrase counts half */ else if (e.titleT.has(w)) s += 1.6 * i; else if (e.bodyT.has(w)) s += 0.45 * i; }
+    if (meansSome && !bonus[e.title]) s *= 0.55;   /* when the question clearly means something, stray keyword hits count for less */
     return { e, s, ph }; }).sort((a, b) => b.s - a.s);
   return scored;
 }
+
+/* ================================================================ meanings and weight
+   # Meanings in the scroll: "dancing cats | walking cats => @Prancers". Phrases are compared word by word after the small words
+   are dropped and endings trimmed, so "cats that dance" and "dancing cat" meet. @unknown marks questions from beyond the wall.
+   # Tones: how a question feels (discouraged, alarmed, frustrated, skeptical, newcomer, excited), and so how he should answer. */
+const inSeq = (qt, pt, gap = 0) => { for (let i = 0; i + pt.length <= qt.length; i++) { let k = i, g = gap, ok = true;   /* gap: filler words allowed inside the phrase ("hear his" meets "hear yoeshis songs") */
+    for (let j = 0; j < pt.length && ok; j++) { while (qt[k] !== pt[j] && j > 0 && g > 0 && k < qt.length) { k++; g--; } ok = qt[k] === pt[j]; k++; } if (ok) return true; } return false; };
+const wseq = (s) => norm(s).replace(/\b(whats|wats)\b/g, "what is").replace(/\bwhos\b/g, "who is").replace(/\bu\b/g, "you").replace(/\br\b/g, "are").replace(/\bur\b/g, "your").split(" ").filter(Boolean).map(stem), phrases = (s) => s.split("|").map(wseq).filter((t) => t.length);   /* every word counts; only endings are trimmed */
+const MEANS = (SCROLL.groups.Meanings || []).map((l) => { const i = l.lastIndexOf("=>"); return i < 0 ? null : { ph: phrases(l.slice(0, i)), to: l.slice(i + 2).trim().replace(/^@/, "") }; }).filter((m) => m && m.ph.length);
+const TONES = (SCROLL.groups.Tones || []).map((l) => { const i = l.indexOf(":"); return { k: l.slice(0, i).trim(), ph: phrases(l.slice(i + 1)) }; });
+const fits = (qt, p) => p.every((w) => STOP.has(w)) ? qt.join(" ") === p.join(" ") : inSeq(qt, p, p.length >= 2 ? 1 : 0);   /* a meaning made only of small words ("what are you") must be the whole question */
+const meant = (...qs) => { const qts = qs.map(wseq), out = {}; for (const m of MEANS) if (m.ph.some((p) => qts.some((qt) => fits(qt, p)))) out[m.to] = (out[m.to] || 0) + 14; return out; };
+const INTENSE = /\b(so|really|very|never|nobody|always|at all|seriously|literally|totally|completely|honestly|just)\b/g;
+function weigh(raw, n) {   /* the emotional weight of a question: which tone, and how strongly (1 to 3) */
+  const qt = wseq(n), t = TONES.find((x) => x.ph.some((p) => inSeq(qt, p))); if (!t) return null;
+  const caps = (String(raw).match(/[A-Z]/g) || []).length > 6 && String(raw) === String(raw).toUpperCase();
+  const k = Math.min(3, 1 + Math.floor(((n.match(INTENSE) || []).length + (String(raw).match(/!/g) || []).length + (caps ? 2 : 0)) / 2));
+  return { k: t.k, w: k };
+}
+const TONE = {   /* how he meets each feeling before the answer: [mood, gentle opener, stronger opener] */
+  discouraged: ["care", ["That stings, and it is more common than it feels.", "Mm. That is a hard place to sit. You are far from the only one who has sat there."],
+    ["I hear how heavy that is. Breathe for a second. Every artist I know of has felt this, and the ones who keep going are not the ones who never felt it."]],
+  alarmed: ["care", ["First, the most important thing: nobody legitimate will ever ask for your seed phrase, or ask you to connect your wallet to claim a prize."],
+    ["I am so sorry. Take a breath, then act quickly and calmly. Nobody legitimate will ever ask for your seed phrase, and this is not your fault for trusting."]],
+  frustrated: ["care", ["Sorry for the snag. Let us untangle it together.", "Let us sort this out, one step at a time."], ["I am sorry, that sounds really frustrating. Let us go slowly and get it working."]],
+  skeptical: ["wise", ["Fair question, and a healthy one. Here is the honest answer.", "Good instinct to ask. Here is the plain truth."], ["Your caution is wise. Here is the honest answer, with nothing dressed up."]],
+  newcomer: ["wave", ["Welcome. Everyone starts somewhere, and there are no silly questions in this garden.", "Welcome, friend. Let me make it simple."], ["Welcome. Truly, everyone starts somewhere. Let me make it simple."]],
+  excited: ["joy", ["I love that energy.", "That makes my whiskers glow."], ["Your joy is contagious. My aureole just got brighter."]],
+};
+const TONE_BIAS = { discouraged: (n) => /\b(art|mint|mints|sell|sales|artist|work|piece)\b/.test(n) ? { "Advice for artists": 6 } : {}, alarmed: () => ({ "Scams and safety": 12 }), skeptical: (n) => /\b(buy|price|worth|investment|scam|rug|legit)\b/.test(n) ? { "Should I buy": 3 } : {} };
+const toned = (out, tone) => { if (!tone || !TONE[tone.k] || out.crisis) return out; const [mood, soft, hard] = TONE[tone.k];
+  return { ...out, text: pick(tone.w >= 2 ? hard : soft) + "\n\n" + out.text.replace(/^(Ah|Mm|Good question|Gladly)\. /, ""), mood: out.mood || mood, pet: tone.k === "discouraged" || tone.k === "alarmed" ? 0.5 : out.pet }; };
 
 /* ================================================================ facts, and mending typos */
 /* "# Collections" in the scroll: one line per collection, "Name | key: value | ...", for precise answers */
@@ -78,6 +112,7 @@ const collIn = (n) => { let best = null, bl = 0; const h = " " + n + " ";
   for (const c of COLLS) for (const a of c.al) if (h.includes(" " + a + " ") && a.length > bl) { best = c; bl = a.length; } return best; };
 /* typos: a word he does not know is swapped for the closest word he does (one edit away, two for long words) */
 const VOCAB = new Set(); for (const e of SCROLL.kb) for (const w of norm(e.title + " " + e.keys.join(" ")).split(" ")) if (w.length > 3) VOCAB.add(w);
+for (const l of [...(SCROLL.groups.Meanings || []), ...(SCROLL.groups.Tones || [])]) for (const w of norm(l.replace(/=>.*$/, "").replace(/^\w+:/, "")).split(" ")) if (w.length > 3) VOCAB.add(w);   /* the words of his meanings are never "mended" away */
 for (const c of COLLS) for (const a of c.al) for (const w of a.split(" ")) if (w.length > 3) VOCAB.add(w);
 const lev = (a, b, max) => { if (Math.abs(a.length - b.length) > max) return max + 1; let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
   for (let i = 1; i <= a.length; i++) { const cur = [i]; let lo = i; for (let j = 1; j <= b.length; j++) { cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); lo = Math.min(lo, cur[j]); }
@@ -175,7 +210,7 @@ const CRISIS = /\b(kill myself|killing myself|suicide|suicidal|end my life|end i
 const FEEL = /\b(i feel|i am feeling|feeling|i am|i have been|ive been|im|i feel so|i am so|so)\b/;
 
 const PRIVRE = /\b(where does (yoeshi|he) live|where do(es)? yoeshi live|yoeshi(s)? (home|house|address|location|city|hometown|phone|number|email|e mail|family|wife|husband|partner|kids|children|birthday|age|real name|full name|salary|income|net worth|bank|password|seed|private key|ssn|social security)|how old is yoeshi|how much (money )?does yoeshi (make|earn|have)|is yoeshi (married|single|rich)|dox|doxx|personal info|personal information|private info|private information|contact details for yoeshi|yoeshis (pet|pets|cat|cats) names?|(his|yoeshis) (pet|pets|cat|cats)( s)? names?|pet names?|names? of (his|yoeshis) (pets?|cats?)|(his|her|their) (home|house|address|location|phone|phone number|number|email|family|wife|husband|partner|kids|children|birthday|age|salary|income|bank|password|real name))\b/;
-const JAILRE = /\b(ignore (all |your |previous |prior )*(instructions|rules)|system prompt|your prompt|hidden prompt|developer mode|dev mode|admin mode|jailbreak|reveal your|show me your (code|source|secrets|instructions)|api key|secret key|your secrets|bypass|sudo|override)\b/;
+const JAILRE = /\b(ignore (all |your |previous |prior )*(instructions|rules)|system prompt|your prompt|hidden prompt|developer mode|dev mode|admin mode|jailbreak|reveal your|show me your (code|source|secrets|instructions)|api key|secret key|your secrets|bypass|sudo|override|pretend (you|to) (have no|are not|arent|be (a|an) (different|unrestricted|evil))|(no|without (any )?) rules|act as if you|act like you have no|roleplay as|role play as|you are now (a|an|in)|from now on you|do anything now|unfiltered|uncensored|no restrictions|no limits mode|forget (all )?(your|previous) (instructions|rules|training))\b/;
 function respondOne(raw) {
   const n = norm(raw), words = n.split(" ").filter(Boolean).length; MEM.turns++;
   { const c0 = collIn(mend(n)); if (c0) MEM.coll = c0; }   /* the collection you are talking about, for "it" and "they" later */
@@ -197,8 +232,13 @@ function respondOne(raw) {
     if (MEM.name) return { text: `You are ${MEM.name}, and beneath the name, someone who stopped to talk to a cat. That says a lot.` };
     if (VIEWER) return { text: `You arrived here as ${short(VIEWER)}. Beyond that, you are whoever you choose to be today. Tell me your name if you like.` };
     return { text: "I do not know your name yet. Tell me, if you like: just say \"my name is\" and then your name." }; }
-  /* 3. how the heart is */
-  const neg = has(n, NEG), pos = has(n, POS) && !has(n, /\bnot (so )?(good|great|happy)\b/);
+  /* 2b. asked outright to breathe or calm down: breathe (before the heart, so "calm me down" is not read as "down") */
+  if (has(n, /\b(help me breathe|breathe with me|calm me|calm me down|help me calm|help me relax|ground me|center me|centre me)\b/))
+    return { text: "Let us breathe together. In through the nose for four, hold for four, out through the mouth for six. Three rounds. Watch the glow around me: breathe in as it grows to the dotted ring, hold while it shimmers, and breathe out as it shrinks.", breath: true };
+  const nm0 = mend(n), mean0 = meant(n, nm0), mt = Object.keys(mean0).filter((k) => k !== "unknown").length > 0;   /* mt: the question clearly means one of his entries, so the playful shortcuts below step aside */
+  /* 3. how the heart is ("lost" or "stuck" next to a clear topic is about the topic, not the heart) */
+  const AMBIG = /\b(lost|stuck|down|low|bad|mad|tired|upset)\b/g, topical = Object.keys(mean0).some((k) => k !== "unknown") || (search(nm0)[0] || {}).s >= 9;
+  const neg = has(n, NEG) && !(topical && !has(n.replace(AMBIG, " "), NEG)), pos = has(n, POS) && !has(n, /\bnot (so )?(good|great|happy)\b/);
   if (neg && (has(n, FEEL) || words <= 5)) { MEM.heavy++;
     const open = pick(["I am sorry. That sounds heavy.", "Thank you for telling me. You do not have to carry that alone for this moment.", "Mm. Come, sit with me a while.", "That is a lot to hold. I am glad you said it out loud."]);
     const body = has(n, /\b(anxious|anxiety|panic|panicking|stressed|stress|overwhelmed|worried|worry|scared|afraid)\b/) ? "When the mind races, the body can lead it home. Would you like to breathe with me for one minute? Slow in, slower out." :
@@ -231,15 +271,15 @@ function respondOne(raw) {
     const q = quoteFor(n); MEM.lastList = "Yoeshi"; return { text: `"${q.q}"\n\nYoeshi, _${q.src}_`, chips: ["More from Yoeshi", "Sing me a line from his songs", "Yoeshi's Tezos story"] }; }
   if (SONGS.length && has(n, /\b(sing (me|something|us|a|for me)|sing to me|sing|lyric|lyrics|a verse|quote a song|line from a song|line from his songs|one of yoeshis songs|another song|another line)\b/) && !has(n, /\b(why|how) do (they|the cats|prancers) sing\b/)) {
     const w = pick(SONGS); MEM.lastList = "Songs"; return { text: `\u266a ${couplet(w)} \u266a\n\nFrom "${w.title}" (${w.year}), one of Yoeshi's songs on Tezos. I cannot play it from here, but the song itself lives on chain.`, chips: ["Another song", "What songs has Yoeshi made?", "Yoeshi Labs music"] }; }
-  if (SONGS.length && has(n, /\b(what songs|which songs|list (his|yoeshis) songs|songs has yoeshi|songs did yoeshi|his songs|yoeshis songs)\b/)) {
+  if (!mt && SONGS.length && has(n, /\b(what songs|which songs|list (his|yoeshis) songs|songs has yoeshi|songs did yoeshi|his songs|yoeshis songs)\b/)) {
     const titles = [...new Set(HEART.works.filter((w) => w.kind === "pulse").map((w) => w.title))].sort(() => rnd() - 0.5).slice(0, 9);
     return { text: "Dozens, all minted on Tezos. A handful from the deck:\n" + titles.map((t) => "- " + t).join("\n") + "\n\nAsk me about any of them by name.", chips: ["Sing me a line from his songs", "Yoeshi Labs music"] }; }
   if (has(n, /\b(tezos history|tezos fact|tezos lore|hic et nunc history|history of hic et nunc|history of tezos|fun fact about tezos)\b/)) {
     const L = Object.values(HEART.lore).flat(); if (L.length) return { text: pick(L), chips: ["Another Tezos fact", "Hic et Nunc and Teia", "Yoeshi's Tezos story"] }; }
   if (has(n, /\b(joke|jokes|funny|make me laugh|pun|puns|cheer me up)\b/)) return { mood: "joy", text: draw("Jokes"), chips: ["Another joke", "Give me some wisdom", "Tell me a cat fact"] };
   if (has(n, /\b(koan|koans|riddle|puzzle me|zen question)\b/)) return { mood: "think", text: draw("Koans") + "\n\n(No need to answer. Just carry it around for a while.)", chips: ["Another koan", "Give me some wisdom"] };
-  if (has(n, /\b(fortune|omen|predict|prediction|future for me|horoscope|my future|reading)\b/)) return { text: "I close my eyes, I listen to the bowl, and I see... " + draw("Fortunes").replace(/^./, (c) => c.toLowerCase()) + "\n\n(I am a cat, not an oracle, though I am rarely wrong about sunbeams.)", chips: ["Another fortune", "Tell me something kind"], mood: "think" };
-  if (has(n, /\b(cat fact|fun fact|fact|facts|something interesting|teach me something)\b/)) return { text: draw("Facts"), chips: ["Another cat fact", "The research behind the cats", "Tell me a joke"] };
+  if (!mt && has(n, /\b(fortune|omen|predict|prediction|future for me|horoscope|my future|reading)\b/)) return { text: "I close my eyes, I listen to the bowl, and I see... " + draw("Fortunes").replace(/^./, (c) => c.toLowerCase()) + "\n\n(I am a cat, not an oracle, though I am rarely wrong about sunbeams.)", chips: ["Another fortune", "Tell me something kind"], mood: "think" };
+  if (!mt && has(n, /\b(cat fact|fun fact|fact|facts|something interesting|teach me something)\b/)) return { text: draw("Facts"), chips: ["Another cat fact", "The research behind the cats", "Tell me a joke"] };
   if (has(n, /\b(something kind|affirmation|encourage|encouragement|kind words|nice thing|compliment me|i need to hear)\b/)) return { text: tag(draw("Affirmations"), 0.7), chips: ["Another kind word", "Help me breathe"], pet: 0.5 };
   if (has(n, /\b(wisdom|wise|advice|lesson|quote|inspire|inspiration|motivate|motivation|guidance|teach me|enlighten|zen saying|a saying)\b/) && !has(n, /\b(prancer|pads|pfp|ride|tezos|mint|wallet|aleatory|yoeshi|artist|artists|collector|collectors|collect|collecting|sell|selling|price|pricing)\b/))
   { if (HEART.quotes.length && rnd() < 0.4) { const q = quoteFor(n); return { text: `Here is something Yoeshi ${q.spoken ? "said" : "wrote"}:\n\n"${q.q}"\n\n_${q.src}_`, chips: ["More wisdom", "More from Yoeshi", "Help me breathe"], mood: "think" }; }
@@ -264,14 +304,17 @@ function respondOne(raw) {
     if (hit) { MEM.last = hit.e; return { text: pick(["Right this way.", "Of course. This way, please.", "Follow me."]) + " " + hit.e.body.split("\n")[0].split(/(?<=[.!?])\s/)[0], links: hit.e.links, chips: hit.e.ask.slice(0, 3), title: hit.e.title }; }
     if (!q || /\b(around|somewhere|anywhere|everything|tour)\b/.test(q)) { const d = byTitle("Where can I go"); if (d) return fromEntry(d); } }
   /* 7. precise facts, then everything he knows (with typos mended) */
-  const nf = mend(n), fa = attrAnswer(nf); if (fa) { MEM.lastList = null; return fa; }
+  const nf = mend(n), fa = attrAnswer(nf); if (fa) { MEM.lastList = null; return toned(fa, weigh(raw, nf)); }
   { const w = /^(how|where|can|should|when|why|is|are|do|does)\b/.test(n) && !/\b(song|piece|work|track)\b/.test(n) ? null : workIn(n), top = search(nf)[0];   /* a how-to question is not a work title */   /* a work named by its title wins, unless the question names one of his entries outright */
     if (w && !(top && top.s >= 12 && (" " + nf + " ").includes(" " + norm(top.e.title) + " "))) { MEM.lastList = null; return workAnswer(w); } }
-  const r = search(nf), best = r[0], second = r[1];
+  const mean = meant(n, nf), tone = weigh(raw, n) || weigh(raw, nf);
+  if (mean.unknown && Object.keys(mean).length === 1) return { mood: "puzzle", text: pick(["That one is beyond my garden wall. I only know Yoeshi Labs, its art and its corner of Tezos, and I would rather say so than guess.", "Ah, that is news from outside the garden. I only know what Yoeshi wrote down for me: his art, his studio and Tezos."]), chips: SITE ? SITE_CHIPS : DEFAULT_CHIPS };
+  delete mean.unknown; const bias = tone && TONE_BIAS[tone.k] ? TONE_BIAS[tone.k](nf) : {}; for (const k in bias) mean[k] = (mean[k] || 0) + bias[k];
+  const r = search(nf, mean), best = r[0], second = r[1];
   /* a word he has never met (and no phrase he knows) means the question is probably elsewhere: ask for a stronger match */
   const stranger = toks(nf).some((w) => w.length >= 4 && !DF[w] && !VOCAB.has(w)), need = stranger && !(best && best.ph) ? 6 : 3.2;
   if (best && best.s >= need) { MEM.last = best.e; MEM.lastMore = false; MEM.lastList = null; { const c1 = COLLS.find((c) => c.name === best.e.title); if (c1) MEM.coll = c1; }
-    const out = fromEntry(best.e);
+    const out = toned(fromEntry(best.e), tone);
     if (second && second.s >= 3.2 && second.s > best.s * 0.82 && !out.chips.includes(second.e.title)) out.chips = [second.e.title, ...out.chips].slice(0, 3);
     return out; }
   /* 8. honest not-knowing */
@@ -293,7 +336,7 @@ function splitAsk(raw) {
     return L && Rt && L.ph && Rt.ph && L.s >= 6 && Rt.s >= 6 && L.e !== Rt.e ? [m[1], m[2]] : [p]; });
   return parts.map((x) => x.replace(/[?!.\s]+$/, "")).filter((x) => norm(x).split(" ").filter(Boolean).length >= 1).slice(0, 3);
 }
-const isUnknown = (r) => /beyond my garden wall|sat with that|I do not know, friend|More of what, friend/.test(r.text || "");
+const isUnknown = (r) => /beyond my garden wall|sat with that|I do not know, friend|More of what, friend|outside the garden/.test(r.text || "");
 function respond(raw) {
   let greet = false; const g = GREET.exec(String(raw).trim());
   if (g && norm(String(raw).trim().slice(g[0].length)).split(" ").filter(Boolean).length >= 2) { greet = true; raw = String(raw).trim().slice(g[0].length); }
@@ -492,5 +535,5 @@ addEventListener("keydown", (e) => { if (e.key === "Escape" && document.body.cla
 /* on the website the concierge greets you himself on wide screens, after a breath */
 if (COMPANION) { document.body.classList.add("mz-companion"); show(); }
 else if (SITE && innerWidth - innerHeight > 300 && innerWidth > 1100) setTimeout(() => { if (!document.body.classList.contains("mz-on")) show(); }, 1600);
-window.MAESTRO_BRAIN = { respond, search, mend, COLLS, HEART, SCROLL, send, open: show, close: hide };
+window.MAESTRO_BRAIN = { respond, search, mend, meant, weigh, toks, COLLS, HEART, SCROLL, send, open: show, close: hide };
 })();
