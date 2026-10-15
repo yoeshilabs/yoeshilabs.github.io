@@ -439,11 +439,11 @@ function speak(r, then) {
   const text = r.text || "", think = Math.min(1400, 450 + text.length * 2.2);
   busy = true; status("thinking", true); M.think(true); if (r.mood === "think") M.ripple();
   const dots = add("mz-m", '<span style="opacity:.7;letter-spacing:3px">\u00b7 \u00b7 \u00b7</span>');
-  later(() => { M.think(false); dots.remove(); const el = add("mz-m", ""), P = plain(text);
+  later(() => { M.think(false); dots.remove(); const el = add("mz-m", ""), P = plain(text); el.style.whiteSpace = "pre-line";   /* line breaks show while he types */
     const secs = Math.min(9, 0.6 + P.length / 32); M.say(secs); M.chime(); if (r.pet) M.pet(r.pet); if (r.mood === "bow" || r.mood === "care") M.ripple();
     { const mk = { care: "care", think: "wise", bow: "bow", pet: "joy", joy: "joy", wave: "wave", puzzle: "puzzle" }[r.mood]; if (mk) M.mood(mk, Math.min(6, secs + 1.2)); }   /* his body answers too */
     status("replying", false); let i = 0; const step = Math.max(2, Math.round(P.length / (secs * 30)));
-    const done = (quiet) => { finish = null; el.innerHTML = fmt(text); if (SITE && r.links) addLinks(el, r.links); keep(el); busy = false; status("ready"); if (quiet) M.hush(); else { chips(r.chips); keep(el); if (then) then(); } };   /* re-anchor once the suggestions take their room */
+    const done = (quiet) => { finish = null; el.style.whiteSpace = ""; el.innerHTML = fmt(text); if (SITE && r.links) addLinks(el, r.links); keep(el); busy = false; status("ready"); if (quiet) M.hush(); else { chips(r.chips); keep(el); if (then) then(); } };   /* re-anchor once the suggestions take their room */
     const tick = () => { if (!finish) return; i += step; if (i >= P.length) return done(false);
       el.textContent = P.slice(0, i); keep(el); if (i % 60 < step) { const rc = el.getBoundingClientRect(); M.look(rc.left + rc.width * 0.7, rc.bottom - 10); } later(tick, 33); };   /* his eyes follow the words */
     finish = () => done(true); tick(); }, think);
