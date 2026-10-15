@@ -463,11 +463,11 @@ function send(raw) {
 /* ================================================================ one minute of breathing: 4 in, 4 hold, 6 out, three times */
 const BREATH = { on: false };
 function startBreath() {
-  BREATH.on = true; const el = add("mz-m mz-b", ""), phases = [["Breathe in", 4], ["Hold", 4], ["Breathe out", 6]]; let round = 0, k = 0;
-  M.bowl();   /* the breathing guide shows on him, so no thinking motes here */
+  BREATH.on = true; CHIPS.innerHTML = ""; const el = add("mz-m mz-b", "Breathe in"), phases = [["Breathe in", 4], ["Hold", 4], ["Breathe out", 6]]; let round = 0, k = 0;
+  M.hush(); M.bowl();   /* hands settle; the breathing guide shows on him, so no thinking motes here */
   const run = () => { if (!BREATH.on) return; const [w, s] = phases[k]; let c = 0; M.breathe(["in", "hold", "out"][k], s);   /* the aura is the guide */
     const tickc = () => { if (!BREATH.on) return; c++; el.textContent = w + " " + "\u00b7".repeat(c); if (k === 2 && c === 1) M.ripple(); if (c < s) later(tickc, 1000); else { k = (k + 1) % 3; if (!k) round++; if (round < 3) later(run, 1000); else endBreath(el); } };
-    el.textContent = w; later(tickc, 1000); };
+    el.textContent = w; LOG.scrollTop = LOG.scrollHeight; later(tickc, 1000); };   /* the cue stays in view; the suggestions return afterwards */
   later(run, 600);
 }
 function endBreath(el) { BREATH.on = false; M.think(false); M.breathe(null); el.textContent = "\u00b7 \u00b7 \u00b7"; M.bowl();
