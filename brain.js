@@ -344,7 +344,7 @@ body.mz-phone #mz header{padding:8px 8px 7px 12px;gap:8px} body.mz-phone #mz hea
 body.mz-phone #mz header button{width:30px;height:30px;font-size:16px} body.mz-phone .mz-beta{font-size:10px;padding:3px 7px 2px}
 body.mz-phone #mz-log{padding:10px 10px 4px;gap:8px} body.mz-phone .mz-m{font-size:15.5px;max-width:92%} body.mz-phone .mz-u{font-size:14px}
 body.mz-phone #mz-chips{padding:2px 10px 6px;gap:5px} body.mz-phone #mz-chips button{padding:5px 10px;font-size:12px}
-body.mz-phone #mz .mz-f{padding:7px 8px 6px;gap:6px} body.mz-phone #mz input{padding:9px 12px} body.mz-phone #mz .mz-f button{width:40px;height:40px}
+body.mz-phone #mz .mz-f{padding:7px 8px 6px;gap:6px} body.mz-phone #mz input{padding:9px 12px;font-size:16px} body.mz-phone #mz .mz-f button{width:40px;height:40px}
 body.mz-phone .mz-note{font-size:10px;padding:0 10px 6px;margin-top:0} body.mz-phone .mz-more{display:none} body.mz-kb #mz-chips{display:none}
 body.mz-phone > svg{transition:transform .35s ease,opacity .25s ease}
 body.mz-wide #mz{left:auto;right:16px;top:16px;bottom:16px;height:auto;width:var(--mzw);transform:translateX(16px)} body.mz-wide.mz-on #mz{transform:none}
@@ -366,10 +366,10 @@ body.mz-companion #mz-open{display:none} body.mz-companion #mz{left:0!important;
 .mz-links{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.mz-links a{display:inline-block;padding:7px 13px;border-radius:999px;background:#f0b44a;color:#2a1704;font:600 13px/1.1 ui-rounded,system-ui,sans-serif;text-decoration:none}.mz-links a:hover{background:#ffc75e}.mz-links a:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .mz-b{font-size:24px;letter-spacing:2px;text-align:center;padding:6px 0;color:#ffe3a6}
 #mz-chips{display:flex;flex-wrap:wrap;gap:7px;padding:4px 14px 10px;flex:none}   /* they wrap: every suggestion visible, no hidden scrolling */
-#mz-chips button{flex:0 1 auto;max-width:100%;overflow:hidden;text-overflow:ellipsis;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,214,140,.38);background:rgba(255,214,140,.06);color:#fbecd0;font:500 13px/1.1 inherit;font-family:inherit;cursor:pointer;white-space:nowrap}
+#mz-chips button{flex:0 1 auto;max-width:100%;overflow:hidden;text-overflow:ellipsis;padding:7px 12px;border-radius:999px;border:1px solid rgba(255,214,140,.38);background:rgba(255,214,140,.06);color:#fbecd0;font-family:inherit;font-weight:500;font-size:13px;line-height:1.1;cursor:pointer;white-space:nowrap}
 #mz-chips button:hover{background:rgba(255,214,140,.16)}
 #mz .mz-f{display:flex;gap:8px;padding:10px 12px 12px;border-top:1px solid rgba(255,214,140,.16)}
-#mz input{flex:1;min-width:0;padding:11px 14px;border-radius:999px;border:1px solid rgba(255,214,140,.3);background:rgba(0,0,0,.25);color:#fff7e8;font:16px/1.2 inherit;font-family:inherit;outline:none}
+#mz input{flex:1;min-width:0;padding:11px 14px;border-radius:999px;border:1px solid rgba(255,214,140,.3);background:rgba(0,0,0,.25);color:#fff7e8;font-family:inherit;font-size:16px;line-height:1.2;outline:none}   /* 16px: iPhone Safari zooms into anything smaller */
 #mz input::placeholder{color:#bda98a} #mz input:focus{border-color:#f4c65c;box-shadow:0 0 0 3px rgba(244,198,92,.18)}
 #mz .mz-f button{width:44px;height:44px;flex:none;border-radius:50%;border:0;background:#f0b44a;color:#2a1704;cursor:pointer;display:grid;place-items:center} #mz .mz-f button:hover{background:#ffc75e}
 #mz .mz-f button svg{width:20px;height:20px}
@@ -397,10 +397,11 @@ function layout() { const vv = window.visualViewport, w = innerWidth, h = innerH
   if (phone && on) {
     /* on a phone the conversation comes first: the art shrinks to a band across the top (his face stays in view), and
        when the keyboard is up (the visible height drops) it steps aside so the chat gets everything above the keys */
-    const kb = Math.max(0, h - H - (vv ? vv.offsetTop : 0)), band = H < 560 ? 0 : Math.round(Math.min(w, H * 0.3));
+    const kb = Math.max(0, h - H - (vv ? vv.offsetTop : 0)), typing = kb > 100 || document.activeElement === IN && H < 0.62 * (screen.height || h);
+    const band = typing || H < 380 ? 0 : Math.round(Math.min(w, H * (H < 600 ? 0.24 : 0.3)));
     if (ART) { ART.style.transformOrigin = "50% 0"; ART.style.transform = `translateY(${-Math.round((h - w) / 2) + (vv ? Math.round(vv.offsetTop) : 0)}px) scale(${(band / w).toFixed(3)})`; ART.style.opacity = band ? "" : "0"; }
     panel.style.top = (band + (vv ? Math.round(vv.offsetTop) : 0) + 6) + "px"; panel.style.bottom = (kb + 6) + "px"; panel.style.height = "auto";
-    document.body.classList.toggle("mz-kb", !band); return; }   /* keyboard up: the suggestions step aside too */
+    document.body.classList.toggle("mz-kb", typing); return; }   /* suggestions step aside only while the keyboard is really up */   /* keyboard up: the suggestions step aside too */
   document.body.classList.remove("mz-kb");
   if (ART) ART.style.opacity = "";
   const need = wide && on ? Math.max(0, pw + 32 - side) : 0, tall = h - w > 160;
@@ -452,6 +453,7 @@ function send(raw) {
   if (!raw) return;
   if (busy && !BREATH.on && finish) finish();
   M.sound(); add("mz-u", esc(raw)); IN.value = ""; CHIPS.innerHTML = ""; lookAtChat();
+  if (matchMedia("(pointer: coarse)").matches) { IN.blur(); setTimeout(layout, 350); }   /* touch screens: close the keyboard so the answer has the room */
   if (BREATH.on) { stopBreath(); if (/\b(stop|enough|cancel|quit|no)\b/i.test(raw)) { speak({ text: "We can stop. Even one breath counts.", chips: DEFAULT_CHIPS }); return; } }
   /* a button that names something he knows answers it directly */
   const e = byTitle(raw), r = e ? (MEM.last = e, MEM.lastMore = false, MEM.turns++, fromEntry(e)) : respond(raw); const lst = LISTOF(norm(raw)); if (lst && !r.title) MEM.lastList = lst; else if (r.title) MEM.lastList = null;
@@ -482,7 +484,7 @@ open.addEventListener("click", show); $("mz-x").addEventListener("click", hide);
 /* no <form>: objkt's sandbox may block form submission, so Enter and the button send directly */
 $("mz-go").addEventListener("click", () => send(IN.value));
 IN.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); send(IN.value); } });
-IN.addEventListener("input", lookAtChat); IN.addEventListener("focus", lookAtChat);
+IN.addEventListener("input", lookAtChat); IN.addEventListener("focus", () => { lookAtChat(); setTimeout(layout, 350); }); IN.addEventListener("blur", () => setTimeout(layout, 350));
 addEventListener("keydown", (e) => { if (e.key === "Escape" && document.body.classList.contains("mz-on")) hide();
   else if ((e.key === "/" || e.key === "Enter") && !document.body.classList.contains("mz-on") && document.activeElement === document.body) { e.preventDefault(); show(); } });
 /* on the website the concierge greets you himself on wide screens, after a breath */
