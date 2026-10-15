@@ -6,7 +6,7 @@
  */
 (function () {
 "use strict";
-const M = window.MAESTRO || { say() {}, hush() {}, think() {}, look() {}, ripple() {}, pet() {}, sound() {}, chime() {}, bowl() {} };
+const M = Object.assign({ say() {}, hush() {}, think() {}, look() {}, ripple() {}, pet() {}, sound() {}, chime() {}, bowl() {}, attend() {}, mood() {}, breathe() {} }, window.MAESTRO || {});
 
 /* ================================================================ the scroll */
 const SCROLL = (() => {
@@ -209,14 +209,14 @@ function respondOne(raw) {
       "Feelings are like weather over the garden. They pass, even the long storms. You do not have to fix anything this minute.";
     const yq = HEART.quotes.length ? quoteFor("", (FEELTHEME.find(([re]) => has(n, re)) || [0, "resilience"])[1]) : null;
     return { text: open + "\n\n" + body + (yq ? `\n\nYoeshi once ${yq.spoken ? "said" : "wrote"} something I keep close: "${yq.q}" _(${yq.src})_` : "") + (MEM.heavy > 1 ? "\n\nIf it ever feels like more than you can carry, please reach out to someone you trust, or a professional. Asking for help is strength, not weakness." : ""), chips: ["Help me breathe", "Give me some wisdom", "Tell me something kind"], mood: "care", pet: 0.5 }; }
-  if (pos && has(n, FEEL) && words <= 9) return { text: tag(pick(["That makes my whiskers glow. Hold onto it a moment longer than you normally would.", "Wonderful. Joy noticed is joy doubled.", "I love that for you. Savour it like a sunbeam."])), chips: ["Give me some wisdom", "Tell me a joke", "Tell me about the Prancer Purranchise"], pet: 0.7 };
+  if (pos && has(n, FEEL) && words <= 9) return { mood: "joy", text: tag(pick(["That makes my whiskers glow. Hold onto it a moment longer than you normally would.", "Wonderful. Joy noticed is joy doubled.", "I love that for you. Savour it like a sunbeam."])), chips: ["Give me some wisdom", "Tell me a joke", "Tell me about the Prancer Purranchise"], pet: 0.7 };
   /* 4. small courtesies */
   if (words <= 5 && /^(hi|hey|hello|hiya|howdy|yo|gm|gn|sup|greetings|namaste|good morning|good afternoon|good evening|hola|hey there|hi there|hello there|hey maestro|hi maestro|hello maestro)\b/.test(n))
-    return { text: pick([`${hourWord()}${nm(0.8)}. What is on your mind?`, `Namaste${nm(0.8)}. I was just watching the gravel. What brings you to the garden?`, `Hello${nm(0.8)}. Sit, stay a while. Ask me anything.`]), chips: DEFAULT_CHIPS };
+    return { mood: "wave", text: pick([`${hourWord()}${nm(0.8)}. What is on your mind?`, `Namaste${nm(0.8)}. I was just watching the gravel. What brings you to the garden?`, `Hello${nm(0.8)}. Sit, stay a while. Ask me anything.`]), chips: DEFAULT_CHIPS };
   if (has(n, /\b(how are you|how r u|how are u|how do you feel|hows it going|how is it going|how have you been|you ok|are you ok)\b/))
     return { text: pick(["Peaceful, thank you. The maple is dropping leaves and my tongue is out. A perfect day. How about you?", "Very well. I meditated, I napped, I meditated about napping. How are you, truly?", "Content as a cat in a sunbeam. How is your heart today?"]), chips: ["I am doing well", "I am having a hard day", "Tell me a joke"] };
   if (words <= 7 && has(n, /\b(thank you|thanks|thank u|thx|ty|appreciate|grateful to you)\b/))
-    return { text: tag(pick(["You are most welcome.", "It was my pleasure. Truly.", "Anytime. The garden is always open."]), 0.6), pet: 0.5 };
+    return { mood: "joy", text: tag(pick(["You are most welcome.", "It was my pleasure. Truly.", "Anytime. The garden is always open."]), 0.6), pet: 0.5 };
   if (words <= 6 && has(n, /\b(bye|goodbye|good night|goodnight|see you|see ya|later|farewell|gotta go|got to go)\b/))
     return { text: tag(pick(["Go gently. The garden will be here.", "Farewell, friend. May your next nap be a long one.", "Until next time. Leave a little kindness wherever you go."]), 0.6), mood: "bow" };
   if (has(n, /\b(i love you|love you|you are cute|youre cute|so cute|adorable|cutie|beautiful|handsome|good boy|good kitty|good cat|you are the best|best cat|good maestro)\b/))
@@ -226,7 +226,7 @@ function respondOne(raw) {
   /* 5. rituals */
   if (has(n, /\b(stop|enough|cancel|quit)\b/) && BREATH.on) return { text: "We can stop. Even one breath counts.", stopBreath: true };
   if (has(n, /\b(breath|breathe|breathing|meditation|calm me|calm down|relax|help me relax|ground me|center me|centre me|stay with me)\b/))
-    return { text: "Let us breathe together. In through the nose for four, hold for four, out through the mouth for six. Three rounds. Follow the words, and my aureole.", breath: true };
+    return { text: "Let us breathe together. In through the nose for four, hold for four, out through the mouth for six. Three rounds. Watch the glow around me: breathe in as it grows to the dotted ring, hold while it shimmers, and breathe out as it shrinks.", breath: true };
   if (HEART.quotes.length && has(n, /\b(yoeshi (say|said|says|wrote|write|writes|think|thinks)|what would yoeshi|words from yoeshi|yoeshi quote|quote from yoeshi|quote yoeshi|in yoeshis words|something yoeshi|yoeshis words|yoeshi wisdom|wisdom from yoeshi|another yoeshi quote|more from yoeshi)\b/)) {
     const q = quoteFor(n); MEM.lastList = "Yoeshi"; return { text: `"${q.q}"\n\nYoeshi, _${q.src}_`, chips: ["More from Yoeshi", "Sing me a line from his songs", "Yoeshi's Tezos story"] }; }
   if (SONGS.length && has(n, /\b(sing (me|something|us|a|for me)|sing to me|sing|lyric|lyrics|a verse|quote a song|line from a song|line from his songs|one of yoeshis songs|another song|another line)\b/) && !has(n, /\b(why|how) do (they|the cats|prancers) sing\b/)) {
@@ -236,8 +236,8 @@ function respondOne(raw) {
     return { text: "Dozens, all minted on Tezos. A handful from the deck:\n" + titles.map((t) => "- " + t).join("\n") + "\n\nAsk me about any of them by name.", chips: ["Sing me a line from his songs", "Yoeshi Labs music"] }; }
   if (has(n, /\b(tezos history|tezos fact|tezos lore|hic et nunc history|history of hic et nunc|history of tezos|fun fact about tezos)\b/)) {
     const L = Object.values(HEART.lore).flat(); if (L.length) return { text: pick(L), chips: ["Another Tezos fact", "Hic et Nunc and Teia", "Yoeshi's Tezos story"] }; }
-  if (has(n, /\b(joke|jokes|funny|make me laugh|pun|puns|cheer me up)\b/)) return { text: draw("Jokes"), chips: ["Another joke", "Give me some wisdom", "Tell me a cat fact"] };
-  if (has(n, /\b(koan|koans|riddle|puzzle me|zen question)\b/)) return { text: draw("Koans") + "\n\n(No need to answer. Just carry it around for a while.)", chips: ["Another koan", "Give me some wisdom"] };
+  if (has(n, /\b(joke|jokes|funny|make me laugh|pun|puns|cheer me up)\b/)) return { mood: "joy", text: draw("Jokes"), chips: ["Another joke", "Give me some wisdom", "Tell me a cat fact"] };
+  if (has(n, /\b(koan|koans|riddle|puzzle me|zen question)\b/)) return { mood: "think", text: draw("Koans") + "\n\n(No need to answer. Just carry it around for a while.)", chips: ["Another koan", "Give me some wisdom"] };
   if (has(n, /\b(fortune|omen|predict|prediction|future for me|horoscope|my future|reading)\b/)) return { text: "I close my eyes, I listen to the bowl, and I see... " + draw("Fortunes").replace(/^./, (c) => c.toLowerCase()) + "\n\n(I am a cat, not an oracle, though I am rarely wrong about sunbeams.)", chips: ["Another fortune", "Tell me something kind"], mood: "think" };
   if (has(n, /\b(cat fact|fun fact|fact|facts|something interesting|teach me something)\b/)) return { text: draw("Facts"), chips: ["Another cat fact", "The research behind the cats", "Tell me a joke"] };
   if (has(n, /\b(something kind|affirmation|encourage|encouragement|kind words|nice thing|compliment me|i need to hear)\b/)) return { text: tag(draw("Affirmations"), 0.7), chips: ["Another kind word", "Help me breathe"], pet: 0.5 };
@@ -276,7 +276,7 @@ function respondOne(raw) {
     return out; }
   /* 8. honest not-knowing */
   const near = r.filter((x) => x.s > 0.8).slice(0, 3).map((x) => x.e.title);
-  return { text: pick(["That one is beyond my garden wall. My scroll does not say, and I would rather tell you that than guess.", "Hmm. I have sat with that, and nothing in my scroll answers it. I do not want to make something up.", "I do not know, friend. I only know what Yoeshi wrote down for me, and that is not in it."]) +
+  return { mood: "puzzle", text: pick(["That one is beyond my garden wall. My scroll does not say, and I would rather tell you that than guess.", "Hmm. I have sat with that, and nothing in my scroll answers it. I do not want to make something up.", "I do not know, friend. I only know what Yoeshi wrote down for me, and that is not in it."]) +
     (SITE ? " I am still in beta, so my scroll has gaps." : "") + (near.length ? "\n\nPerhaps one of these is close?" : "\n\nHere is what I can talk about."), chips: near.length ? near : SITE ? SITE_CHIPS : DEFAULT_CHIPS };
 }
 /* ================================================================ two (or three) questions at once */
@@ -441,10 +441,11 @@ function speak(r, then) {
   const dots = add("mz-m", '<span style="opacity:.7;letter-spacing:3px">\u00b7 \u00b7 \u00b7</span>');
   later(() => { M.think(false); dots.remove(); const el = add("mz-m", ""), P = plain(text);
     const secs = Math.min(9, 0.6 + P.length / 32); M.say(secs); M.chime(); if (r.pet) M.pet(r.pet); if (r.mood === "bow" || r.mood === "care") M.ripple();
+    { const mk = { care: "care", think: "wise", bow: "bow", pet: "joy", joy: "joy", wave: "wave", puzzle: "puzzle" }[r.mood]; if (mk) M.mood(mk, Math.min(6, secs + 1.2)); }   /* his body answers too */
     status("replying", false); let i = 0; const step = Math.max(2, Math.round(P.length / (secs * 30)));
     const done = (quiet) => { finish = null; el.innerHTML = fmt(text); if (SITE && r.links) addLinks(el, r.links); keep(el); busy = false; status("ready"); if (quiet) M.hush(); else { chips(r.chips); keep(el); if (then) then(); } };   /* re-anchor once the suggestions take their room */
     const tick = () => { if (!finish) return; i += step; if (i >= P.length) return done(false);
-      el.textContent = P.slice(0, i); keep(el); later(tick, 33); };
+      el.textContent = P.slice(0, i); keep(el); if (i % 60 < step) { const rc = el.getBoundingClientRect(); M.look(rc.left + rc.width * 0.7, rc.bottom - 10); } later(tick, 33); };   /* his eyes follow the words */
     finish = () => done(true); tick(); }, think);
   if (!finish) finish = () => { timers.forEach(clearTimeout); timers = []; M.think(false); dots.remove(); add("mz-m", fmt(text)); busy = false; finish = null; status("ready"); };
 }
@@ -452,7 +453,7 @@ function send(raw) {
   raw = String(raw || "").trim(); if (/^again$/i.test(raw)) raw = "help me breathe";
   if (!raw) return;
   if (busy && !BREATH.on && finish) finish();
-  M.sound(); add("mz-u", esc(raw)); IN.value = ""; CHIPS.innerHTML = ""; lookAtChat();
+  M.sound(); add("mz-u", esc(raw)); IN.value = ""; CHIPS.innerHTML = ""; lookAtChat(); M.attend(false); M.mood("ack", 1.2);
   if (matchMedia("(pointer: coarse)").matches) { IN.blur(); setTimeout(layout, 350); }   /* touch screens: close the keyboard so the answer has the room */
   if (BREATH.on) { stopBreath(); if (/\b(stop|enough|cancel|quit|no)\b/i.test(raw)) { speak({ text: "We can stop. Even one breath counts.", chips: DEFAULT_CHIPS }); return; } }
   /* a button that names something he knows answers it directly */
@@ -463,15 +464,15 @@ function send(raw) {
 const BREATH = { on: false };
 function startBreath() {
   BREATH.on = true; const el = add("mz-m mz-b", ""), phases = [["Breathe in", 4], ["Hold", 4], ["Breathe out", 6]]; let round = 0, k = 0;
-  M.think(true); M.bowl();
-  const run = () => { if (!BREATH.on) return; const [w, s] = phases[k]; let c = 0;
+  M.bowl();   /* the breathing guide shows on him, so no thinking motes here */
+  const run = () => { if (!BREATH.on) return; const [w, s] = phases[k]; let c = 0; M.breathe(["in", "hold", "out"][k], s);   /* the aura is the guide */
     const tickc = () => { if (!BREATH.on) return; c++; el.textContent = w + " " + "\u00b7".repeat(c); if (k === 2 && c === 1) M.ripple(); if (c < s) later(tickc, 1000); else { k = (k + 1) % 3; if (!k) round++; if (round < 3) later(run, 1000); else endBreath(el); } };
     el.textContent = w; later(tickc, 1000); };
   later(run, 600);
 }
-function endBreath(el) { BREATH.on = false; M.think(false); el.textContent = "\u00b7 \u00b7 \u00b7"; M.bowl();
+function endBreath(el) { BREATH.on = false; M.think(false); M.breathe(null); el.textContent = "\u00b7 \u00b7 \u00b7"; M.bowl();
   speak({ text: tag(pick(["Well done. Notice how you feel now, without judging it. That is meditation; you just did it.", "Beautiful. Three breaths is a small thing, and small things are where calm lives.", "There. The garden did not change, but you did, a little. Come back whenever you need to."]), 0.7), chips: ["Again", "Give me some wisdom", "Tell me something kind"] }); }
-function stopBreath() { BREATH.on = false; timers.forEach(clearTimeout); timers = []; busy = false; M.think(false); }
+function stopBreath() { BREATH.on = false; timers.forEach(clearTimeout); timers = []; busy = false; M.think(false); M.breathe(null); }
 
 /* ================================================================ opening and closing */
 let greeted = false;
@@ -484,7 +485,8 @@ open.addEventListener("click", show); $("mz-x").addEventListener("click", hide);
 /* no <form>: objkt's sandbox may block form submission, so Enter and the button send directly */
 $("mz-go").addEventListener("click", () => send(IN.value));
 IN.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); send(IN.value); } });
-IN.addEventListener("input", lookAtChat); IN.addEventListener("focus", () => { lookAtChat(); setTimeout(layout, 350); }); IN.addEventListener("blur", () => setTimeout(layout, 350));
+const attendNow = () => M.attend(document.activeElement === IN || IN.value.trim().length > 0);
+IN.addEventListener("input", () => { lookAtChat(); attendNow(); }); IN.addEventListener("focus", () => { lookAtChat(); attendNow(); setTimeout(layout, 350); }); IN.addEventListener("blur", () => { attendNow(); setTimeout(layout, 350); });
 addEventListener("keydown", (e) => { if (e.key === "Escape" && document.body.classList.contains("mz-on")) hide();
   else if ((e.key === "/" || e.key === "Enter") && !document.body.classList.contains("mz-on") && document.activeElement === document.body) { e.preventDefault(); show(); } });
 /* on the website the concierge greets you himself on wide screens, after a breath */

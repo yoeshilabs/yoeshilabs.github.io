@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-Q7y/CEVWK0csiiGNl6ZVQsm433ziDZmlOG2Az+ZQqD4=' 'sha256-f8M32nVDa4oJtFzBzyG/Vf24Kd7FCKzxTnyS1OiXPM8=' 'sha256-vDeMCShT2Nr6RhwkXPqri18I24nqrH9S2NBwRoaWrqM='; style-src 'unsafe-inline'; img-src 'self' data: blob:; media-src 'none'; connect-src 'none'; font-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-Q7y/CEVWK0csiiGNl6ZVQsm433ziDZmlOG2Az+ZQqD4=' 'sha256-H3akLgcJ2ALLmWcRWDwQ/Y/HQ7UIzDmxjiarQY9hXrc=' 'sha256-vDeMCShT2Nr6RhwkXPqri18I24nqrH9S2NBwRoaWrqM='; style-src 'unsafe-inline'; img-src 'self' data: blob:; media-src 'none'; connect-src 'none'; font-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Yoeshi Labs &middot; Maestro, the concierge (Beta)</title>
@@ -1417,7 +1417,11 @@ const BPM = Math.round(wp([[72, 2], [80, 3], [88, 3], [96, 2]]) * (0.9 + 0.2 * A
 
 /* ================================================================ the pose */
 let CLICK = null, CLICKXY = null;                 // live only
-const MST = { talk0: -9, talk1: -9, think: 0, thinkOn: false };   /* MAESTRO: the chat drives these */
+const MST = { talk0: -9, talk1: -9, think: 0, thinkOn: false, attend: 0, attendOn: false, mood: null, br: null };
+/* the breathing guide: 0 (empty) to 1 (full) through the exercise's phases, or null when no exercise is running */
+let BRG_ = null, MOTES_ = null;   /* the breathing guide's ring, and the thought motes (made on first use) */
+function breathK(t) { const B_ = MST.br; if (!B_) return null; const u = cl((t - B_.t0) / B_.dur);
+  return B_.ph === "in" ? smooth(u) : B_.ph === "hold" ? 1 : smooth(1 - u); }   /* MAESTRO: the chat drives these */
 let RIPT = -9;
 const LIVE = { gx: 0, gy: 0, att: 0, pet: 0, tx: 500, ty: 400, in: false };
 function pose(t, b, lb) {
@@ -1470,6 +1474,19 @@ function pose(t, b, lb) {
   if (tk > 0) { P.yawn = Math.max(P.yawn, tk * (0.12 + 0.18 * Math.abs(Math.sin(t * 9.5)) * (0.6 + 0.4 * Math.sin(t * 2.3)))); P.head += 3 * tk * Math.sin(t * 3.1); P.lid = lerp(P.lid, 0.9, tk); P.blep *= 1 - tk; }
   if (MST.think > 0.01) { P.aura = Math.max(P.aura, 0.75 * MST.think); P.lid = lerp(P.lid, 0.28, MST.think); P.float = Math.max(P.float, 7 * MST.think); }
   P.talk = tk;
+  /* MAESTRO: aware of the chat. Leaning in while you type; a body that answers with the words; breathing with you */
+  const at_ = MST.attend; if (at_ > 0.01) { P.ear += 10 * at_; P.pupil += 0.03 * at_; P.tilt += 5 * at_; }
+  const mo = MST.mood, mu = mo ? (t - mo.t0) / mo.dur : 2, me = mu > 0 && mu < 1 ? smooth(cl(mu / 0.15)) * smooth(cl((1 - mu) / 0.3)) : 0;
+  if (me > 0) switch (mo.k) {
+    case "ack": lidMul = Math.min(lidMul, 1 - 0.85 * bump(mu, 0.5, 0.35)); P.ear += 8 * me; break;                     /* got it: a slow blink */
+    case "joy": P.head += 7 * Math.abs(Math.sin(TAU * mu * 2.5)) * me; P.blep = Math.max(P.blep, 0.9 * me); P.ear += 12 * me; P.whisk += 6 * me; lidMul = Math.min(lidMul, 1 - 0.3 * me); break;
+    case "care": P.tilt += 12 * me; P.lid = lerp(P.lid, 0.55, me); P.ear -= 6 * me; break;                             /* soft eyes, a gentle tilt */
+    case "wise": lidMul = Math.min(lidMul, 1 - 0.92 * me); P.head -= 7 * bump(mu, 0.45, 0.25); break;                  /* eyes closed, a slow nod */
+    case "bow": P.head -= 14 * bump(mu, 0.4, 0.3); lidMul = Math.min(lidMul, 1 - 0.8 * bump(mu, 0.4, 0.3)); break;
+    case "puzzle": P.tilt -= 16 * me; P.ear += 6 * me; P.lid = lerp(P.lid, 1, me); P.pupil += 0.05 * me; lidMul = 1; break;   /* wide eyes: curious, not cross */                                                          /* not in my scroll... */
+    case "wave": P.ear += 8 * me; break;
+  }
+  { const bk = breathK(t); if (bk !== null) { lidMul = Math.min(lidMul, 0.12); P.head += 6 * bk; P.aura = Math.max(P.aura, 0.9); P.blep *= 0.3; } }
   /* live: your pointer pulls the gaze; petting softens everything */
   const a = LIVE.att * (1 - m * 0.5);
   P.gx = lerp(P.gx, LIVE.gx, a); P.gy = lerp(P.gy, LIVE.gy, a); P.yaw = lerp(P.yaw, LIVE.gx * 0.55, a); P.tilt += 6 * LIVE.gx * a; P.ear += 8 * a;
@@ -1513,7 +1530,7 @@ function pose(t, b, lb) {
 let LASTT = null;
 function draw(t) {
   const b = t / BEAT, lb = frac(b / LOOP) * LOOP, P = pose(t, b, lb);
-  const br = Math.sin(TAU * b / 4);                                   // one breath every four beats
+  const BRK = breathK(t), br = BRK === null ? Math.sin(TAU * b / 4) : BRK * 2 - 1;   // one breath every four beats (MAESTRO: or with you, in the exercise)
   const float = SPK === "Ghost" || SPK === "Celestial" ? 10 * Math.sin(TAU * lb / 8) : 0;
   const hx = HX + P.yaw * 12, hy = HY - P.head * 0.9 + P.crouch * 0.5 - 4 * br + float + P.back * 14 - P.float;
   const sc = 1 - 0.04 * P.back;
@@ -1548,6 +1565,20 @@ function draw(t) {
   set(SMIRK, { opacity: f1(P.smirk * 100) / 100 }); set(WRINK, { opacity: f1(P.snarl * 100) / 100 });
   set(BLEP, { opacity: P.blep > 0.03 ? 1 : 0, transform: `translate(0 ${U(0.43)}) scale(1 ${f1(Math.max(0.05, P.blep) * 100) / 100}) translate(0 ${-U(0.43)})` });
   set(AURA, { cy: f1(hy - 0.1 * K), opacity: f1(P.aura * (0.55 + 0.25 * Math.sin(TAU * b / 2)) * 100) / 100, "stroke-width": f1(8 + 6 * P.aura) });
+  /* MAESTRO: the breathing guide. The aura grows as you breathe in (gold), holds full and shimmers, and shrinks as you breathe
+     out (teal), inside a faint ring that shows how full to breathe; his aureole breathes with it */
+  if (!AURA.dataset.s) AURA.dataset.s = AURA.getAttribute("stroke");
+  if (!BRG_) { BRG_ = E("ellipse", { cx: HX, fill: "none", stroke: "#ffffff", "stroke-width": 4, "stroke-dasharray": "6 12", "stroke-linecap": "round", opacity: 0, "pointer-events": "none" }); S.insertBefore(BRG_, CAT); }
+  { const bk = breathK(t), G_ = BRG_;
+    if (bk !== null) { const hold = MST.br.ph === "hold", col = mix("#6fd3c9", "#ffd36b", bk);
+      set(AURA, { rx: f1((1.2 + 0.78 * bk) * K), ry: f1((1.28 + 0.82 * bk) * K), stroke: col, fill: col, "fill-opacity": f1((0.1 + 0.1 * bk) * 100) / 100, "stroke-width": f1(10 + 12 * bk), opacity: f1((0.92 + (hold ? 0.08 * Math.sin(t * 7) : 0)) * 100) / 100 });
+      set(G_, { cy: f1(hy - 0.1 * K), rx: f1(2.0 * K), ry: f1(2.12 * K), opacity: 0.6 });
+      set(AUR, { transform: `translate(${f1(hx)} ${f1(hy - 0.04 * K)}) scale(${f1((1 + 0.07 * bk) * 1000) / 1000})` }); }
+    else { set(AURA, { rx: f1(1.45 * K), ry: f1(1.55 * K), stroke: AURA.dataset.s, fill: "none" }); set(G_, { opacity: 0 }); } }
+  /* MAESTRO: thought motes drift up around his head while he thinks */
+  if (!MOTES_) MOTES_ = [0, 1, 2, 3].map(() => E("circle", { r: 8, fill: "#ffe7a0", stroke: "#fff8e6", "stroke-width": 2, opacity: 0, filter: "url(#eg)", "pointer-events": "none" }));
+  MOTES_.forEach((m_, i) => { const th = MST.think; if (th < 0.03) return set(m_, { opacity: 0 }); const a = t * 1.7 + i * 1.57, rise = frac(t * 0.45 + i / 3);
+    set(m_, { cx: f1(hx + Math.cos(a) * 1.05 * K), cy: f1(hy - 1.1 * K + Math.sin(a) * 0.22 * K - rise * 0.35 * K), r: f1(6 + 8 * Math.sin(Math.PI * rise)), opacity: f1(th * Math.sin(Math.PI * rise) * 100) / 100 }); });
   ZZZ.forEach((z, i) => { const u = frac(t / 2.4 + i / 3); set(z, { opacity: f1(P.zzz * bump(u, 0.5, 0.5) * 100) / 100, transform: `translate(${f1(hx + (0.8 + 0.25 * u) * K + i * 6)} ${f1(hy - (0.9 + 0.8 * u) * K)}) scale(${f1(0.6 + 0.8 * u)})` }); });
   STARS.forEach((st, i) => { const a = TAU * (t / 1.2 + i / 3); set(st, { opacity: f1(P.dizzy * 100) / 100, transform: `translate(${f1(hx + 0.9 * K * Math.cos(a))} ${f1(hy - 1.05 * K + 0.22 * K * Math.sin(a))})` }); });
   set(MOUTH, { opacity: P.yawn > 0.02 ? 1 : 0, transform: `translate(0 ${U(0.5)}) scale(1 ${f1(Math.max(0.05, P.yawn) * 100) / 100}) translate(0 ${-U(0.5)})` });
@@ -1729,6 +1760,8 @@ function draw(t) {
         else mix2([s * 0.42, 1.35 - 0.3 * bump(au, 0.36, 0.1)], am);                  // a flick of the paw: toss, flip, bop
       }
     }
+    if (MST.mood && MST.mood.k === "wave" && s < 0) { const wu = (t - MST.mood.t0) / MST.mood.dur; if (wu > 0 && wu < 1) { const we = smooth(cl(wu / 0.15)) * smooth(cl((1 - wu) / 0.25));
+      mix2([s * 0.98 + 0.06 * Math.sin(t * 12), 0.72], we); palm = Math.max(palm, we); } }   /* MAESTRO: hello! */
     if (P.talk > 0 && s < 0) { mix2([s * 0.94 + 0.03 * Math.sin(t * 2.1), 0.86 + 0.05 * Math.sin(t * 3.3)], P.talk); palm = Math.max(palm, P.talk); }   /* MAESTRO: teaching (vitarka) as he speaks */
     const rx_ = HX + ix * K, ry_ = HY + iy * K + float * 0.6;
     tx = lerp(rx_, tx, W.ext); ty = lerp(ry_, ty, W.ext); W.palm_ = Math.max(W.ext, palm);
@@ -1793,7 +1826,7 @@ function live(t) {
   LIVE.gx += (gx - LIVE.gx) * k; LIVE.gy += (gy - LIVE.gy) * k;
   LIVE.pet = cl(LIVE.pet + (t - STROKE < 0.3 ? dt * 0.9 : -dt * 0.35));
   SOUND.purr(LIVE.pet); if (SW_ && SW_.plasma) SOUND.hum(SW_.eng);
-  MST.think += ((MST.thinkOn ? 1 : 0) - MST.think) * (1 - Math.exp(-dt * 4));
+  MST.think += ((MST.thinkOn ? 1 : 0) - MST.think) * (1 - Math.exp(-dt * 4)); MST.attend += ((MST.attendOn ? 1 : 0) - MST.attend) * (1 - Math.exp(-dt * 5));
 }
 
 /* ================================================================== sound */
@@ -1976,7 +2009,9 @@ requestAnimationFrame(loop);
 window.MAESTRO = { FEAT, BEAT, LOOP, draw, now,
   say(sec) { const t = now(); MST.talk0 = t; MST.talk1 = t + sec; }, hush() { MST.talk1 = Math.min(MST.talk1, now() + 0.2); },
   think(on) { MST.thinkOn = !!on; }, look(cx, cy) { const p = svgPt({ clientX: cx, clientY: cy }); PT = p; PTT = now(); LIVE.tx = p[0]; LIVE.ty = p[1]; LIVE.in = true; },
-  ripple() { RIPT = now(); }, pet(p) { LIVE.pet = cl(p); STROKE = now(); }, sound() { SOUND.start(); }, chime() { SOUND.chime(); }, bowl() { SOUND.bowl(); }, get audio() { return !!AC; } };
+  ripple() { RIPT = now(); },
+  attend(on) { MST.attendOn = !!on; }, mood(k, secs = 3) { MST.mood = { k: String(k), t0: now(), dur: Math.max(0.5, +secs || 3) }; },
+  breathe(ph, secs) { MST.br = ph ? { ph: String(ph), t0: now(), dur: Math.max(0.5, +secs || 4) } : null; }, pet(p) { LIVE.pet = cl(p); STROKE = now(); }, sound() { SOUND.start(); }, chime() { SOUND.chime(); }, bowl() { SOUND.bowl(); }, get audio() { return !!AC; } };
 })();
 </script>
 <!-- MAESTRO: what he knows, and how he talks -->
