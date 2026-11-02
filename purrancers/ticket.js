@@ -13,13 +13,18 @@ const OFF = ["requestOperation", "requestEncryptPayload", "requestBroadcast", "r
 const PASS = "purrancers-pass";
 const session = { get() { try { return JSON.parse(sessionStorage.getItem(PASS)); } catch (e) { return null; } }, set(v) { try { sessionStorage.setItem(PASS, JSON.stringify(v)); } catch (e) {} } };
 
-export async function loadTicket() { try { return await (await fetch("ticket.json", { cache: "no-store" })).json(); } catch (e) { return { contract: "" }; } }
+/* ticket.json: { tickets: [{ name, contract, tokenId }], need, get }; holding any one of them is a ticket. ticket.contract is
+   kept true while any ticket is set, so the doors know to ask */
+export async function loadTicket() { let c = {}; try { c = await (await fetch("ticket.json", { cache: "no-store" })).json(); } catch (e) {}
+  c.tickets = (c.tickets || (c.contract ? [{ name: c.name, contract: c.contract, tokenId: c.tokenId }] : [])).filter((t) => t.contract);
+  c.contract = c.tickets.map((t) => `${t.contract}:${t.tokenId ?? ""}`).join(","); return c; }
 
-async function holds(cfg, address) {   // read-only: does this wallet hold the ticket?
-  const q = new URLSearchParams({ account: address, "token.contract": cfg.contract, "balance.gt": "0", select: "balance", limit: "1" });
-  if (cfg.tokenId !== "" && cfg.tokenId != null) q.set("token.tokenId", String(cfg.tokenId));
-  const r = await fetch(`https://api.tzkt.io/v1/tokens/balances?${q}`); if (!r.ok) throw new Error("The ticket lookup did not answer. Try again in a moment.");
-  return (await r.json()).length > 0; }
+async function holds(cfg, address) {   // read-only: does this wallet hold any of the tickets?
+  const one = async (t) => { const q = new URLSearchParams({ account: address, "token.contract": t.contract, "balance.gt": "0", select: "balance", limit: "1" });
+    if (t.tokenId !== "" && t.tokenId != null) q.set("token.tokenId", String(t.tokenId));
+    const r = await fetch(`https://api.tzkt.io/v1/tokens/balances?${q}`); if (!r.ok) throw new Error("The ticket lookup did not answer. Try again in a moment.");
+    return (await r.json()).length > 0; };
+  return (await Promise.all(cfg.tickets.map(one))).some(Boolean); }
 
 /* a Micheline string, as Tezos wallets expect a signed message: 05 01, the length, then the text */
 function micheline(text, stringToBytes) { const hex = stringToBytes(text); return "0501" + (hex.length / 2).toString(16).padStart(8, "0") + hex; }
@@ -28,7 +33,7 @@ function micheline(text, stringToBytes) { const hex = stringToBytes(text); retur
 export async function checkTicket(cfg, ui) {
   if (!cfg.contract) return true;                                                               // no ticket set yet: doors open
   if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).get("ticket") === "skip") return true;   // checking the show locally
-  const pass = session.get(); if (pass && pass.contract === cfg.contract && pass.tokenId === String(cfg.tokenId)) return true;
+  const pass = session.get(); if (pass && pass.contract === cfg.contract) return true;
   ui.status("Opening your wallet…");
   const W = await import("./lib/ticket-wallet.js");
   const client = new W.DAppClient({ name: "The Purrancers, live in the Sphere", iconUrl: new URL("assets/purrancers-title.png", location.href).href, appUrl: location.origin + location.pathname, network: { type: W.NetworkType.MAINNET } });
@@ -46,8 +51,8 @@ export async function checkTicket(cfg, ui) {
     const { signature } = await client.requestSignPayload({ signingType: W.SigningType.MICHELINE, payload, sourceAddress: address });
     if (!publicKey || W.getPkhfromPk(publicKey) !== address || !W.verifySignature(payload, publicKey, signature)) throw new Error("That signature did not match the wallet. Try again.");
     ui.status("Checking your ticket…");
-    if (!(await holds(cfg, address))) { ui.status(`This wallet does not hold ${cfg.name} yet.`, true); return false; }
-    session.set({ contract: cfg.contract, tokenId: String(cfg.tokenId), address, at: Date.now() });
+    if (!(await holds(cfg, address))) { ui.status(`This wallet does not hold a ticket yet: ${cfg.need || "the concert film"}.`, true); return false; }
+    session.set({ contract: cfg.contract, address, at: Date.now() });
     return true;
   } catch (e) { ui.status(/abort|reject|declin|cancel/i.test(e?.message || e?.errorType || "") ? "No problem. Connect again whenever you are ready." : (e?.message || "Something went wrong. Try again."), true); return false; }
   finally { try { await client.clearActiveAccount(); await client.disconnect?.(); } catch (e) {} } }

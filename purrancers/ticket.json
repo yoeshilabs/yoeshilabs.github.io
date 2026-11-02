@@ -1,7 +1,13 @@
 {
-  "_about": "The ticket: holding this token lets a wallet into the show. Fill in the concert film once it is minted. contract empty = doors open to everyone; tokenId empty = any token from that contract counts.",
-  "contract": "",
-  "tokenId": "",
-  "name": "The Purrancers concert film",
-  "get": ""
+  "_about": "Who may enter: a wallet holding any token below (tokenId empty = any token from that contract). Add the concert film here once it is minted. An empty list leaves the doors open to everyone.",
+  "tickets": [
+    { "name": "Internet Friend", "contract": "KT1HSDxtqEY4UpYWrzxJoUWq1UDLDTMaFU24", "tokenId": "25" },
+    { "name": "Prancers", "contract": "KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw", "tokenId": "" },
+    { "name": "Prancer Pads", "contract": "KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf", "tokenId": "" },
+    { "name": "Prancer PFP", "contract": "KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY", "tokenId": "" },
+    { "name": "Wild Ride", "contract": "KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY", "tokenId": "" },
+    { "name": "Prancer Post", "contract": "KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En", "tokenId": "" }
+  ],
+  "need": "Internet Friend, any Purranchise chapter, or the concert film",
+  "get": "https://aleatory.art/generator/KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY"
 }
