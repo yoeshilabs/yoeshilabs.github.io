@@ -1,0 +1,229 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Prancer Band: the Sphere's wall</title>
+<style>html, body { margin: 0; background: #000; } canvas { display: block; }</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="perform.js"></script>
+<script>
+/* The inside wall of the Sphere: one equirectangular frame per moment of the song, for wrapping the dome in 3D.
+   No words, no titles: a show made of light, the way a real sphere is. Every pixel is drawn from its own direction
+   on the sphere (a WebGL shader), so nothing stretches or pinches where the wall curves overhead.
+
+   The wall has modes that cross-fade by section of the song (see SCORE):
+     dawn   a painted sunset sky: a low sun, layered clouds lit from beneath, the first stars
+     trance the Prance Trance tunnel: rings of walking Prancers (their own sprite sheets) streaming out of a point
+            above the stage, forever, one ring every eight beats, trails of light between the rings
+     face   the singer's face, many storeys tall, as a giant LED image on the wall above the stage
+     star   deep night: three layers of stars turning slowly, a faint nebula and an aurora along the horizon
+     bloom  a twelve-fold kaleidoscope of the tunnel, colour turning with the song, opening on every kick
+     freeze the wall stalls: blocks of the picture hold and slip, colour splits, then lets go
+     chain  (over the others, for the bridge) a chain of glowing blocks draws itself across the night, block by block on
+            the beat, each linked to the last, light running along the links
+   Always on: a ring of light bars all round the horizon, each stretch an instrument of the song; and the LED
+   pitch of the wall itself, panel seams and pixels, so it reads as a screen the size of a building.
+   ?w=3072 sets the width (height is half). window.__frame(songSeconds) draws a moment. */
+const q = new URLSearchParams(location.search), Wd = +(q.get("w") || 2048), Ht = Wd / 2;
+const cv = document.getElementById("c"); cv.width = Wd; cv.height = Ht;
+const gl = cv.getContext("webgl2", { preserveDrawingBuffer: true, antialias: false });
+
+const VS = `#version 300 es
+in vec2 p; out vec2 uv; void main() { uv = p * 0.5 + 0.5; uv.y = 1.0 - uv.y; gl_Position = vec4(p, 0, 1); }`;
+const FS = `#version 300 es
+precision highp float; precision highp sampler2DArray;
+in vec2 uv; out vec4 o;
+uniform vec2 R; uniform float T, BEAT, KICK, VOC, DRM, BAS, OTH, PNO, GTR, AIR;
+uniform float mDawn, mTrance, mFace, mStar, mBloom, mFreeze, mDark, mChain, CHAIN;
+const int NB = 14; uniform vec3 NODES[NB];
+uniform sampler2DArray CATS; uniform float NCATS;
+uniform sampler2D FACE, TITLE; uniform float mTitle, mSym, TITLEUP; uniform vec4 FACEBOX;   // the face's crop inside its texture: x, y, w, h (0..1)
+const float PI = 3.14159265, TAU = 6.2831853;
+vec3 dirOf(vec2 u) { float lon = (u.x - 0.5) * TAU, lat = (0.5 - u.y) * PI; return vec3(cos(lat) * sin(lon), sin(lat), cos(lat) * cos(lon)); }
+float h1(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
+float noise(vec3 x) { vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(h1(i), h1(i + vec3(1,0,0)), f.x), mix(h1(i + vec3(0,1,0)), h1(i + vec3(1,1,0)), f.x), f.y),
+             mix(mix(h1(i + vec3(0,0,1)), h1(i + vec3(1,0,1)), f.x), mix(h1(i + vec3(0,1,1)), h1(i + vec3(1,1,1)), f.x), f.y), f.z); }
+float fbm(vec3 p) { float a = 0.5, s = 0.0; for (int i = 0; i < 5; i++) { s += a * noise(p); p = p * 2.03 + 0.17; a *= 0.5; } return s; }
+vec3 hue(float h) { return clamp(abs(mod(h * 6.0 + vec3(0, 4, 2), 6.0) - 3.0) - 1.0, 0.0, 1.0); }
+/* the point the show radiates from: high above the stage (the stage is toward +z) */
+const vec3 F = normalize(vec3(0.0, 0.42, 1.0)), FX = normalize(cross(vec3(0, 1, 0), F)), FY = cross(F, FX);
+float stars(vec3 d, float scale, float density, float tw) { vec3 c = floor(d * scale), f = fract(d * scale) - 0.5; float h = h1(c);
+  if (h > density) return 0.0; vec3 off = vec3(h1(c + 1.3), h1(c + 2.7), h1(c + 5.1)) - 0.5; float r = length(f - off * 0.6);
+  return smoothstep(0.08, 0.0, r) * (0.55 + 0.45 * sin(T * (1.0 + 3.0 * h) * tw + h * 40.0)); }
+
+vec3 dawn(vec3 d) { float y = d.y;
+  vec3 sky = mix(vec3(1.0, 0.72, 0.42), vec3(0.85, 0.32, 0.42), smoothstep(0.0, 0.18, y)); sky = mix(sky, vec3(0.36, 0.16, 0.42), smoothstep(0.15, 0.45, y)); sky = mix(sky, vec3(0.07, 0.04, 0.16), smoothstep(0.4, 0.95, y));
+  vec3 S = normalize(vec3(0.62, 0.07, 0.78)); float sd = max(dot(d, S), 0.0);
+  sky += vec3(1.0, 0.85, 0.55) * pow(sd, 900.0) * 3.0 + vec3(1.0, 0.6, 0.35) * pow(sd, 40.0) * 0.55 + vec3(1.0, 0.5, 0.4) * pow(sd, 6.0) * 0.18;
+  float band = smoothstep(0.02, 0.12, y) * smoothstep(0.5, 0.2, y), cl = fbm(vec3(d.x * 3.0 + T * 0.02, d.y * 9.0, d.z * 3.0));
+  float cm = smoothstep(0.45, 0.7, cl) * band; vec3 cc = mix(vec3(0.45, 0.2, 0.42), vec3(1.0, 0.62, 0.5), smoothstep(0.35, 0.05, y) * (0.6 + 0.4 * sd));
+  sky = mix(sky, cc + vec3(1.0, 0.7, 0.5) * pow(sd, 8.0) * 0.5, cm * 0.85);
+  sky += vec3(1.0, 0.95, 0.9) * stars(d, 160.0, 0.06, 1.0) * smoothstep(0.35, 0.8, y) * 0.9;
+  return sky; }
+
+vec3 night(vec3 d) { float ry = T * 0.006; mat3 rot = mat3(cos(ry), 0, sin(ry), 0, 1, 0, -sin(ry), 0, cos(ry)); vec3 r = rot * d;
+  vec3 c = mix(vec3(0.05, 0.03, 0.12), vec3(0.008, 0.006, 0.03), smoothstep(0.0, 0.9, d.y));
+  float nb = fbm(r * 2.4 + vec3(0, 0, T * 0.01)); c += vec3(0.5, 0.16, 0.65) * smoothstep(0.5, 0.88, nb) * 0.55 + vec3(0.1, 0.45, 0.6) * smoothstep(0.55, 0.92, fbm(r * 3.1 + 7.0)) * 0.4;
+  c += vec3(1.0) * stars(r, 60.0, 0.06, 0.8) * 1.6 + vec3(0.8, 0.85, 1.0) * stars(r, 120.0, 0.1, 1.5) * 1.1 + vec3(1.0, 0.9, 0.8) * stars(r, 240.0, 0.16, 2.0) * 0.8;
+  c += vec3(0.6, 0.7, 1.0) * smoothstep(0.62, 0.95, fbm(r * 1.3 + 3.0)) * 0.12;   // the milky band
+  float au = smoothstep(0.02, 0.1, d.y) * smoothstep(0.3, 0.1, d.y) * (0.5 + 0.5 * sin(atan(d.x, d.z) * 3.0 + T * 0.3 + fbm(d * 4.0) * 4.0));
+  c += vec3(0.2, 0.9, 0.6) * au * 0.35 * (0.6 + VOC);
+  return c; }
+
+/* the tunnel: polar coordinates about F. ln(angle) gives rings of equal shape, 24 arms around */
+vec4 tunnel(vec3 d, float speed, float fold) { float p = dot(d, F), th = acos(clamp(p, -1.0, 1.0)); float ph = atan(dot(d, FY), dot(d, FX));
+  if (fold > 0.5) { float seg = TAU / 12.0; ph = mod(ph, seg); ph = abs(ph - seg * 0.5); }
+  float K = 24.0 / TAU, z = log(max(th, 1e-4)) * K - BEAT / 8.0 * speed, rz = floor(z), lz = fract(z);
+  float arm = ph / TAU * 24.0 + 0.5 * mod(rz, 2.0) + BEAT * 0.04 * (mod(rz, 2.0) > 0.5 ? -1.0 : 1.0), ra = floor(arm), la = fract(arm);
+  float frame = mod(ra * 3.0 + rz * 11.0 + floor(BEAT * 4.0), 100.0), layer = mod(ra + rz * 5.0, NCATS);
+  vec2 cell = vec2(la, 1.0 - lz); vec2 inset = (cell - 0.5) * vec2(1.25, 1.05) + 0.5;   // the cat fills its cell, feet toward the centre
+  vec4 cat = vec4(0); if (inset.x > 0.0 && inset.x < 1.0 && inset.y > 0.0 && inset.y < 1.0) {
+    vec2 fuv = vec2(mod(frame, 10.0) + inset.x, floor(frame / 10.0) + inset.y) / vec2(10.0, 10.0); cat = texture(CATS, vec3(fuv, layer)); }
+  float ringLine = exp(-pow(min(lz, 1.0 - lz) * 30.0, 2.0)) * (0.35 + 0.65 * KICK);
+  float fadeIn = smoothstep(0.03, 0.12, th), fadeOut = smoothstep(-0.05, 0.12, d.y);
+  vec3 rc = hue(fract(rz * 0.07 + BEAT * 0.01 + 0.82)) * 0.9 + 0.1;
+  return vec4(cat.rgb * cat.a * (0.75 + 0.5 * KICK) + rc * ringLine * 0.6, max(cat.a, ringLine * 0.6)) * fadeIn * fadeOut; }
+
+vec3 tranceBg(vec3 d) { float p = dot(d, F), th = acos(clamp(p, -1.0, 1.0));
+  vec3 c = mix(vec3(0.24, 0.05, 0.3), vec3(0.03, 0.01, 0.07), smoothstep(0.0, 1.6, th)); c += vec3(1.0, 0.7, 0.95) * exp(-th * 18.0) * (0.8 + 0.6 * KICK);   // the light at the heart of it
+  return c; }
+
+const vec3 FF = normalize(vec3(0.0, 0.78, 1.0)), FFX = normalize(cross(vec3(0, 1, 0), FF)), FFY = cross(FF, FFX);   // the face hangs higher, clear of the horizon
+/* the singer, whole: from above his ears down to the floor line (pl.y = -0.78 is the horizon, straight out from the centre),
+   standing behind the ring of light bars; FACEBOX picks the whole cat out of his card (720 x 892 px of it, so 0.807 wide per high) */
+const float TOPY = 0.75, BOTY = -0.78, HALFW = (TOPY - BOTY) * 0.807 * 0.5;
+vec3 faceImg(vec3 d) { float p = dot(d, FF); if (p < 0.3) return vec3(-1.0); vec2 pl = vec2(dot(d, FFX), dot(d, FFY)) / p;   // flat on the wall, seen from the centre
+  vec2 f = vec2(pl.x / HALFW * 0.5 + 0.5, (TOPY - pl.y) / (TOPY - BOTY)); if (any(lessThan(f, vec2(0))) || any(greaterThan(f, vec2(1)))) return vec3(-1.0);
+  vec2 N = vec2(260.0, 260.0 / 0.807), led = (floor(f * N) + 0.5) / N;   // a giant LED image: 260 pixels across
+  vec4 c = texture(FACE, FACEBOX.xy + led * FACEBOX.zw); float dot_ = smoothstep(0.5, 0.3, length(fract(f * N) - 0.5));
+  float edge = smoothstep(0.0, 0.05, f.x) * smoothstep(1.0, 0.95, f.x) * smoothstep(0.0, 0.04, f.y);   // no fade at the bottom: he stands on the floor line
+  return mix(vec3(-1.0), c.rgb * (0.55 + 0.6 * dot_) * 1.1, c.a * edge); }
+
+/* a band's name in lights (window.__title): a wide LED panel above the stage, its foot just over the light bars */
+vec4 titleImg(vec3 d) { float p = dot(d, FF); if (p < 0.3) return vec4(0); vec2 pl = vec2(dot(d, FFX), dot(d, FFY)) / p;
+  vec2 f = vec2(0.5 - pl.x / 0.68 * 0.5, (0.1 + TITLEUP - pl.y) / 0.34);   // mirrored in x: the 3D dome shows the wall flipped, so the name reads right there
+  float plate = smoothstep(-0.06, 0.06, f.x) * smoothstep(1.06, 0.94, f.x) * smoothstep(-0.12, 0.08, f.y) * smoothstep(1.12, 0.92, f.y);   // a soft dark plate, so the tunnel does not fight the letters
+  if (any(lessThan(f, vec2(0))) || any(greaterThan(f, vec2(1)))) return vec4(vec3(0.03, 0.01, 0.06), 0.6 * plate);
+  vec2 N = vec2(420.0, 420.0 * 0.34 / 1.36), led = (floor(f * N) + 0.5) / N; vec4 c = texture(TITLE, led);
+  float dot_ = smoothstep(0.5, 0.25, length(fract(f * N) - 0.5));
+  return vec4(mix(vec3(0.03, 0.01, 0.06), c.rgb * (0.5 + 0.8 * dot_) * (1.1 + 0.35 * KICK), c.a), max(c.a, 0.6 * plate)); }
+
+vec3 ring(vec3 d, vec3 base) { float lon = atan(d.x, d.z), y = d.y; if (y < 0.0 || y > 0.42) return base;
+  float bars = 288.0, bi = floor((lon / TAU + 0.5) * bars), bx = fract((lon / TAU + 0.5) * bars), u = bi / bars;
+  if (mSym > 0.5) { float a = abs(lon) / PI * 144.0; bi = floor(a); bx = fract(a); u = bi / 144.0; }   // mirrored about the stage's centre line: the vocal in the middle, then keys, the rest, bass, drums and guitar outward
+  float st = floor(u * 6.0), lev = st < 1.0 ? VOC : st < 2.0 ? PNO : st < 3.0 ? OTH : st < 4.0 ? BAS : st < 5.0 ? DRM : GTR;
+  float wob = 0.75 + 0.35 * sin(bi * 1.7 + BEAT * 3.1) * cos(bi * 0.37 - BEAT * 1.3), hgt = 0.03 + lev * wob * 0.3;
+  float on = step(y, hgt) * smoothstep(0.0, 0.12, bx) * smoothstep(1.0, 0.88, bx), seg = smoothstep(0.15, 0.3, fract(y * 120.0));
+  vec3 col = hue(fract(u + BEAT * 0.01)) * (0.7 + 0.6 * (y / max(hgt, 1e-3))) ; vec3 glow = hue(fract(u + BEAT * 0.01)) * exp(-max(y - hgt, 0.0) * 40.0) * 0.25 * lev;
+  return mix(base, col * 1.3, on * seg * 0.9) + glow * step(0.0, y); }
+
+/* the chain: blocks at points of light around the dome, revealed in order as CHAIN runs 0..1, linked along great circles */
+vec3 chain(vec3 d, vec3 base) { vec3 c = base; float n = float(NB) * CHAIN;
+  for (int i = 0; i < NB; i++) { float k = clamp(n - float(i), 0.0, 1.0); if (k <= 0.0) break; vec3 a = NODES[i];
+    if (i > 0) { vec3 b = NODES[i - 1], nab = normalize(cross(b, a)); float ang = acos(clamp(dot(a, b), -1.0, 1.0));   // the link back to the last block
+      float t = acos(clamp(dot(b, d), -1.0, 1.0)) / ang, ln = abs(dot(d, nab));
+      if (dot(cross(b, d), nab) > 0.0 && dot(cross(d, a), nab) > 0.0 && t < min(1.0, k * 1.6)) {
+        float pk = exp(-pow((fract(T * 0.45 + float(i) * 0.37) - t) * 18.0, 2.0));   // a pulse of light running along it
+        c += vec3(0.35, 0.85, 1.0) * (smoothstep(0.0035, 0.0012, ln) * 0.9 + exp(-ln * 260.0) * 0.25) * (0.7 + 0.6 * pk) + vec3(1.0, 0.9, 0.6) * pk * smoothstep(0.006, 0.0, ln); } }
+    float pd = dot(d, a); if (pd < 0.97) continue;   // the block itself, flat on the wall
+    vec3 tx = normalize(cross(vec3(0, 1, 0), a)), ty = cross(a, tx); vec2 q = vec2(dot(d, tx), dot(d, ty)) / pd;
+    float pop = k < 1.0 ? smoothstep(0.0, 0.6, k) * (1.0 + 0.25 * sin(k * PI)) : 1.0 + 0.08 * KICK, sz = 0.05 * pop;
+    vec2 aq = abs(q) / sz; float box = max(aq.x, aq.y); if (box > 1.6) continue;
+    float edge = smoothstep(1.0, 0.94, box) - smoothstep(0.9, 0.84, box), fill = smoothstep(1.0, 0.97, box);
+    vec2 cell = floor((q / sz * 0.5 + 0.5) * 5.0); float bit = step(0.5, h1(vec3(cell, float(i) * 3.1 + 1.0)));   // its data: a little grid of lit cells
+    vec3 col = mix(vec3(0.3, 0.8, 1.0), vec3(1.0, 0.8, 0.4), fract(float(i) * 0.37));
+    c = mix(c, vec3(0.02, 0.03, 0.07), fill * 0.85) + col * (edge * 1.6 + fill * bit * 0.55 * smoothstep(0.92, 0.7, box)) + col * exp(-max(box - 1.0, 0.0) * 6.0) * 0.18 * step(1.0, box); }
+  return c; }
+
+void main() { vec2 u = uv;
+  if (mFreeze > 0.0) { float bl = floor(u.y * 24.0), sl = h1(vec3(bl, floor(T * 6.0), 1.0)); u.x += (sl - 0.5) * 0.06 * mFreeze * step(0.55, sl);   // slipping blocks
+    u = mix(u, (floor(u * vec2(96, 48)) + 0.5) / vec2(96, 48), mFreeze * step(0.7, h1(vec3(floor(u * vec2(12, 6)), floor(T * 3.0))))); }
+  vec3 d = dirOf(u);
+  if (d.y < -0.02) { o = vec4(0.02, 0.01, 0.025, 1); return; }   // below the horizon: the floor and seats, never seen on the wall
+  vec3 c = vec3(0);
+  float wsum = mDawn + mStar + mTrance + mBloom + 0.0001;
+  c += dawn(d) * mDawn; c += night(d) * mStar;
+  if (mTrance > 0.001) { vec4 tn = tunnel(d, 1.0, 0.0); c += mix(tranceBg(d), tn.rgb, tn.a) * mTrance; }
+  if (mBloom > 0.001) { vec4 tn = tunnel(d, 2.0, 1.0); vec3 bg = tranceBg(d) + hue(fract(atan(dot(d, FY), dot(d, FX)) / TAU * 2.0 + BEAT * 0.03)) * 0.18 * (0.5 + KICK);
+    float flare = exp(-acos(clamp(dot(d, F), -1.0, 1.0)) * (6.0 - 3.0 * KICK)); c += (mix(bg, tn.rgb * 1.2, tn.a) + vec3(1.0, 0.8, 0.95) * flare * 0.6) * mBloom; }
+  c /= max(1.0, wsum);
+  if (mFace > 0.001) { vec3 fc = faceImg(d); if (fc.x >= 0.0) c = mix(c, fc, mFace); }
+  if (mChain > 0.001) c = mix(c, chain(d, c), mChain);
+  if (mTitle > 0.001) { vec4 tt = titleImg(d); c = mix(c, tt.rgb, tt.a * mTitle); }
+  c = ring(d, c);
+  if (mFreeze > 0.0) { float sp = 0.004 * mFreeze; c.r = mix(c.r, c.r * 1.25, mFreeze * 0.5); c.b = mix(c.b, c.b * 1.3, mFreeze * 0.5); c = mix(c, vec3(dot(c, vec3(0.3, 0.59, 0.11))), mFreeze * 0.35); }
+  /* the wall is a screen: panel seams along latitude and longitude, and the pixel pitch */
+  vec2 pg = vec2(atan(d.x, d.z) / TAU * 360.0, asin(clamp(d.y, -1.0, 1.0)) / PI * 180.0); vec2 sm = abs(fract(pg / vec2(4.0, 3.0)) - 0.5);
+  float seam = 1.0 - 0.22 * (smoothstep(0.485, 0.5, sm.x) + smoothstep(0.485, 0.5, sm.y));
+  vec2 px = fract(u * R * 0.5); float pit = 0.9 + 0.1 * smoothstep(0.5, 0.3, length(px - 0.5));
+  c *= seam * pit * (1.0 - mDark);
+  o = vec4(pow(max(c, 0.0), vec3(0.95)), 1); }`;
+
+function shader(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; }
+const prog = gl.createProgram(); gl.attachShader(prog, shader(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog);
+if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+gl.useProgram(prog);
+const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+const loc = gl.getAttribLocation(prog, "p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+const U = (n) => gl.getUniformLocation(prog, n);
+
+/* the Prancers for the tunnel: walking sprite sheets (10 x 10 frames of 150 x 181), halved, as a texture array */
+const IDS = Array.from({ length: 20 }, (_, i) => (i * 7 + 3) % 91), SW = 750, SH = 905;
+const catTex = gl.createTexture(); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D_ARRAY, catTex);
+gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 1, gl.RGBA8, SW, SH, IDS.length);
+gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+const faceTex = gl.createTexture(); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, faceTex);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+const titleTex = gl.createTexture(); gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, titleTex);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+gl.uniform1i(U("CATS"), 0); gl.uniform1i(U("FACE"), 1); gl.uniform1i(U("TITLE"), 2); gl.uniform1f(U("NCATS"), IDS.length);
+const half = document.createElement("canvas"); half.width = SW; half.height = SH; const hx = half.getContext("2d");
+const loadImg = (src) => new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+const sheetsReady = Promise.all(IDS.map((n, i) => loadImg(`sprites/150/${n}.webp`).then((im) => { if (!im) return;
+  hx.clearRect(0, 0, SW, SH); hx.drawImage(im, 0, 0, SW, SH); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D_ARRAY, catTex);
+  gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, i, SW, SH, 1, gl.RGBA, gl.UNSIGNED_BYTE, half); })));
+
+/* the score: which mode the wall is in, by song time (seconds), with cross-fades; from SHOTLIST.md */
+const SCORE = [
+  [0, { dawn: 0.35 }], [8, { dawn: 0.7 }], [15, { dawn: 1 }], [30, { dawn: 0.6, face: 0.9 }], [36.5, { dawn: 1 }], [43, { star: 1 }], [49, { star: 0.6, trance: 0.45 }],
+  [54.4, { trance: 1 }], [64, { trance: 0.6, face: 1 }], [70, { trance: 1 }], [76, { trance: 0.5, face: 1 }], [82, { bloom: 1, freeze: 0.25 }], [93, { dawn: 0.5, star: 0.6 }],
+  [100.3, { trance: 1, freeze: 0.5 }], [101.6, { trance: 1 }], [106, { dawn: 0.5, star: 0.6, face: 1 }], [112, { dawn: 0.5, star: 0.6 }], [119, { bloom: 1 }], [133, { bloom: 0.5, face: 1 }], [147, { trance: 0.55 }],
+  [159.6, { star: 1 }], [163, { star: 1, chain: 1 }], [172.7, { star: 0.5, trance: 0.7, chain: 0.6 }], [178, { star: 0.3, trance: 0.9 }], [184, { bloom: 1 }], [197, { bloom: 0.5, face: 1 }], [204, { bloom: 1 }], [208, { bloom: 0.5, face: 1 }],
+  [211.5, { trance: 1 }], [216.8, { bloom: 1 }], [222, { trance: 1 }], [227, { bloom: 1 }], [236, { dawn: 0.45 }], [245.5, { trance: 0.9 }], [252.4, { trance: 0.6 }]];   // Prance Trance over the ending (Yoeshi, 2026-11-01)
+const FADE = 0.9, MODES = ["dawn", "trance", "face", "star", "bloom", "freeze", "dark", "chain"];
+const CHAIN0 = 163, CHAIN1 = 172;   // the chain draws itself over the bridge
+/* the blocks: points of light spiralling round the dome from above the stage, out over the crowd and back */
+const NODES = Array.from({ length: 14 }, (_, i) => { const lon = (20 + i * 26) * Math.PI / 180, lat = (16 + 14 * Math.sin(i * 1.3) + i * 1.2) * Math.PI / 180; return [Math.cos(lat) * Math.sin(lon), Math.sin(lat), Math.cos(lat) * Math.cos(lon)]; }).flat();
+function modeAt(ts) { let i = 0; while (i < SCORE.length - 1 && SCORE[i + 1][0] <= ts) i++;
+  const cur = SCORE[i][1], prev = i ? SCORE[i - 1][1] : cur, k = Math.min(1, (ts - SCORE[i][0]) / FADE), e = k * k * (3 - 2 * k), out = {};
+  for (const m of MODES) out[m] = (prev[m] || 0) * (1 - e) + (cur[m] || 0) * e; return out; }
+
+let FACEIMG = null;
+window.__ready = Promise.all([PERFORM.load("../data/map.json", "../data/beats.json"), sheetsReady]).then(() => true);
+/* the face: a frame of the singer's card (a transparent PNG); FACEBOX picks the head out of it */
+window.__face = (src, box) => loadImg(src).then((im) => { if (!im) return; gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, faceTex); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); gl.uniform4f(U("FACEBOX"), ...box); });
+/* a band's name for the wall (a transparent PNG, 2.5 wide per 0.62 high), shown when the mode has title > 0 */
+/* the singer from a canvas already in hand (the live show composes him from its band video): box as for __face */
+window.__faceEl = (el, box) => { gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, faceTex); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, el); gl.uniform4f(U("FACEBOX"), ...box); };
+window.__title = (src) => loadImg(src).then((im) => { if (!im) return; gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, titleTex); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); });
+window.__frame = (ts, force) => { const E = (k) => PERFORM.env(k, ts), b = PERFORM.beat(ts), m = force || modeAt(ts), kick = Math.max(E("hits"), Math.exp(-((b % 1 + 1) % 1) * 6) * 0.6);
+  gl.viewport(0, 0, Wd, Ht); gl.uniform2f(U("R"), Wd, Ht); gl.uniform1f(U("T"), ts); gl.uniform1f(U("BEAT"), b); gl.uniform1f(U("KICK"), kick);
+  for (const [u_, k] of [["VOC", "vocals"], ["DRM", "drums"], ["BAS", "bass"], ["OTH", "other"], ["PNO", "piano"], ["GTR", "guitar"]]) gl.uniform1f(U(u_), Math.min(1, E(k) * 1.15));
+  for (const [u_, k] of [["mDawn", "dawn"], ["mTrance", "trance"], ["mFace", "face"], ["mStar", "star"], ["mBloom", "bloom"], ["mFreeze", "freeze"], ["mDark", "dark"], ["mChain", "chain"], ["mTitle", "title"], ["mSym", "sym"], ["TITLEUP", "titleUp"]]) gl.uniform1f(U(u_), m[k] || 0);
+  gl.uniform1f(U("CHAIN"), force && force.chainAt !== undefined ? force.chainAt : Math.min(1, Math.max(0, (ts - CHAIN0) / (CHAIN1 - CHAIN0)))); gl.uniform3fv(U("NODES[0]"), NODES);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); return new Promise((r) => requestAnimationFrame(() => r(m))); };
+window.__modeAt = modeAt;
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Purrancers, live in the Sphere</title>
+<style>
+  :root { --ink: #fff7ef; --dim: rgba(255, 247, 239, .72); --pink: #ff5fa8; --gold: #ffd36e; --night: #120a1c; }
+  html, body { margin: 0; height: 100%; background: var(--night); color: var(--ink); font: 16px/1.4 ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif; overflow: hidden; touch-action: none; }
+  canvas#view { display: block; width: 100vw; height: 100vh; }
+  #wallframe { position: fixed; left: 0; top: 0; width: 2px; height: 2px; opacity: 0; pointer-events: none; border: 0; }
+  .veil { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 40%, rgba(40, 14, 60, .55), rgba(10, 4, 16, .9)); z-index: 5; padding: 16px; }
+  .card { max-width: 440px; text-align: center; }
+  .card img { width: min(420px, 86vw); height: auto; }
+  .card p { color: var(--dim); margin: 10px 0 22px; }
+  button { font: inherit; font-size: 18px; color: #2a0f3c; background: linear-gradient(var(--pink), var(--gold)); border: 0; border-radius: 999px; padding: 14px 30px; cursor: pointer; box-shadow: 0 6px 24px rgba(255, 95, 168, .35); }
+  button:disabled { opacity: .5; cursor: wait; }
+  #hud { position: fixed; left: 16px; right: 16px; bottom: 14px; display: flex; justify-content: space-between; align-items: end; pointer-events: none; z-index: 3; font-size: 13px; color: var(--dim); text-shadow: 0 1px 3px #000; }
+  #hud b { color: var(--ink); }
+  #stick { position: fixed; left: 24px; bottom: 54px; width: 110px; height: 110px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .25); display: none; z-index: 4; }
+  #stick i { position: absolute; left: 35px; top: 35px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, .35); }
+  #paws { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 2; }
+  #toast { position: fixed; left: 50%; top: 18px; transform: translate(-50%, -12px); opacity: 0; transition: .3s; z-index: 4; pointer-events: none;
+    background: rgba(26, 11, 36, .85); border: 1px solid rgba(255, 211, 110, .5); border-radius: 14px; padding: 10px 18px; text-align: center; max-width: calc(100vw - 32px); }
+  #toast.on { opacity: 1; transform: translate(-50%, 0); } #toast b { display: block; color: var(--gold); } #toast span { color: var(--dim); font-size: 14px; }
+  #score { position: fixed; right: 16px; top: 14px; z-index: 3; color: var(--ink); font-size: 14px; text-shadow: 0 1px 3px #000; pointer-events: none; white-space: pre; }
+  #prompt { position: fixed; left: 50%; bottom: 46%; transform: translateX(-50%); z-index: 3; opacity: 0; transition: opacity .2s; pointer-events: none;
+    background: rgba(26, 11, 36, .8); border-radius: 999px; padding: 8px 16px; font-size: 15px; } #prompt.on { opacity: 1; }
+  .act { position: fixed; z-index: 4; width: 72px; height: 72px; border-radius: 50%; padding: 0; font-size: 13px; display: none; box-shadow: none; }
+  #use { right: 22px; bottom: 120px; } #pawsup { right: 106px; bottom: 60px; background: linear-gradient(#7fe6ff, #c38bff); }
+  .coats { display: flex; gap: 10px; justify-content: center; margin: 0 0 20px; flex-wrap: wrap; }
+  .coat { width: 40px; height: 40px; padding: 0; border-radius: 50%; border: 3px solid transparent; box-shadow: 0 2px 8px rgba(0, 0, 0, .5); }
+  .coat.on { border-color: var(--gold); }
+  .recap ul { list-style: none; padding: 0; margin: 0 0 14px; text-align: left; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; max-height: 46vh; overflow: auto; }
+  .recap li { color: rgba(255, 247, 239, .4); font-size: 13px; } .recap li.got { color: var(--ink); } .recap li b { display: block; font-size: 14px; } .recap li.got b { color: var(--gold); }
+  @media (pointer: coarse) { #stick { display: block; } .keys { display: none; } .act { display: block; } #prompt { bottom: 40%; } }
+  @media (pointer: fine) { .touch { display: none; } }
+</style>
+<script type="importmap">{ "imports": { "three": "./lib/three.module.min.js" } }</script>
+</head>
+<body>
+<canvas id="view"></canvas>
+<iframe id="wallframe" title="the Sphere's wall" aria-hidden="true"></iframe>
+<canvas id="paws"></canvas>
+<div id="stick"><i></i></div>
+<button class="act" id="use">Use</button><button class="act" id="pawsup">Paws up</button>
+<div id="toast"></div><div id="score"></div><div id="prompt"></div>
+<div id="hud"><span><b>The Purrancers</b>, live in the Sphere</span><span id="clock"></span></div>
+<div class="veil" id="doors">
+  <div class="card">
+    <img src="assets/purrancers-title.png" alt="The Purrancers">
+    <p>Live in the Sphere. Walk the floor, find your spot, and turn the sound up.
+      <span class="keys"><br>W A S D to walk, the mouse to look, E to use, Space for paws up.</span>
+      <span class="touch"><br>The stick to walk, drag to look, Use and Paws up buttons.</span></p>
+    <p style="margin:0 0 10px">You are a Prancer tonight. Pick your coat:</p>
+    <div class="coats" id="coats"></div>
+    <button id="enter" disabled>Doors opening…</button>
+    <p id="ticketmsg" hidden style="margin:14px 0 0"></p>
+    <a id="ticketget" hidden target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;color:var(--gold)">Get your ticket</a>
+  </div>
+</div>
+<script type="module" src="show.js?v=10"></script>
+</body>
+</html>

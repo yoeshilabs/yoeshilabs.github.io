@@ -1,0 +1,7 @@
+{
+  "_about": "The ticket: holding this token lets a wallet into the show. Fill in the concert film once it is minted. contract empty = doors open to everyone; tokenId empty = any token from that contract counts.",
+  "contract": "",
+  "tokenId": "",
+  "name": "The Purrancers concert film",
+  "get": ""
+}
