@@ -219,7 +219,10 @@ const enter = $("enter");
 band.addEventListener("loadeddata", () => { band.addEventListener("seeked", () => { makePinFaces(band, pinCanvases); venue.pins.forEach((p) => (p.sprite.material.map.needsUpdate = true));
     band.currentTime = START; enter.disabled = false; enter.textContent = ticket.contract ? "Show your ticket" : "Enter the show"; }, { once: true }); band.currentTime = 70; }, { once: true }); band.load();
 enter.addEventListener("click", async () => { enter.disabled = true; tget.hidden = true; if (!(await checkTicket(ticket, ticketUi))) return;
-  $("doors").remove(); live = true; audio.currentTime = START; await audio.play(); band.currentTime = START; band.play().catch(() => {});
+  $("doors").remove(); live = true; audio.currentTime = START; band.currentTime = START;
+  try { await audio.play(); } catch (e) {   // a long wallet visit can use up the click that allowed sound: one more tap starts it
+    const g = $("soundgate"); g.hidden = false; await new Promise((res) => g.addEventListener("click", res, { once: true })); g.hidden = true; await audio.play().catch(() => {}); }
+  band.play().catch(() => {});
   if (matchMedia("(pointer: fine)").matches) lock(); });
 audio.addEventListener("ended", () => { live = false; band.pause(); const v = game.recap();
   v.querySelector("button").onclick = () => { v.remove(); live = true; audio.currentTime = 0; audio.play(); band.currentTime = 0; band.play(); }; document.exitPointerLock?.(); });
