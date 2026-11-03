@@ -42,7 +42,7 @@ const pmrem = new THREE.PMREMGenerator(renderer); scene.environment = pmrem.from
 /* the glow of a real show: lights, the wall, beams and signs bloom a little */
 const composer = new EffectComposer(renderer); composer.setPixelRatio(Q.dpr); composer.setSize(innerWidth, innerHeight);   // (multisampled targets render black in some browsers: edges are smoothed in the materials instead)
 composer.addPass(new RenderPass(scene, cam));
-const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.22, 0.35, 0.93); composer.addPass(bloom); composer.addPass(new OutputPass());
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.18, 0.3, 0.95); composer.addPass(bloom); composer.addPass(new OutputPass());
 addEventListener("resize", () => { renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); });
 
 /* ------------------------------------------------------------------ the song's clock */
@@ -51,7 +51,9 @@ const beats = (await (await fetch("data/beats.json")).json()).beats;
 const beatAt = (t) => { if (t <= beats[0]) return (t - beats[0]) / (beats[1] - beats[0]); let lo = 0, hi = beats.length - 1;
   if (t >= beats[hi]) return hi + (t - beats[hi]) / (beats[hi] - beats[hi - 1]);
   while (hi - lo > 1) { const m = (lo + hi) >> 1; if (beats[m] <= t) lo = m; else hi = m; } return lo + (t - beats[lo]) / (beats[lo + 1] - beats[lo]); };
-let live = false; const songTime = () => (live ? audio.currentTime : 0);
+/* ?film=1 (this Mac only): the show filmed frame by frame on a set clock, for trailers (window.__film) */
+const FILM = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).has("film"); let filmT = 0;
+let live = false; const songTime = () => (live ? (FILM ? filmT : audio.currentTime) : 0);
 
 /* ------------------------------------------------------------------ the venue */
 const lay = await (await fetch("assets/sphere.json")).json();
@@ -62,7 +64,7 @@ const wallTex = new THREE.CanvasTexture(wallFrame.contentDocument.getElementById
 const gltf = await new GLTFLoader().loadAsync("assets/sphere.glb");
 gltf.scene.traverse((o) => { if (!o.isMesh) return;
   if (o.name.startsWith("dome")) o.material = new THREE.MeshBasicMaterial({ map: wallTex, side: THREE.DoubleSide, fog: false });
-  else if (o.material.emissive && o.material.emissiveIntensity > 0 && o.material.emissive.getHex()) { o.material.toneMapped = false; o.material.emissiveIntensity *= 0.3; }   // the glow pass does the rest
+  else if (o.material.emissive && o.material.emissiveIntensity > 0 && o.material.emissive.getHex()) { o.material.toneMapped = false; o.material.emissiveIntensity *= /^rlight/.test(o.material.name) ? 0.12 : 0.3; }   // the glow pass does the rest
   else if (o.material.isMeshStandardMaterial) { const n = o.material.name || "";                                  // gloss where a real venue has it
     o.material.envMapIntensity = o.material.metalness > 0.5 ? 0.35 : 0.05;
     if (/stage|riser/.test(n)) { o.material.roughness = 0.3; o.material.metalness = 0.1; o.material.envMapIntensity = 0.08; } } });
@@ -230,15 +232,21 @@ const clock = $("clock"); let last = performance.now(), n = 0, synced = 0;
    stalls the first time it comes into view (a stand, the Art Hall, the confetti, a pin) */
 scene.traverse((o) => { for (const m of [].concat(o.material || [])) for (const k of ["map", "alphaMap", "emissiveMap", "normalMap", "roughnessMap", "metalnessMap"]) if (m[k] && !m[k].isVideoTexture) renderer.initTexture(m[k]); });
 await renderer.compileAsync(scene, cam);
-renderer.setAnimationLoop(() => { const now = performance.now(), dt = Math.min(0.05, (now - last) / 1000); last = now; n++;
+function frame(now, dt) { n++;
   const t = songTime(), b = beatAt(t), pulse = Math.exp(-(((b % 1) + 1) % 1) * 5);
   if (live && !band.seeking && now - synced > 1000 && Math.abs(band.currentTime - t) > 0.12) { band.currentTime = t + 0.05; synced = now; }   // keep the band on the song (at most once a second, so a seek can finish)
   W.__frame(live ? t : now / 1000 % 60, live ? undefined : DOORS); wallTex.needsUpdate = true;
   if (live && n % 2 === 0 && (W.__modeAt(t).face || 0) > 0.01 && band.readyState >= 2) composeFace();
   for (const p of players) p.rotation.y = Math.atan2(cam.position.x - p.position.x, cam.position.z - p.position.z);
   beams.forEach((m, i) => (m.material.uniforms.gain.value = 0.75 + 0.5 * pulse * (i % 2 ? 1 : 0.6)));
-  pools.forEach((m, i) => (m.material.opacity = 0.16 + 0.14 * pulse * (i % 2 ? 1 : 0.6))); dustMat.uniforms.t.value = now / 1000;
+  pools.forEach((m, i) => (m.material.opacity = 0.08 + 0.08 * pulse * (i % 2 ? 1 : 0.6))); dustMat.uniforms.t.value = now / 1000;
   fanMat.uniforms.t.value = live ? t : now / 1000; confMat.uniforms.t.value = t;
-  walk(dt); venue.update(t, now); game.update(t, dt, b, now, me.moving, live); if (Q.bloom) composer.render(); else renderer.render(scene, cam); govern(dt);
-  if (live) clock.textContent = `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`; });
+  if (FILM) { const m = me.moving; walk(dt); me.moving = m; } else walk(dt); venue.update(t, now); game.update(t, dt, b, now, me.moving, live); if (Q.bloom) composer.render(); else renderer.render(scene, cam); if (!FILM) govern(dt);
+  if (live) clock.textContent = `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`; }
+if (!FILM) renderer.setAnimationLoop(() => { const now = performance.now(), dt = Math.min(0.05, (now - last) / 1000); last = now; frame(now, dt); });
+else {   // one frame at song time t, from a pose: { x, z, yaw, pitch, moving, up }; the band video is seeked to t first
+  Q.dpr = 1; Q.bloom = true; $("doors")?.remove(); live = true; band.pause(); window.govern = null;
+  window.__film = async (t, pose = {}) => { filmT = t; Object.assign(me, pose); if (pose.up !== undefined) dispatchEvent(new KeyboardEvent(pose.up ? "keydown" : "keyup", { code: "Space" }));
+    if (Math.abs(band.currentTime - t) > 0.001) { band.currentTime = t; await new Promise((r) => band.addEventListener("seeked", r, { once: true })); }
+    frame(t * 1000, 1 / 30); await new Promise((r) => requestAnimationFrame(() => r())); return t; }; }
 window.__show = { audio, band, cam, confMat, confetti, scene, me, venue, Q, composer, renderer };   // for checking a moment from the console

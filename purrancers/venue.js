@@ -69,7 +69,7 @@ export function buildVenue({ scene, STAGE, fanTex, fanMeta, pinFaces }) {
     /* a Prancer behind the counter, one of the fans, dancing */
     const vt = fanTex.clone(); vt.repeat.set(1 / fanMeta.cols, 1 / fanMeta.rows); vt.needsUpdate = true;
     const vendor = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 1.53), new THREE.MeshBasicMaterial({ map: vt, transparent: true, alphaTest: 0.35 })); vendor.position.set(-0.75, 1.05, -0.65); g.add(vendor);   // standing behind the counter, head and shoulders above it
-    const light = new THREE.PointLight(c1, 14, 7, 1.6); light.position.set(0, 2.6, 0.6); g.add(light);
+    const light = new THREE.PointLight(c1, 6, 6, 1.8); light.position.set(0, 2.6, 0.6); g.add(light);
     const front = P(23.9, d.a, DECK); colliders.push({ x: g.position.x, z: g.position.z, r: 1.75 });
     return { ...d, group: g, front, vendor: { tex: vt, kind: (si * 7 + 3) % fanMeta.fronts }, next: 0 }; });
 

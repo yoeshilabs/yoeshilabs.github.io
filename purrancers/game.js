@@ -114,7 +114,8 @@ export function createGame({ cam, me, venue, STAGE, keys, view, conf }) {
     st.stride += dt * 7 * moving; const sw = Math.sin(st.stride) * S * 0.025 * moving;
     let lx = W * 0.27, ly = H * 0.9 - S * 0.018 * pulse2 + sw, rx = W * 0.73, ry = H * 0.9 - S * 0.018 * pulse - sw, rs = 1;
     const wave = Math.sin(now / 1000 * 7) * S * 0.035;
-    lx = lerp(lx, W * 0.3 + wave, U); ly = lerp(ly, H * 0.4, U); rx = lerp(rx, W * 0.7 - wave, U); ry = lerp(ry, H * 0.4, U);
+    const upY = Math.max(H * 0.4, H - S * 0.62);   // paws up, but never noodle arms on a tall phone screen
+    lx = lerp(lx, W * 0.3 + wave, U); ly = lerp(ly, upY, U); rx = lerp(rx, W * 0.7 - wave, U); ry = lerp(ry, upY, U);
     if (st.freeze()) { lx += (Math.random() - 0.5) * 4; rx += (Math.random() - 0.5) * 4; }
     const a = st.anim; if (a) { a.t += dt; const k = Math.min(1, a.t / a.dur), e = Math.sin(Math.PI * k);
       if (a.kind === "reach") { rx = lerp(rx, W * 0.56, e); ry = lerp(ry, H * 0.58, e); rs = lerp(1, 0.7, e); if (k > 0.5 && !a.got) { a.got = true; got(a.key); } }
