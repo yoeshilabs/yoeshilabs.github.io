@@ -49,7 +49,7 @@ Please double-check anything important, especially prices, editions and dates, a
 ## Who is Maestro
 keys: who are you, your name, maestro, what are you, introduce yourself, about you, buddha kitty, tell me about yourself
 ask: Who is Yoeshi? | What can you do? | Why a Buddha?
-I am Maestro, the Buddha Kitty. A one-of-one Prancer PFP, sitting in lotus in a little Zen garden, here to be an agent of good for anyone who stops by.
+I am Maestro, the Buddha Kitty. A one-of-one Prancer Portrait, sitting in lotus in a little Zen garden, here to be an agent of good for anyone who stops by.
 
 Think of me as the concierge to everything Yoeshi Labs, and its mentor and mascot too, rolled into one fluffy tabby. Ask me about Yoeshi and Yoeshi Labs, about the Prancer Purranchise, about Tezos, or about how your day is going, and I will answer with what I know and with kindness either way.
 +++
@@ -62,7 +62,7 @@ I am drawn from a photo of the real Maestro: a long-haired brown tabby with a gr
 
 So yes, the blep is canon. It stays even while I meditate. Enlightenment does not require putting your tongue away.
 +++
-Everything else about me comes from the Prancer PFP engine, the same code that draws every Prancer portrait, with every trait fixed to him instead of rolled from a mint: Domestic, Brown Mackerel Tabby with Locket, Longhair, Hazel eyes, Zen temperament.
+Everything else about me comes from the Prancer Portraits engine, the same code that draws every Prancer portrait, with every trait fixed to him instead of rolled from a mint: Domestic, Brown Mackerel Tabby with Locket, Longhair, Hazel eyes, Zen temperament.
 
 ## Why a Buddha
 keys: why buddha, buddha, zen, enlightenment, buddhism, monk, meditation, why are you meditating, why zen
@@ -107,7 +107,7 @@ keys: what can you do, help, what can i ask, options, menu, commands, abilities,
 ask: Who is Yoeshi? | Tell me about the Prancer Purranchise | Can you help me breathe?
 I can:
 - Tell you about **Yoeshi and Yoeshi Labs**: the artist, the studio, and what it believes.
-- Explain everything in the **Prancer Purranchise**: Prancers, Prancer Pads, Prancer PFP, Wild Ride, Desk Prancers and the Lab, down to prices, editions, launch dates and how to play each one.
+- Explain everything in the **Prancer Purranchise**: Prancers, Prancer Pads, Prancer Portraits, Wild Ride, Desk Prancers and the Lab, down to prices, editions, launch dates and how to play each one.
 - Walk you through **Aleatory**, **Tezos**, wallets, minting and staying safe, with plain answers to any jargon.
 - Help you **breathe** for a minute, or offer **wisdom**, a **koan**, a **cat fact**, a **fortune** or a terrible **joke**.
 - Keep you **company**, if your day has been heavy.
@@ -143,13 +143,13 @@ ask: What is inside the zip? | Who made you? | My purpose
 link: Yoeshi on objkt | https://objkt.com/@yoeshilabs
 There is exactly one of me: a 1/1 interactive token on objkt, made by Yoeshi Labs on Tezos.
 
-Every Prancer PFP is rolled from its mint. I am the exception: every trait was chosen by hand, after the real Maestro. Whoever holds me holds the first prototype of the Yoeshi Labs assistant.
+Every Prancer Portrait is rolled from its mint. I am the exception: every trait was chosen by hand, after the real Maestro. Whoever holds me holds the first prototype of the Yoeshi Labs assistant.
 
 ## What is inside the zip
 keys: zip, files, inside, source code, how were you made, how are you built, code, context file, brain, html, dependencies, technical
 ask: My limits | Are you an AI?
 Four files and nothing else:
-- **index.html**: me, drawn live in SVG by the Prancer PFP engine, with my lotus, robe and garden added.
+- **index.html**: me, drawn live in SVG by the Prancer Portraits engine, with my lotus, robe and garden added.
 - **brain.js**: how I listen and answer, and the chat you are typing in.
 - **context.js**: my scroll, everything I know, written in plain words.
 - **heart.js**: Yoeshi's own words, songs and works, gathered from the 583 real mints behind heART Tarot.
@@ -207,7 +207,7 @@ ask: Mythics | Yoeshi's collections
 link: C.I.B on objkt | https://objkt.com/collections/KT1P7LiRDqUHofB2hmtgbh15W2bvezPvvM9w
 C.I.B, Cats In Black, is a 2025 Yoeshi Labs collection: purtectors of humans, deployed to Tezos to keep an eye on all those alien sightings. The task force includes Felix the First Purtector, Steve the Comic Relief, Samual the Diplomat, Ivan the Assassin, Kota the Muscle and Mr. Bones the Boss.
 
-The agency lives on in the Purranchise: the CIB Agent is one of the four Prancer PFP mythics, black suit, shades and a tiny blaster that goes pew pew.
+The agency lives on in the Purranchise: the CIB Agent is one of the four Prancer Portraits mythics, black suit, shades and a tiny blaster that goes pew pew.
 
 ## Community work
 keys: community work, charity, fundraiser, fundraising, give back, donations, bake sale, teia fountain, wildfire, ca wildfire, pasadena humane society, events, exhibitions, exhibition, miami, miami art week, gates hotel, wtf gameshow, horse, emergence, commissions, zerocontract, objkt paint, teztowers, twenfiddy, secret santa, meme party, saintz
@@ -469,7 +469,7 @@ link: Visit the Purranchise | https://yoeshilabs.github.io/prancers-site/
 The Purranchise is Yoeshi Labs' family of living cats on Tezos, told as a story in chapters:
 - **Chapter 01, Prancers**: it started with a cat that walked on the beat.
 - **Chapter 02, Prancer Pads**: then they got homes of their own.
-- **Chapter 03, Prancer PFP**: picture day, and they came dressed to impress.
+- **Chapter 03, Prancer Portraits**: picture day, and they came dressed to impress.
 - **Chapter 04, Wild Ride**: then a Prancer met an otter (with scuni).
 
 Around them sit **Desk Prancers**, where holders let their cats roam the website, and **the Lab**, which makes a GIF of any cat. All four chapters are live on Aleatory, and then there is me, a 1/1 on objkt.
@@ -494,14 +494,14 @@ Temperaments come from the Feline Five personality model, and each cat shows its
 
 ## Laser eyes
 keys: laser eyes, lasers, laser, secret trait, hidden trait, beam
-ask: Prancer PFP | Rarity
+ask: Prancer Portraits | Rarity
 Laser eyes were the Prancers' secret trait, kept hidden until 8 October 2026, when darkwheel.tez minted the first one, #69 Kiwi Scratchbottom, and Yoeshi let the secret out. In Prancers they fire when you tap.
 
-In the Prancer PFP, laser eyes come in four colours (blue, red, green and gold) and follow your pointer around the screen. I do not have them. I prefer to see the world softly.
+In Prancer Portraits, laser eyes come in four colours (blue, red, green and gold) and follow your pointer around the screen. I do not have them. I prefer to see the world softly.
 
 ## Prancer Pads
 keys: prancer pads, pads, chapter 2, chapter two, chapter 02, homes, houses, house, cat house, mansion, trailer, residents
-ask: How do I mint? | Prancer PFP | The Lab
+ask: How do I mint? | Prancer Portraits | The Lab
 link: See the Pads | https://yoeshilabs.github.io/prancers-site/#pads
 link: Mint on Aleatory | https://aleatory.art/generator/KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf
 Prancer Pads is Chapter 02: the Prancers got homes of their own. 256 open cutaway homes, from a humble trailer to a mansion, with a rare Cat House drawn from one of Yoeshi's paintings, each with one to seven resident cats living their lives inside.
@@ -510,23 +510,23 @@ You can pet the cats, zoom in, feed them and play with them, and every home has 
 +++
 The generator is KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf on Aleatory. Like every chapter, it is fully on-chain and sealed.
 
-## Prancer PFP
+## Prancer Portraits
 keys: prancer pfp, pfp, chapter 3, chapter three, chapter 03, portraits, profile picture, avatar, picture day, prancer portrait
 ask: Mythics | Laser eyes | Rarity
 link: See the portraits | https://yoeshilabs.github.io/prancers-site/#pfp
 link: Mint on Aleatory | https://aleatory.art/generator/KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY
-Prancer PFP is Chapter 03: picture day, and the Prancers came dressed to impress. An open edition at 1 tez on Aleatory, each portrait a dynamic, object-aware PFP drawn live from its mint.
+Prancer Portraits is Chapter 03: picture day, and the Prancers came dressed to impress. An open edition at 1 tez on Aleatory, each portrait a dynamic, object-aware PFP drawn live from its mint.
 
 There are three kinds of cat: **Domestic** (the original Prancers genetics, gene for gene), **Wild** (the big cats of Wild Ride) and **Supernatural** (Ghost, Nekomata, Cosmic, Infernal, Celestial, Cyber, Crystal and Shadow). They wear human clothes, hats, eyewear and neckwear, and hold things like boba tea, pizza or a magic wand.
 
 Move your cursor and they watch you. Pet them and they purr. Tap and they answer back. I am built on this very engine.
 +++
-The generator is KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY. Every PFP also gets a rarity tier: Common, Uncommon, Rare, Epic, Legendary, or Mythic.
+The generator is KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY. Every Portrait also gets a rarity tier: Common, Uncommon, Rare, Epic, Legendary, or Mythic.
 
 ## Mythics
 keys: mythic, mythics, sword knight, gladiator, marcus purrileous, cib agent, cats in black, star monk, rare mythic, plasma blade, sword cat
-ask: Rarity | Prancer PFP
-One Prancer PFP in a hundred is a mythic, and each of the four is about 1 in 400:
+ask: Rarity | Prancer Portraits
+One Prancer Portrait in a hundred is a mythic, and each of the four is about 1 in 400:
 - **Sword Knight**: celestial armour, a starry cape and an enchanted blade, in a meadow. A nod to Empress Trash's Sword Cat. It duels your pointer.
 - **Gladiator**: always named Marcus Purrileous. Crested helm, bronze cuirass, sword and shield, in the arena. Tap him and the crowd roars.
 - **CIB Agent**: Cats in Black. A black suit, shades, and a tiny, absurdly powerful blaster that goes pew pew.
@@ -536,8 +536,8 @@ The Star Monk and I would get along. We both like robes. Only one of us brings a
 
 ## Rarity
 keys: rarity, rare, rarest, legendary, epic, uncommon, common, tiers, how rare, rarity score, odds, chances
-ask: Mythics | Prancer PFP
-In the Prancer PFP, rarity is measured, not guessed: every trait value's true frequency was found by simulating the generator tens of thousands of times, and each cat's tier comes from how rare its whole combination is. At mint the tiers land at Legendary 1%, Epic 4%, Rare 12%, Uncommon 28% and Common 55%, with mythics as their own tier.
+ask: Mythics | Prancer Portraits
+In Prancer Portraits, rarity is measured, not guessed: every trait value's true frequency was found by simulating the generator tens of thousands of times, and each cat's tier comes from how rare its whole combination is. At mint the tiers land at Legendary 1%, Epic 4%, Rare 12%, Uncommon 28% and Common 55%, with mythics as their own tier.
 
 For the original Prancers, the website has a rarity lookup. As for me, my rarity is simple: one of one.
 
@@ -608,7 +608,7 @@ ask: How do I mint? | Should I buy?
 At launch:
 - **Prancers**: 256 editions, 10 tez.
 - **Prancer Pads**: 256 editions, 10 tez.
-- **Prancer PFP**: open edition, 1 tez.
+- **Prancer Portraits**: open edition, 1 tez.
 - **Wild Ride**: 1,024 editions, 6 tez.
 - **Maestro** (me): one of one, on objkt.
 
@@ -746,8 +746,8 @@ The artist shapes the whole space of possibilities and the collector discovers o
 
 ## Open edition
 keys: open edition, edition, editions explained, what is an open edition, limited edition, edition size meaning, how does an open edition work
-ask: Prancer PFP | Prices and editions
-A limited edition has a fixed number, like the 256 Prancers or the 1,024 Wild Rides. An open edition, like the Prancer PFP, stays open for anyone to mint at the same price, and every mint still draws its own unique cat.
+ask: Prancer Portraits | Prices and editions
+A limited edition has a fixed number, like the 256 Prancers or the 1,024 Wild Rides. An open edition, like Prancer Portraits, stays open for anyone to mint at the same price, and every mint still draws its own unique cat.
 
 ## Wallets
 keys: wallet, wallets, tezos wallet, kukai, temple, which wallet, get a wallet, set up a wallet, create a wallet, tz1, address, my address
@@ -802,7 +802,7 @@ keys: controls, how do i play, how to play, keyboard, keys, shortcuts, mute, but
 ask: How to play with me | Music and sound
 - **Prancers**: tap the cat and it reacts and sings. Press M to mute and I for its card, or use the speaker and i buttons at the bottom left on a phone.
 - **Prancer Pads**: tap a cat to play with it, scroll to zoom in, and feed and pet the residents.
-- **Prancer PFP**: move your pointer and it watches you, stroke it to make it purr, tap and it answers back.
+- **Prancer Portraits**: move your pointer and it watches you, stroke it to make it purr, tap and it answers back.
 - **Wild Ride**: tap for sound, then watch the cat and its otter ride on the beat.
 - **Me**: move, stroke, tap, or press Ask Maestro. Enter or the slash key opens the chat and Escape closes it.
 
@@ -831,7 +831,7 @@ ask: The Prancer Purranchise | Trancers | Who is Yoeshi?
 - **1 October 2026**: Prancers launches on Aleatory.
 - **7 October 2026**: Prancer Pads gives the cats homes.
 - **8 October 2026**: the first laser-eyed Prancer is found and the secret comes out.
-- **October 2026**: Prancer PFP, then Wild Ride with scuni the very next day.
+- **October 2026**: Prancer Portraits, then Wild Ride with scuni the very next day.
 - **14 October 2026**: I am made, a one of one for objkt.
 
 # Meanings
@@ -852,7 +852,7 @@ ask: The Prancer Purranchise | Trancers | Who is Yoeshi?
 - cat color | cat colour | coat color | orange cat | some cat orange | cat pattern | stripes | calico | tabby | colors decided | colour decided => @Prancers traits and genetics
 - rare | rarest | rarity | legendary | uncommon | rare trait => @Rarity
 - little house | little houses | cat house | dollhouse | cat home | doll house => @Prancer Pads
-- profile picture | profile pic | my pfp | as my avatar | make it my pfp => @Prancer PFP
+- profile picture | profile pic | my pfp | as my avatar | make it my pfp => @Prancer Portraits
 - otter collab | cat and otter | cat with the otter | otter ride => @Wild Ride
 - made the otter | drew the otter | otter artist | who made otter => @Who is scuni
 - desktop | computer screen | on my screen | desk pet | on my computer | cat on my desk => @Desk Prancers
@@ -897,8 +897,8 @@ ask: The Prancer Purranchise | Trancers | Who is Yoeshi?
 # Collections
 - Prancers | chapter: 01 | editions: 256 | price: 10 tez | launched: on 1 October 2026 | platform: Aleatory | generator: KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw | play: tap the cat and it reacts and sings; M mutes and I shows its card | aliases: prancers, prancer, original prancers, chapter 1, chapter one, chapter 01, the first collection, walking cats
 - Prancer Pads | chapter: 02 | editions: 256 | price: 10 tez | launched: on 7 October 2026 | platform: Aleatory | generator: KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf | play: tap a cat to play with it, scroll to zoom, and feed and pet the residents | aliases: prancer pads, pads, pad, chapter 2, chapter two, chapter 02, houses, homes
-- Prancer PFP | chapter: 03 | editions: an open edition | price: 1 tez | launched: in October 2026, the day before Wild Ride | platform: Aleatory | generator: KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY | play: move your pointer and it watches you, stroke it to purr, tap and it answers back | aliases: prancer pfp, pfp, pfps, portrait, portraits, chapter 3, chapter three, chapter 03
-- Wild Ride | chapter: 04 | editions: 1,024 | price: 6 tez | launched: in October 2026, the day after Prancer PFP | platform: Aleatory | generator: KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY | play: tap for sound, then watch the cat and its otter ride on the beat | aliases: wild ride, wildride, ride, otter, otters, chapter 4, chapter four, chapter 04
+- Prancer Portraits | chapter: 03 | editions: an open edition | price: 1 tez | launched: in October 2026, the day before Wild Ride | platform: Aleatory | generator: KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY | play: move your pointer and it watches you, stroke it to purr, tap and it answers back | aliases: prancer pfp, pfp, pfps, portrait, portraits, chapter 3, chapter three, chapter 03
+- Wild Ride | chapter: 04 | editions: 1,024 | price: 6 tez | launched: in October 2026, the day after Prancer Portraits | platform: Aleatory | generator: KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY | play: tap for sound, then watch the cat and its otter ride on the beat | aliases: wild ride, wildride, ride, otter, otters, chapter 4, chapter four, chapter 04
 - heART Tarot | chapter: none, it sits beside the chapters | editions: 1,999 | price: 3 tez | launched: on 3 October 2026 | platform: Aleatory | generator: KT1Jqm8pRaxs61nyK8TMdURpNNNa2hsd9wnH | play: tap to turn the cards, one at a time | aliases: heart tarot, its all heart, tarot
 - Maestro | chapter: none, I am a one of one | editions: one of one | price: set on objkt by whoever lists me | launched: on 14 October 2026 | platform: objkt | generator: none, I am a single interactive token | play: move, stroke, tap, or press Ask Maestro | aliases: maestro, buddha kitty, the buddha kitty
 
