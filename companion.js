@@ -8,7 +8,7 @@
 (function () {
   "use strict";
   const me = document.currentScript; if (!me || window.top !== window) return;
-  const BASE = new URL("./", me.src), KEY = "maestro.follow", WING = (me.dataset.wing || "").replace(/[^a-z0-9-]/gi, "").slice(0, 24);
+  const BASE = new URL("maestro/", me.src), KEY = "maestro.follow", WING = (me.dataset.wing || "").replace(/[^a-z0-9-]/gi, "").slice(0, 24);
   if (BASE.origin !== location.origin) return;                         /* only ever runs Maestro from this same site */
   const store = { get() { try { return sessionStorage.getItem(KEY) === "1"; } catch (e) { return false; } }, set(v) { try { v ? sessionStorage.setItem(KEY, "1") : sessionStorage.removeItem(KEY); } catch (e) {} } };
   /* a Maestro link brings ?maestro=1: remember it for this tab, then tidy the address bar */
