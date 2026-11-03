@@ -32,7 +32,8 @@ export function createGame({ cam, me, venue, STAGE, keys, view, conf }) {
 
   /* ------------------------------------------------ badges, toasts, the HUD */
   const toastEl = $("toast"), hudEl = $("score"), promptEl = $("prompt");
-  let toastT = 0; const toast = (title, line) => { toastEl.innerHTML = `<b>${title}</b><span>${line}</span>`; toastEl.classList.add("on"); toastT = performance.now() + 2600; };
+  let toastT = 0; const toast = (title, line) => { const b = document.createElement("b"), sp = document.createElement("span"); b.textContent = title; sp.textContent = line; toastEl.replaceChildren(b, sp);   // text only, never markup
+    toastEl.classList.add("on"); toastT = performance.now() + 2600; };
   const award = (key) => { if (st.badges.has(key)) return; st.badges.add(key); const b = BADGES.find((x) => x[0] === key); toast(`★ ${b[1]}`, b[2]); hud(); };
   const hud = () => { hudEl.textContent = `★ ${st.badges.size}/${BADGES.length}   ● Pins ${st.pins}/8`; };
   hud();

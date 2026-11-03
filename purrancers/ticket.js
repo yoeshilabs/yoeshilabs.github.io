@@ -46,7 +46,7 @@ export async function checkTicket(cfg, ui) {
     if (!publicKey) { const r = await fetch(`https://api.tzkt.io/v1/accounts/${address}?select=publicKey`); publicKey = r.ok ? await r.json() : null; }
     ui.status("Sign the message in your wallet. It is free and moves nothing.");
     const code = Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => b.toString(16).padStart(2, "0")).join("");
-    const text = `Tezos Signed Message: The Purrancers, live in the Sphere. Sign in to show your ticket. This is free and does not move anything. Address: ${address} Time: ${new Date().toISOString()} Code: ${code}`;
+    const text = `Tezos Signed Message: ${location.origin} ${new Date().toISOString()} The Purrancers, live in the Sphere. Sign in to show your ticket. This is free and does not move anything. Address: ${address} Code: ${code}`;   // the site and the time first, the way Tezos sign-in messages name where they come from
     const payload = micheline(text, W.stringToBytes);
     const { signature } = await client.requestSignPayload({ signingType: W.SigningType.MICHELINE, payload, sourceAddress: address });
     if (!publicKey || W.getPkhfromPk(publicKey) !== address || !W.verifySignature(payload, publicKey, signature)) throw new Error("That signature did not match the wallet. Try again.");

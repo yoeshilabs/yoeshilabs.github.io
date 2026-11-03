@@ -249,4 +249,4 @@ else {   // one frame at song time t, from a pose: { x, z, yaw, pitch, moving, u
   window.__film = async (t, pose = {}) => { filmT = t; Object.assign(me, pose); if (pose.up !== undefined) dispatchEvent(new KeyboardEvent(pose.up ? "keydown" : "keyup", { code: "Space" }));
     if (Math.abs(band.currentTime - t) > 0.001) { band.currentTime = t; await new Promise((r) => band.addEventListener("seeked", r, { once: true })); }
     frame(t * 1000, 1 / 30); await new Promise((r) => requestAnimationFrame(() => r())); return t; }; }
-window.__show = { audio, band, cam, confMat, confetti, scene, me, venue, Q, composer, renderer };   // for checking a moment from the console
+if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__show = { audio, band, cam, confMat, confetti, scene, me, venue, Q, composer, renderer };   // for checking a moment from the console (this Mac only)
