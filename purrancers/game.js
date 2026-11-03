@@ -46,9 +46,10 @@ export function createGame({ cam, me, venue, STAGE, keys, view, conf }) {
     if (h && (ITEMS[h.key].kind === "food" || ITEMS[h.key].kind === "drink")) { st.anim = { kind: "eat", t: 0, dur: 0.75, bit: false }; return; }
     if (h && h.key === "glow") { st.holding = null; return; }
     const s = nearStand(); if (s && !h) { const key = s.items[s.next % s.items.length]; s.next++; st.anim = { kind: "reach", t: 0, dur: 0.8, key, got: false }; } }
-  addEventListener("keydown", (e) => { if (e.code === "KeyE" && !e.repeat) use(); if (e.code === "Space") { st.upHeld = true; e.preventDefault(); } });
+  addEventListener("keydown", (e) => { if (e.code === "KeyE" && !e.repeat) use(); if (e.code === "Space") { st.upHeld = true; if (!e.repeat && e.isTrusted) me.jumpReq = true; e.preventDefault(); } });   // Space: a jump, and paws up while it is held
   addEventListener("keyup", (e) => { if (e.code === "Space") st.upHeld = false; });
   $("use").addEventListener("pointerdown", (e) => { e.preventDefault(); use(); });
+  $("jump").addEventListener("pointerdown", (e) => { e.preventDefault(); me.jumpReq = true; });
   const pu = $("pawsup"); pu.addEventListener("pointerdown", (e) => { e.preventDefault(); st.upHeld = true; pu.setPointerCapture(e.pointerId); });
   pu.addEventListener("pointerup", () => (st.upHeld = false)); pu.addEventListener("pointercancel", () => (st.upHeld = false));
 
@@ -149,7 +150,7 @@ export function createGame({ cam, me, venue, STAGE, keys, view, conf }) {
     if (live) { award("doors"); if (r < 9.4) award("front"); if (r > 20.6) award("gods"); if (r > 21.5 && a > venue.hall.a0 && a < venue.hall.a1) award("art");
       if (inChorus(t) && st.up > 0.8) { st.upChorus += dt; if (st.upChorus > 2) award("pawsup"); if (st.holding?.key === "glow") { st.glowChorus += dt; if (st.glowChorus > 2) award("glow"); } }
       catchConfetti(t); }
-    for (const p of venue.pins) if (!p.got && Math.hypot(p.base.x - me.x, p.base.z - me.z) < 1.4 && Math.abs(p.base.y - (me.eye - 0.1)) < 2.2) {
+    for (const p of venue.pins) if (!p.got && Math.hypot(p.base.x - me.x, p.base.z - me.z) < (p.up ? 2.6 : 1.4) && Math.abs(p.base.y - (me.eye + me.jy - 0.1)) < 2.2 && (!p.up || me.jy > 0.7)) {   // the pin over the desk: jump for it
       p.got = true; p.sprite.visible = false; p.halo.intensity = 0;   // dim the light, never remove it: a change in the number of lights rebuilds every shader (a half-second stall)
        st.pins++; hud(); toast(`Band pin ${st.pins} of 8`, `The ${p.who === "me" ? "singer" : p.who} pin`); if (st.pins === 8) award("pins"); }
     const s = !st.anim && nearStand(), h = st.holding;

@@ -116,7 +116,7 @@ export function buildVenue({ scene, STAGE, fanTex, fanMeta, pinFaces }) {
   const pins = PINS.map(([who, r, a, up = 0], i) => { const tex = new THREE.CanvasTexture(pinFaces[i]); tex.colorSpace = THREE.SRGBColorSpace;
     const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, toneMapped: false })); s.scale.set(0.55, 0.55, 1);
     const p = P(r, a, floorAt(r) + 1.25 + up); s.position.copy(p); group.add(s);
-    const halo = new THREE.PointLight(0xffd36e, 3, 2.5, 2); halo.position.copy(p); group.add(halo); return { who, sprite: s, halo, base: p, got: false }; });
+    const halo = new THREE.PointLight(0xffd36e, 3, 2.5, 2); halo.position.copy(p); group.add(halo); return { who, sprite: s, halo, base: p, up, got: false }; });
 
   function update(t, now) { const k = now / 1000;
     for (const s of stands) { const f = s.vendor.kind * fanMeta.frames + Math.floor(k * 10) % fanMeta.frames;   // the vendors dance

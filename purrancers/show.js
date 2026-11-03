@@ -35,7 +35,7 @@ renderer.setPixelRatio(Q.dpr); renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.NoToneMapping;
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0a0410); scene.fog = new THREE.FogExp2(0x1a0d24, 0.011);
 const cam = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.05, 200); cam.rotation.order = "YXZ";
-const me = { x: 0.6, z: -11, yaw: Math.PI, pitch: 0.06, eye: 1.3, moving: 0 };      // you start mid-floor, facing the stage
+const me = { x: 0.6, z: -11, yaw: Math.PI, pitch: 0.06, eye: 1.3, moving: 0, jy: 0, vy: 0, jumpReq: false };   // jy: how high you are off the floor in a jump      // you start mid-floor, facing the stage
 scene.add(new THREE.HemisphereLight(0xb9a0ff, 0x2a1020, 1.4));
 const pmrem = new THREE.PMREMGenerator(renderer); scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;   // soft reflections on metal and gloss
 
@@ -197,7 +197,9 @@ function walk(dt) { let f = 0, s = 0;
   for (const c of venue.colliders) { const ex = me.x - c.x, ez = me.z - c.z, d = Math.hypot(ex, ez); if (d < c.r && d > 0) { me.x = c.x + ex / d * c.r; me.z = c.z + ez / d * c.r; } }
   r = Math.hypot(me.x - STAGE.x, me.z - STAGE.z); me.eye += (floorAt(r) + 1.3 - me.eye) * Math.min(1, dt * 6);
   me.moving += ((Math.abs(f) + Math.abs(s) > 0.1 ? 1 : 0) - me.moving) * Math.min(1, dt * 8);
-  cam.position.set(me.x, me.eye, me.z); cam.rotation.set(me.pitch, me.yaw, 0); }
+  if (me.jumpReq) { if (me.jy === 0) me.vy = 5.6; me.jumpReq = false; }   // a jump: up about 1.2 m and down in under a second
+  me.vy -= 13 * dt; me.jy = Math.max(0, me.jy + me.vy * dt); if (me.jy === 0) me.vy = 0;
+  cam.position.set(me.x, me.eye + me.jy, me.z); cam.rotation.set(me.pitch, me.yaw, 0); }
 
 /* ------------------------------------------------------------------ you: paws, the stands, badges (game.js) */
 const game = createGame({ cam, me, venue, STAGE, keys, view, conf: { cp, cv, CUES, attr: cg.attributes.vel } });

@@ -27,7 +27,7 @@
   #prompt { position: fixed; left: 50%; bottom: 46%; transform: translateX(-50%); z-index: 3; opacity: 0; transition: opacity .2s; pointer-events: none;
     background: rgba(26, 11, 36, .8); border-radius: 999px; padding: 8px 16px; font-size: 15px; } #prompt.on { opacity: 1; }
   .act { position: fixed; z-index: 4; width: 72px; height: 72px; border-radius: 50%; padding: 0; font-size: 13px; display: none; box-shadow: none; }
-  #use { right: 22px; bottom: 120px; } #pawsup { right: 106px; bottom: 60px; background: linear-gradient(#7fe6ff, #c38bff); }
+  #use { right: 22px; bottom: 120px; } #pawsup { right: 106px; bottom: 60px; background: linear-gradient(#7fe6ff, #c38bff); } #jump { right: 22px; bottom: 36px; width: 64px; height: 64px; background: linear-gradient(#ffd36e, #ff5fa8); }
   .coats { display: flex; gap: 10px; justify-content: center; margin: 0 0 20px; flex-wrap: wrap; }
   .coat { width: 40px; height: 40px; padding: 0; border-radius: 50%; border: 3px solid transparent; box-shadow: 0 2px 8px rgba(0, 0, 0, .5); }
   .coat.on { border-color: var(--gold); }
@@ -44,14 +44,14 @@
 <iframe id="wallframe" title="the Sphere's wall" aria-hidden="true"></iframe>
 <canvas id="paws"></canvas>
 <div id="stick"><i></i></div>
-<button class="act" id="use">Use</button><button class="act" id="pawsup">Paws up</button>
+<button class="act" id="use">Use</button><button class="act" id="pawsup">Paws up</button><button class="act" id="jump">Jump</button>
 <div id="toast"></div><div id="score"></div><div id="prompt"></div>
 <div id="hud"><span><b>The Purrancers</b>, live in the Sphere</span><span id="clock"></span></div>
 <div class="veil" id="doors">
   <div class="card">
     <img src="assets/purrancers-title.png" alt="The Purrancers">
     <p>Live in the Sphere. Walk the floor, find your spot, and turn the sound up.
-      <span class="keys"><br>W A S D to walk, the mouse to look, E to use, Space for paws up.</span>
+      <span class="keys"><br>W A S D to walk, the mouse to look, E to use, Space to jump (hold for paws up).</span>
       <span class="touch"><br>The stick to walk, drag to look, Use and Paws up buttons.</span></p>
     <p style="margin:0 0 10px">You are a Prancer tonight. Pick your coat:</p>
     <div class="coats" id="coats"></div>
