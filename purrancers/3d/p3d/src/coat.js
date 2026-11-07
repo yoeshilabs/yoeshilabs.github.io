@@ -78,10 +78,11 @@ vec3 coat(out vec3 emis) {
     else if (uPat == 25) { c = uBody * (0.75 + 0.5 * h31(floor(p * 6.0))); }
     else if (uPat == 26) { c = uBody; }
   } else {
-    float m = uHasMark > 0.5 && uPart != 7 ? marks(p, l) * uMarkO : 0.0;   /* no stripes on the muzzle */
+    // the patches first, then the stripes over both colours, darker red within a patch, as a torbie's run (Yoeshi 2026-11-07: the patches had erased them)
+    float t = 0.0; if (uHasPatch > 0.5) { t = uPat == 9 ? smoothstep(0.45, 0.6, fbm(p * 7.0)) : smoothstep(0.48, 0.56, fbm(p * 1.8 + 7.0)); c = mix(c, uPatch, t); }
+    float m = uHasMark > 0.5 && uPart != 7 ? marks(p, l) * uMarkO : 0.0;   // no stripes on the muzzle
     if (uPat == 11 || uPat == 10) m *= pointMask(p, l);   // lynx points carry their stripes on the points only
-    c = mix(c, uMark, m); if (uNeon > 0.5) emis += uMark * m * 0.9;
-    if (uHasPatch > 0.5) { float t = uPat == 9 ? smoothstep(0.45, 0.6, fbm(p * 7.0)) : smoothstep(0.48, 0.56, fbm(p * 1.8 + 7.0)); c = mix(c, uPatch, t); }
+    c = mix(c, mix(uMark, uPatch * 0.5, t), m); if (uNeon > 0.5) emis += uMark * m * 0.9;
     if (uHasPoint > 0.5) c = mix(c, uPoint, pointMask(p, l));
   }
   if (uWhiteMode > 0 && uWhiteMode != 7) c = mix(c, uWhite, clamp(whiteMask(p, l), 0.0, 1.0));
