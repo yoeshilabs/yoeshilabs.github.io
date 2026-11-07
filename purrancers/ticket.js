@@ -29,12 +29,25 @@ async function holds(cfg, address) {   // read-only: does this wallet hold any o
 /* a Micheline string, as Tezos wallets expect a signed message: 05 01, the length, then the text */
 function micheline(text, stringToBytes) { const hex = stringToBytes(text); return "0501" + (hex.length / 2).toString(16).padStart(8, "0") + hex; }
 
+/* Some browsers offer the Web Locks API and then refuse it: Firefox inside another site's frame (the TezTowers Sphere),
+   with strict tracking protection, or in a private window ("LockManager.query: query() is not allowed in this context",
+   a holder at the door, 2026-11-07). The wallet library's tab coordination (broadcast-channel) uses Web Locks whenever
+   they are offered, so the door stopped there. Ask once; if they are refused, hide them, and the library falls back to
+   its other way of coordinating tabs. Where the locks work, nothing changes. */
+let locksChecked = false;
+async function guardLocks() {
+  if (locksChecked) return; locksChecked = true;
+  try { if (!navigator.locks || typeof navigator.locks.query !== "function") return; await navigator.locks.query(); return; } catch (e) {}
+  try { Object.defineProperty(navigator, "locks", { value: undefined, configurable: true }); } catch (e) {}
+  try { if (navigator.locks) Object.defineProperty(Object.getPrototypeOf(navigator), "locks", { get: () => undefined, configurable: true }); } catch (e) {}
+}
 /* ui: { status(text), done() } — returns true when the visitor may enter */
 export async function checkTicket(cfg, ui) {
   if (!cfg.contract) return true;                                                               // no ticket set yet: doors open
   if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).get("ticket") === "skip") return true;   // checking the show locally
   const pass = session.get(); if (pass && pass.contract === cfg.contract) return true;
   ui.status("Opening your wallet…");
+  await guardLocks();
   const W = await import("./lib/ticket-wallet.js");
   const client = new W.DAppClient({ name: "The Purrancers, live in the Sphere", iconUrl: new URL("assets/purrancers-title.png", location.href).href, appUrl: location.origin + location.pathname, network: { type: W.NetworkType.MAINNET } });
   for (const m of OFF) client[m] = () => Promise.reject(new Error("The show only asks for a sign-in message."));
