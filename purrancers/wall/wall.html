@@ -8,6 +8,7 @@
 <body>
 <canvas id="c"></canvas>
 <script src="perform.js"></script>
+<script src="guest.js"></script>
 <script>
 /* The inside wall of the Sphere: one equirectangular frame per moment of the song, for wrapping the dome in 3D.
    No words, no titles: a show made of light, the way a real sphere is. Every pixel is drawn from its own direction
@@ -23,8 +24,21 @@
      freeze the wall stalls: blocks of the picture hold and slip, colour splits, then lets go
      chain  (over the others, for the bridge) a chain of glowing blocks draws itself across the night, block by block on
             the beat, each linked to the last, light running along the links
+   For Decentralize (the 3D show's second song; window.__song sets its score and timings):
+     garden vines and flowers growing up the dome from the horizon as GROW runs 0..1 ("the kind that grow without a
+            patent, wild and awake"), over a warm evening
+     cage   (over the others) bars coming down over the dome as CAGEK runs 0..1 ("they built the cage and named it safety")
+     net    (over the others) a net of points and threads with no centre, light pulsing out from the stage every bar
+            ("take it back, decentralize")
+     freq   the bridge: slow rings of light rising out of the ground, the stars coming through ("frequencies the earth
+            has kept")
+     soul   a mandala of rings opening from above the stage ("the open soul")
+     word   a word in lights above the stage, now and then, where a line earns it (window.__song's words)
    Always on: a ring of light bars all round the horizon, each stretch an instrument of the song; and the LED
    pitch of the wall itself, panel seams and pixels, so it reads as a screen the size of a building.
+   Guest artists (dev/guest.js, guests/README.md): another artist's piece on the wall for a stretch of a song, as a
+   screen above the stage, the whole sky or a band round the dome, with their name in lights as it arrives and leaves;
+   nothing booked, nothing drawn (the wall is then exactly as it was).
    ?w=3072 sets the width (height is half). window.__frame(songSeconds) draws a moment. */
 const q = new URLSearchParams(location.search), Wd = +(q.get("w") || 2048), Ht = Wd / 2;
 const cv = document.getElementById("c"); cv.width = Wd; cv.height = Ht;
@@ -37,8 +51,10 @@ precision highp float; precision highp sampler2DArray;
 in vec2 uv; out vec4 o;
 uniform vec2 R; uniform float T, BEAT, KICK, VOC, DRM, BAS, OTH, PNO, GTR, AIR;
 uniform float mDawn, mTrance, mFace, mStar, mBloom, mFreeze, mDark, mChain, CHAIN;
-const int NB = 14; uniform vec3 NODES[NB];
+const int NB = 14; uniform vec3 NODES[NB]; uniform float CSTEP[NB], CID[NB], CN; uniform int CPREV[NB], CPREV2[NB];   // the chain's layout (CHAINS below)
 uniform sampler2DArray CATS; uniform float NCATS;
+uniform float mGarden, mCage, mNet, mFreq, mSoul, mWord, GROW, CAGEK; uniform sampler2D WORD;   // Decentralize's modes (0 for Internet Friend)
+uniform sampler2D GUEST, CREDIT; uniform float mGuest, mCredit, GFIT, GASP;   // a guest artist's piece and its credit (dev/guest.js)
 uniform sampler2D FACE, TITLE; uniform float mTitle, mSym, TITLEUP; uniform vec4 FACEBOX;   // the face's crop inside its texture: x, y, w, h (0..1)
 const float PI = 3.14159265, TAU = 6.2831853;
 vec3 dirOf(vec2 u) { float lon = (u.x - 0.5) * TAU, lat = (0.5 - u.y) * PI; return vec3(cos(lat) * sin(lon), sin(lat), cos(lat) * cos(lon)); }
@@ -120,23 +136,120 @@ vec3 ring(vec3 d, vec3 base) { float lon = atan(d.x, d.z), y = d.y; if (y < 0.0 
   vec3 col = hue(fract(u + BEAT * 0.01)) * (0.7 + 0.6 * (y / max(hgt, 1e-3))) ; vec3 glow = hue(fract(u + BEAT * 0.01)) * exp(-max(y - hgt, 0.0) * 40.0) * 0.25 * lev;
   return mix(base, col * 1.3, on * seg * 0.9) + glow * step(0.0, y); }
 
-/* the chain: blocks at points of light around the dome, revealed in order as CHAIN runs 0..1, linked along great circles */
-vec3 chain(vec3 d, vec3 base) { vec3 c = base; float n = float(NB) * CHAIN;
-  for (int i = 0; i < NB; i++) { float k = clamp(n - float(i), 0.0, 1.0); if (k <= 0.0) break; vec3 a = NODES[i];
-    if (i > 0) { vec3 b = NODES[i - 1], nab = normalize(cross(b, a)); float ang = acos(clamp(dot(a, b), -1.0, 1.0));   // the link back to the last block
-      float t = acos(clamp(dot(b, d), -1.0, 1.0)) / ang, ln = abs(dot(d, nab));
-      if (dot(cross(b, d), nab) > 0.0 && dot(cross(d, a), nab) > 0.0 && t < min(1.0, k * 1.6)) {
-        float pk = exp(-pow((fract(T * 0.45 + float(i) * 0.37) - t) * 18.0, 2.0));   // a pulse of light running along it
-        c += vec3(0.35, 0.85, 1.0) * (smoothstep(0.0035, 0.0012, ln) * 0.9 + exp(-ln * 260.0) * 0.25) * (0.7 + 0.6 * pk) + vec3(1.0, 0.9, 0.6) * pk * smoothstep(0.006, 0.0, ln); } }
+/* the chain: blocks at points of light around the dome, each appearing as CHAIN runs 0..1 (block i from step CSTEP[i] of
+   CN), linked back along great circles to the block or two before it (CPREV, CPREV2); CID is a block's own (its colour,
+   its data and the pulse on its links: a mirrored pair shares one, so the two read as one picture in a mirror) */
+vec3 link(vec3 d, vec3 b, vec3 a, float k, float id) { vec3 nab = normalize(cross(b, a)); float ang = acos(clamp(dot(a, b), -1.0, 1.0));   // drawn out from b to a
+  float t = acos(clamp(dot(b, d), -1.0, 1.0)) / ang, ln = abs(dot(d, nab));
+  if (dot(cross(b, d), nab) > 0.0 && dot(cross(d, a), nab) > 0.0 && t < min(1.0, k * 1.6)) {
+    float pk = exp(-pow((fract(T * 0.45 + id * 0.37) - t) * 18.0, 2.0));   // a pulse of light running along it
+    return vec3(0.35, 0.85, 1.0) * (smoothstep(0.0035, 0.0012, ln) * 0.9 + exp(-ln * 260.0) * 0.25) * (0.7 + 0.6 * pk) + vec3(1.0, 0.9, 0.6) * pk * smoothstep(0.006, 0.0, ln); }
+  return vec3(0.0); }
+vec3 chain(vec3 d, vec3 base) { vec3 c = base; float n = CN * CHAIN;
+  for (int i = 0; i < NB; i++) { float k = clamp(n - CSTEP[i], 0.0, 1.0); if (k <= 0.0) continue; vec3 a = NODES[i]; float id = CID[i];
+    if (CPREV[i] >= 0) c += link(d, NODES[CPREV[i]], a, k, id);
+    if (CPREV2[i] >= 0) c += link(d, NODES[CPREV2[i]], a, k, id);
     float pd = dot(d, a); if (pd < 0.97) continue;   // the block itself, flat on the wall
     vec3 tx = normalize(cross(vec3(0, 1, 0), a)), ty = cross(a, tx); vec2 q = vec2(dot(d, tx), dot(d, ty)) / pd;
     float pop = k < 1.0 ? smoothstep(0.0, 0.6, k) * (1.0 + 0.25 * sin(k * PI)) : 1.0 + 0.08 * KICK, sz = 0.05 * pop;
     vec2 aq = abs(q) / sz; float box = max(aq.x, aq.y); if (box > 1.6) continue;
     float edge = smoothstep(1.0, 0.94, box) - smoothstep(0.9, 0.84, box), fill = smoothstep(1.0, 0.97, box);
-    vec2 cell = floor((q / sz * 0.5 + 0.5) * 5.0); float bit = step(0.5, h1(vec3(cell, float(i) * 3.1 + 1.0)));   // its data: a little grid of lit cells
-    vec3 col = mix(vec3(0.3, 0.8, 1.0), vec3(1.0, 0.8, 0.4), fract(float(i) * 0.37));
+    vec2 cell = floor((q / sz * 0.5 + 0.5) * 5.0); float bit = step(0.5, h1(vec3(cell, id * 3.1 + 1.0)));   // its data: a little grid of lit cells
+    vec3 col = mix(vec3(0.3, 0.8, 1.0), vec3(1.0, 0.8, 0.4), fract(id * 0.37));
     c = mix(c, vec3(0.02, 0.03, 0.07), fill * 0.85) + col * (edge * 1.6 + fill * bit * 0.55 * smoothstep(0.92, 0.7, box)) + col * exp(-max(box - 1.0, 0.0) * 6.0) * 0.18 * step(1.0, box); }
   return c; }
+
+/* ---- Decentralize's modes ---- */
+/* the garden: a vine in each of 56 columns round the dome, swaying, leaves either side, flowers opening at the tip and
+   at some nodes; each grows to its own height as GROW runs 0..1 */
+vec3 garden(vec3 d) { float lon = atan(d.x, d.z), lat = asin(clamp(d.y, -1.0, 1.0));
+  vec3 c = mix(vec3(0.95, 0.66, 0.38), vec3(0.42, 0.2, 0.36), smoothstep(0.0, 0.5, d.y)); c = mix(c, vec3(0.06, 0.04, 0.12), smoothstep(0.45, 1.0, d.y));
+  c += vec3(1.0, 0.95, 0.9) * stars(d, 160.0, 0.05, 1.0) * smoothstep(0.5, 0.9, d.y) * 0.8;
+  float cols = 44.0, w = TAU / cols * max(cos(lat), 0.05), x = (lon / TAU + 0.5) * cols, k = floor(x), fx = fract(x) - 0.5;
+  float r = h1(vec3(k, 3.0, 7.0)), top = GROW * (0.5 + 0.7 * r) * 1.35;   // this vine's height, in radians up from the horizon
+  float sway = sin(lat * (6.0 + 5.0 * r) + k * 1.7 + T * 0.5) * 0.17 + sin(T * 0.8 + k) * 0.03, X = (fx - sway) * w;
+  float stem = smoothstep(0.007, 0.0025, abs(X)) * step(lat, top) * step(0.0, lat);
+  float lv = lat / 0.085, li = floor(lv), side = mod(li, 2.0) < 1.0 ? 1.0 : -1.0; vec2 lq = vec2((X - side * 0.017) / 0.0145, (fract(lv) - 0.5) / 0.32);
+  float leaf = smoothstep(1.0, 0.75, length(lq)) * step(li * 0.085 + 0.04, top) * step(0.0, lat);
+  vec3 lc = mix(vec3(0.12, 0.42, 0.2), vec3(0.42, 0.75, 0.3), h1(vec3(k, li, 2.0)));
+  c = mix(c, vec3(0.1, 0.32, 0.14), stem); c = mix(c, lc, leaf * 0.95);
+  for (int j = 0; j < 2; j++) {   /* a flower at the tip, and one at a node lower down if this vine has one */
+    float fy = j == 0 ? top : (floor(top * 0.55 / 0.085) * 0.085), hasIt = j == 0 ? 1.0 : step(0.55, h1(vec3(k, 9.0, 1.0)));
+    if (hasIt < 0.5 || fy <= 0.02) continue;
+    vec2 q = vec2(X, lat - fy); float rr = length(q), a = atan(q.y, q.x), open = clamp(GROW * 3.0 - r, 0.0, 1.0) * (1.0 + 0.12 * KICK), R0 = 0.03 * open;
+    if (R0 < 1e-4) continue;   // not open yet (a zero-sized flower would leave the edges below undefined)
+    float petal = smoothstep(R0 * (0.55 + 0.45 * abs(cos(a * 2.5 + k))), R0 * (0.45 + 0.45 * abs(cos(a * 2.5 + k))), rr);
+    vec3 fc = mix(vec3(1.0, 0.55, 0.75), vec3(1.0, 0.9, 0.45), h1(vec3(k, float(j), 4.0))); fc = mix(fc, vec3(0.75, 0.6, 1.0), step(0.7, h1(vec3(k, 5.0, float(j)))));
+    c = mix(c, fc * 1.15, petal); c = mix(c, vec3(1.0, 0.85, 0.3), smoothstep(R0 * 0.25, R0 * 0.12, rr) * step(0.001, R0)); }
+  float grass = smoothstep(0.035 + 0.02 * noise(vec3(lon * 40.0, T * 0.3, 1.0)), 0.0, d.y);   // a fringe of grass along the horizon
+  return mix(c, vec3(0.16, 0.42, 0.18), grass * min(1.0, GROW * 4.0)); }
+/* the cage: bars along the meridians and rings, coming down from the top of the dome as CAGEK runs 0..1 */
+vec3 cage(vec3 d, vec3 base) { float lon = atan(d.x, d.z), lat = asin(clamp(d.y, -1.0, 1.0)), reach = 1.5708 - CAGEK * 1.6;
+  if (lat < reach) return base;
+  float m = abs(fract(lon / TAU * 40.0) - 0.5) * TAU / 40.0 * cos(lat), pr = abs(fract(lat / 0.11) - 0.5) * 0.11;
+  float bar = max(smoothstep(0.0055, 0.002, m), smoothstep(0.004, 0.0013, pr) * step(0.03, lat)), edge = smoothstep(reach + 0.02, reach, lat);
+  vec3 steel = vec3(0.55, 0.62, 0.76) * (0.65 + 0.35 * sin(lon * 2.0 + lat * 5.0 + T * 0.7)) + vec3(0.9, 0.95, 1.0) * edge * 0.6;
+  return mix(base * (1.0 - 0.45 * CAGEK), steel * 1.4, bar); }
+/* the net: a point in every cell of a 3D grid laid over the dome, each joined to its nearest neighbour by a thread, a
+   ring of light running out from the stage every bar */
+vec3 net(vec3 d, vec3 base) { vec3 q = d * 6.5, i = floor(q), a = vec3(0), b = vec3(0); float da = 9.0, db = 9.0;
+  for (int z = -1; z <= 1; z++) for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) { vec3 g = i + vec3(x, y, z), pp = normalize(g + vec3(h1(g), h1(g + 3.1), h1(g + 7.7)) + 1e-4) * 6.5; float dd = length(pp - q);
+    if (dd < da) { db = da; b = a; da = dd; a = pp; } else if (dd < db) { db = dd; b = pp; } }
+  vec3 ab = b - a; float t = clamp(dot(q - a, ab) / max(dot(ab, ab), 1e-4), 0.0, 1.0), ld = length(q - a - ab * t);
+  float node = smoothstep(0.2, 0.06, da), thread = smoothstep(0.05, 0.014, ld) * step(length(ab), 2.2);
+  float ang = acos(clamp(dot(d, F), -1.0, 1.0)), pulse = exp(-pow((ang - fract(BEAT / 4.0) * 2.6) * 7.0, 2.0));
+  vec3 col = mix(vec3(0.3, 0.85, 1.0), vec3(1.0, 0.5, 0.8), h1(floor(a * 3.0)));
+  return base * 0.8 + col * (node * (0.5 + 0.55 * KICK) + thread * (0.3 + 0.9 * pulse)); }   // points kept under the glow's threshold, so they stay points
+/* the bridge's frequencies: rings rising out of the ground over the night */
+vec3 freq(vec3 d) { vec3 c = night(d) * 0.75; float lon = atan(d.x, d.z), w = 0.0;
+  for (int k = 0; k < 4; k++) { float fk = float(k), yy = fract(d.y * 2.2 - T * 0.045 * (1.0 + fk * 0.3) + fk * 0.27); w += exp(-pow((yy - 0.5) * 38.0, 2.0)) * (0.55 + 0.45 * sin(lon * (3.0 + fk) + T * 0.35 + fk)); }
+  return c + mix(vec3(0.25, 0.9, 0.75), vec3(0.55, 0.45, 1.0), 0.5 + 0.5 * sin(lon * 2.0 + T * 0.1)) * w * 0.75 * (0.6 + VOC) * smoothstep(0.9, 0.15, d.y); }
+/* the open soul: rings of petals opening out from above the stage, one every two beats */
+vec3 soul(vec3 d) { float th = acos(clamp(dot(d, F), -1.0, 1.0)), ph = atan(dot(d, FY), dot(d, FX));
+  vec3 c = mix(vec3(0.38, 0.12, 0.32), vec3(0.04, 0.02, 0.08), smoothstep(0.0, 1.8, th)); float rings = 0.0;
+  for (int k = 0; k < 5; k++) { float fk = float(k), r0 = fract(BEAT / 8.0 + fk * 0.2) * 1.9, pe = 0.5 + 0.5 * cos(ph * (6.0 + fk * 2.0) + T * 0.2 * (mod(fk, 2.0) * 2.0 - 1.0));
+    rings += exp(-pow((th - r0 * (0.86 + 0.14 * pe)) * 13.0, 2.0)) * (1.0 - r0 / 1.9); }
+  return c + hue(fract(th * 0.3 + BEAT * 0.02)) * rings * 0.85 + vec3(1.0, 0.86, 0.72) * exp(-th * 9.0) * (0.6 + 0.8 * KICK); }
+/* a word in lights (window.__song's words): a panel above the stage, mirrored as the title is, so it reads on the dome */
+vec4 wordImg(vec3 d) { float p = dot(d, FF); if (p < 0.3) return vec4(0); vec2 pl = vec2(dot(d, FFX), dot(d, FFY)) / p;
+  vec2 f = vec2(0.5 - pl.x / 1.1 * 0.5, (0.42 - pl.y) / 0.26); if (any(lessThan(f, vec2(0))) || any(greaterThan(f, vec2(1)))) return vec4(0);
+  vec2 N = vec2(520.0, 520.0 * 0.26 / 2.2), led = (floor(f * N) + 0.5) / N; vec4 c = texture(WORD, led); float dot_ = smoothstep(0.5, 0.25, length(fract(f * N) - 0.5));
+  return vec4(c.rgb * (0.5 + 0.8 * dot_) * (1.1 + 0.3 * KICK), c.a); }
+
+/* a guest artist's piece (dev/guest.js), mirrored in x as the title is so it reads the right way round on the dome:
+   GFIT 0  a screen above the stage in the piece's own shape (GASP wide per high), on a dark plate, its foot just over
+           the credit; a piece with a clear background shows the wall through it
+   GFIT 1  the whole sky: a 2:1 equirectangular frame, the stage at its centre, its top row the top of the dome
+   GFIT 2  wrapped round the dome from just over the light bars, repeated round to keep its shape, soft at its edges
+   GFIT 3  the whole Sphere from any frame, as a dome master: the frame's middle overhead, leaning toward the stage (SKYP),
+           its edge down at the horizon behind the crowd, the stage side at the frame's foot (as a planetarium's front) */
+const vec3 FG = normalize(vec3(0.0, 0.6, 1.0)), FGX = normalize(cross(vec3(0, 1, 0), FG)), FGY = cross(FG, FGX);
+const float GBOT = -0.11, GTOP = 0.72, GMAXW = 1.9;   // over FG: the screen's foot and head, its widest
+const vec3 SKYP = vec3(0.0, 0.9553365, 0.2955202), SKYX = vec3(1.0, 0.0, 0.0), SKYY = vec3(0.0, -0.2955202, 0.9553365);   // the sky's pole, 0.3 rad toward the stage
+const float SKYM = 1.8707963;   // the angle from the pole to the horizon behind the crowd: the frame's edge
+vec4 guestImg(vec3 d) {
+  if (GFIT > 2.5) { float k = acos(clamp(dot(d, SKYP), -1.0, 1.0)) / SKYM; if (k > 1.0) return vec4(0);
+    vec2 a = vec2(dot(d, SKYX), dot(d, SKYY)); float l = length(a); a = l > 1e-5 ? a / l : vec2(0.0, 1.0);
+    vec4 g = texture(GUEST, vec2(0.5 - a.x * k * 0.5, 0.5 + a.y * k * 0.5)); return vec4(g.rgb, g.a * smoothstep(1.0, 0.94, k)); }
+  if (GFIT > 1.5) { float lat = asin(clamp(d.y, -1.0, 1.0)), L = 0.95, y0 = 0.36, v = (lat - y0) / L; if (v < 0.0 || v > 1.0) return vec4(0);
+    float k = max(1.0, floor(TAU * cos(y0 + L * 0.5) / (L * GASP) + 0.5)); vec4 g = texture(GUEST, vec2(fract(0.5 - atan(d.x, d.z) / TAU * k), 1.0 - v));
+    return vec4(g.rgb, g.a * smoothstep(0.0, 0.06, v) * smoothstep(1.0, 0.82, v)); }
+  if (GFIT > 0.5) return texture(GUEST, vec2(fract(0.5 - atan(d.x, d.z) / TAU), 0.5 - asin(clamp(d.y, -1.0, 1.0)) / PI));
+  float p = dot(d, FG); if (p < 0.25) return vec4(0); vec2 pl = vec2(dot(d, FGX), dot(d, FGY)) / p;
+  float hh = GTOP - GBOT, ww = hh * GASP; if (ww > GMAXW) { ww = GMAXW; hh = ww / GASP; }
+  vec2 f = vec2(0.5 - pl.x / ww, (GBOT + hh - pl.y) / hh);
+  if (any(lessThan(f, vec2(0))) || any(greaterThan(f, vec2(1)))) { vec2 o = max(-f, f - 1.0); return vec4(vec3(0.02, 0.01, 0.04), 0.75 * smoothstep(0.035, 0.0, max(o.x * ww / hh, o.y))); }
+  return texture(GUEST, f); }
+/* the guest's credit, signed in lights along the dome itself: no plate, the letters running round the curve on a line
+   of latitude just over the light bars, centred on the back of the Sphere over the walkway (CAZ from the stage,
+   Yoeshi), the way a painter signs a work, clear of the band; a soft dark halo round the letters (drawn in the
+   credit's own picture) keeps them readable over any art */
+const float CAZ = 3.1415927, CW = 1.6, CLAT0 = 0.40, CLAT1 = 0.58;   // its middle's angle round from the stage, its width (radians of longitude), its foot and head (latitude)
+vec4 creditImg(vec3 d) { float lat = asin(clamp(d.y, -1.0, 1.0)), dl = mod(atan(d.x, d.z) - CAZ + PI, TAU) - PI;
+  vec2 f = vec2(0.5 - dl / CW, (CLAT1 - lat) / (CLAT1 - CLAT0));   // mirrored, so it reads from inside
+  if (any(lessThan(f, vec2(0))) || any(greaterThan(f, vec2(1)))) return vec4(0);
+  vec2 N = vec2(1400.0, 175.0), led = (floor(f * N) + 0.5) / N; vec4 c = texture(CREDIT, led); float dot_ = smoothstep(0.5, 0.25, length(fract(f * N) - 0.5));
+  return vec4(c.rgb * (0.55 + 0.75 * dot_) * (1.12 + 0.15 * KICK), c.a); }
 
 void main() { vec2 u = uv;
   if (mFreeze > 0.0) { float bl = floor(u.y * 24.0), sl = h1(vec3(bl, floor(T * 6.0), 1.0)); u.x += (sl - 0.5) * 0.06 * mFreeze * step(0.55, sl);   // slipping blocks
@@ -144,16 +257,24 @@ void main() { vec2 u = uv;
   vec3 d = dirOf(u);
   if (d.y < -0.02) { o = vec4(0.02, 0.01, 0.025, 1); return; }   // below the horizon: the floor and seats, never seen on the wall
   vec3 c = vec3(0);
-  float wsum = mDawn + mStar + mTrance + mBloom + 0.0001;
+  float wsum = mDawn + mStar + mTrance + mBloom + 0.0001 + mGarden + mFreq + mSoul;
   c += dawn(d) * mDawn; c += night(d) * mStar;
+  if (mGarden > 0.001) c += garden(d) * mGarden;
+  if (mFreq > 0.001) c += freq(d) * mFreq;
+  if (mSoul > 0.001) c += soul(d) * mSoul;
   if (mTrance > 0.001) { vec4 tn = tunnel(d, 1.0, 0.0); c += mix(tranceBg(d), tn.rgb, tn.a) * mTrance; }
   if (mBloom > 0.001) { vec4 tn = tunnel(d, 2.0, 1.0); vec3 bg = tranceBg(d) + hue(fract(atan(dot(d, FY), dot(d, FX)) / TAU * 2.0 + BEAT * 0.03)) * 0.18 * (0.5 + KICK);
     float flare = exp(-acos(clamp(dot(d, F), -1.0, 1.0)) * (6.0 - 3.0 * KICK)); c += (mix(bg, tn.rgb * 1.2, tn.a) + vec3(1.0, 0.8, 0.95) * flare * 0.6) * mBloom; }
   c /= max(1.0, wsum);
   if (mFace > 0.001) { vec3 fc = faceImg(d); if (fc.x >= 0.0) c = mix(c, fc, mFace); }
   if (mChain > 0.001) c = mix(c, chain(d, c), mChain);
+  if (mCage > 0.001) c = mix(c, cage(d, c), mCage);
+  if (mNet > 0.001) c = mix(c, net(d, c), mNet);
+  if (mGuest > 0.001) { vec4 gg = guestImg(d); c = mix(c, gg.rgb, gg.a * mGuest); }
+  if (mWord > 0.001) { vec4 ww = wordImg(d); c = mix(c, ww.rgb, ww.a * mWord); }
   if (mTitle > 0.001) { vec4 tt = titleImg(d); c = mix(c, tt.rgb, tt.a * mTitle); }
   c = ring(d, c);
+  if (mCredit > 0.001) { vec4 cr = creditImg(d); c = mix(c, cr.rgb, cr.a * mCredit); }
   if (mFreeze > 0.0) { float sp = 0.004 * mFreeze; c.r = mix(c.r, c.r * 1.25, mFreeze * 0.5); c.b = mix(c.b, c.b * 1.3, mFreeze * 0.5); c = mix(c, vec3(dot(c, vec3(0.3, 0.59, 0.11))), mFreeze * 0.35); }
   /* the wall is a screen: panel seams along latitude and longitude, and the pixel pitch */
   vec2 pg = vec2(atan(d.x, d.z) / TAU * 360.0, asin(clamp(d.y, -1.0, 1.0)) / PI * 180.0); vec2 sm = abs(fract(pg / vec2(4.0, 3.0)) - 0.5);
@@ -180,11 +301,18 @@ const faceTex = gl.createTexture(); gl.activeTexture(gl.TEXTURE1); gl.bindTextur
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+const wordTex = gl.createTexture(), wordC = Object.assign(document.createElement("canvas"), { width: 1100, height: 130 });   // a word in lights, drawn here
+gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, wordTex); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+function setWord(w) { if (w === WORDNOW) return; WORDNOW = w; const x = wordC.getContext("2d"); x.clearRect(0, 0, 1100, 130); if (w) { x.font = "900 104px 'Arial Rounded MT Bold', 'Arial Black', sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+    x.shadowColor = "rgba(255,150,60,0.9)"; x.shadowBlur = 18; x.fillStyle = "#fff4e2"; x.fillText(w, 550, 68, 1060); }
+  gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, wordTex); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, wordC); }
 const titleTex = gl.createTexture(); gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, titleTex);
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
-gl.uniform1i(U("CATS"), 0); gl.uniform1i(U("FACE"), 1); gl.uniform1i(U("TITLE"), 2); gl.uniform1f(U("NCATS"), IDS.length);
+gl.uniform1i(U("CATS"), 0); gl.uniform1i(U("FACE"), 1); gl.uniform1i(U("TITLE"), 2); gl.uniform1i(U("WORD"), 3); gl.uniform1f(U("NCATS"), IDS.length);
+const GW = window.GUESTWALL(gl, U);   // guest artists' pieces (units 4 and 5): nothing booked, nothing drawn
 const half = document.createElement("canvas"); half.width = SW; half.height = SH; const hx = half.getContext("2d");
 const loadImg = (src) => new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
 const sheetsReady = Promise.all(IDS.map((n, i) => loadImg(`sprites/150/${n}.webp`).then((im) => { if (!im) return;
@@ -192,16 +320,36 @@ const sheetsReady = Promise.all(IDS.map((n, i) => loadImg(`sprites/150/${n}.webp
   gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, i, SW, SH, 1, gl.RGBA, gl.UNSIGNED_BYTE, half); })));
 
 /* the score: which mode the wall is in, by song time (seconds), with cross-fades; from SHOTLIST.md */
-const SCORE = [
+let SCORE = [
   [0, { dawn: 0.35 }], [8, { dawn: 0.7 }], [15, { dawn: 1 }], [30, { dawn: 0.6, face: 0.9 }], [36.5, { dawn: 1 }], [43, { star: 1 }], [49, { star: 0.6, trance: 0.45 }],
   [54.4, { trance: 1 }], [64, { trance: 0.6, face: 1 }], [70, { trance: 1 }], [76, { trance: 0.5, face: 1 }], [82, { bloom: 1, freeze: 0.25 }], [93, { dawn: 0.5, star: 0.6 }],
   [100.3, { trance: 1, freeze: 0.5 }], [101.6, { trance: 1 }], [106, { dawn: 0.5, star: 0.6, face: 1 }], [112, { dawn: 0.5, star: 0.6 }], [119, { bloom: 1 }], [133, { bloom: 0.5, face: 1 }], [147, { trance: 0.55 }],
   [159.6, { star: 1 }], [163, { star: 1, chain: 1 }], [172.7, { star: 0.5, trance: 0.7, chain: 0.6 }], [178, { star: 0.3, trance: 0.9 }], [184, { bloom: 1 }], [197, { bloom: 0.5, face: 1 }], [204, { bloom: 1 }], [208, { bloom: 0.5, face: 1 }],
   [211.5, { trance: 1 }], [216.8, { bloom: 1 }], [222, { trance: 1 }], [227, { bloom: 1 }], [236, { dawn: 0.45 }], [245.5, { trance: 0.9 }], [252.4, { trance: 0.6 }]];   // Prance Trance over the ending (Yoeshi, 2026-11-01)
-const FADE = 0.9, MODES = ["dawn", "trance", "face", "star", "bloom", "freeze", "dark", "chain"];
-const CHAIN0 = 163, CHAIN1 = 172;   // the chain draws itself over the bridge
-/* the blocks: points of light spiralling round the dome from above the stage, out over the crowd and back */
-const NODES = Array.from({ length: 14 }, (_, i) => { const lon = (20 + i * 26) * Math.PI / 180, lat = (16 + 14 * Math.sin(i * 1.3) + i * 1.2) * Math.PI / 180; return [Math.cos(lat) * Math.sin(lon), Math.sin(lat), Math.cos(lat) * Math.cos(lon)]; }).flat();
+const FADE = 0.9, MODES = ["dawn", "trance", "face", "star", "bloom", "freeze", "dark", "chain", "garden", "cage", "net", "freq", "soul"];
+let EXTRA = null, WORDNOW = "";   // Decentralize's timings: { grow: [[from, to]], cage: [[from, to]], words: [[from, to, "WORD"]] } (window.__song)
+let CHAIN0 = 163, CHAIN1 = 172;   // the chain draws itself over the bridge
+/* the chain's layouts, each block: where it sits, the step it appears on, the block or two it links back to (-1: none) and
+   its id (see chain() in the shader)
+     spiral  Internet Friend's own, as the live show plays it: one block after another in a spiral from above the stage,
+             out over the crowd and back, low on the dome
+     crown   the 3D show's (Yoeshi, 2026-11-07: higher on the inner dome, spread out symmetrically): fourteen blocks evenly
+             round the dome at CROWN_LAT degrees up (extra.chainLat for another), mirrored across the stage's centre
+             line, as the light rig is; the first block above the stage, the chain growing out both ways at once, a
+             mirrored pair on each beat, round to the last block at the back, which links to both sides and closes the ring
+   window.__song's extra.chain picks one; the live show never calls __song, so it keeps the spiral */
+const CROWN_LAT = 50;
+const at = (lonDeg, latDeg) => { const lon = lonDeg * Math.PI / 180, lat = latDeg * Math.PI / 180; return [Math.cos(lat) * Math.sin(lon), Math.sin(lat), Math.cos(lat) * Math.cos(lon)]; };
+const crown = (lat) => [{ at: at(0, lat), step: 0, prev: -1, prev2: -1, id: 0 },
+  ...Array.from({ length: 6 }, (_, j) => [1, -1].map((s) => ({ at: at(s * (j + 1) * 360 / 14, lat), step: j + 1, prev: j ? 2 * j - (s > 0 ? 1 : 0) : 0, prev2: -1, id: j + 1 }))).flat(),
+  { at: at(180, lat), step: 7, prev: 11, prev2: 12, id: 7 }];
+const SPIRAL = Array.from({ length: 14 }, (_, i) => ({ at: at(20 + i * 26, 16 + 14 * Math.sin(i * 1.3) + i * 1.2), step: i, prev: i - 1, prev2: -1, id: i }));
+const CHAINS = { spiral: () => SPIRAL, crown: (x) => crown(x.chainLat || CROWN_LAT) };
+let CHAINNOW = "";
+function useChain(x) { const name = Object.hasOwn(CHAINS, (x && x.chain) || "") ? x.chain : "spiral", key = name + (x && x.chainLat || ""); if (key === CHAINNOW) return; CHAINNOW = key;
+  const L = CHAINS[name](x || {});
+  gl.uniform3fv(U("NODES[0]"), L.flatMap((b) => b.at)); gl.uniform1fv(U("CSTEP[0]"), L.map((b) => b.step)); gl.uniform1fv(U("CID[0]"), L.map((b) => b.id));
+  gl.uniform1iv(U("CPREV[0]"), L.map((b) => b.prev)); gl.uniform1iv(U("CPREV2[0]"), L.map((b) => b.prev2)); gl.uniform1f(U("CN"), Math.max(...L.map((b) => b.step)) + 1); }
 function modeAt(ts) { let i = 0; while (i < SCORE.length - 1 && SCORE[i + 1][0] <= ts) i++;
   const cur = SCORE[i][1], prev = i ? SCORE[i - 1][1] : cur, k = Math.min(1, (ts - SCORE[i][0]) / FADE), e = k * k * (3 - 2 * k), out = {};
   for (const m of MODES) out[m] = (prev[m] || 0) * (1 - e) + (cur[m] || 0) * e; return out; }
@@ -217,13 +365,39 @@ window.__faceEl = (el, box) => { gl.activeTexture(gl.TEXTURE1); gl.bindTexture(g
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, el); gl.uniform4f(U("FACEBOX"), ...box); };
 window.__title = (src) => loadImg(src).then((im) => { if (!im) return; gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, titleTex); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); });
+/* the band at ts, as the guests' pieces read it (window.wall in the kit) */
+const levelsAt = (ts) => { const E = (k) => PERFORM.env(k, ts), b = PERFORM.beat(ts), lv = {};
+  for (const k of ["vocals", "drums", "bass", "other", "piano", "guitar"]) lv[k] = Math.min(1, E(k) * 1.15);
+  return { beat: b, kick: Math.max(E("hits"), Math.exp(-((b % 1 + 1) % 1) * 6) * 0.6), levels: lv, energy: Math.min(1, (lv.drums + lv.bass + lv.vocals + lv.other) / 2.2) }; };
 window.__frame = (ts, force) => { const E = (k) => PERFORM.env(k, ts), b = PERFORM.beat(ts), m = force || modeAt(ts), kick = Math.max(E("hits"), Math.exp(-((b % 1 + 1) % 1) * 6) * 0.6);
   gl.viewport(0, 0, Wd, Ht); gl.uniform2f(U("R"), Wd, Ht); gl.uniform1f(U("T"), ts); gl.uniform1f(U("BEAT"), b); gl.uniform1f(U("KICK"), kick);
   for (const [u_, k] of [["VOC", "vocals"], ["DRM", "drums"], ["BAS", "bass"], ["OTH", "other"], ["PNO", "piano"], ["GTR", "guitar"]]) gl.uniform1f(U(u_), Math.min(1, E(k) * 1.15));
-  for (const [u_, k] of [["mDawn", "dawn"], ["mTrance", "trance"], ["mFace", "face"], ["mStar", "star"], ["mBloom", "bloom"], ["mFreeze", "freeze"], ["mDark", "dark"], ["mChain", "chain"], ["mTitle", "title"], ["mSym", "sym"], ["TITLEUP", "titleUp"]]) gl.uniform1f(U(u_), m[k] || 0);
-  gl.uniform1f(U("CHAIN"), force && force.chainAt !== undefined ? force.chainAt : Math.min(1, Math.max(0, (ts - CHAIN0) / (CHAIN1 - CHAIN0)))); gl.uniform3fv(U("NODES[0]"), NODES);
+  for (const [u_, k] of [["mDawn", "dawn"], ["mTrance", "trance"], ["mFace", "face"], ["mStar", "star"], ["mBloom", "bloom"], ["mFreeze", "freeze"], ["mDark", "dark"], ["mChain", "chain"], ["mTitle", "title"], ["mSym", "sym"], ["TITLEUP", "titleUp"],
+    ["mGarden", "garden"], ["mCage", "cage"], ["mNet", "net"], ["mFreq", "freq"], ["mSoul", "soul"]]) gl.uniform1f(U(u_), m[k] || 0);
+  /* Decentralize's timings: how far the garden has grown and the cage has closed (each holds when its span ends), and
+     the word now in lights (fading in and out over a quarter second) */
+  const span = (list) => { let v = 0; for (const [a, z] of list || []) if (ts >= a) v = Math.min(1, (ts - a) / (z - a)); return v; };
+  gl.uniform1f(U("GROW"), EXTRA ? span(EXTRA.grow) : 0); gl.uniform1f(U("CAGEK"), EXTRA ? span(EXTRA.cage) : 0);
+  const w = EXTRA && (EXTRA.words || []).find(([a, z]) => ts >= a - 0.25 && ts < z + 0.25); if (w) setWord(w[2]);
+  gl.uniform1f(U("mWord"), w ? Math.min(1, (ts - w[0] + 0.25) / 0.25, (w[1] + 0.25 - ts) / 0.25) : 0);
+  const gs = GW.any ? GW.frame(ts, levelsAt(ts)) : { mGuest: 0, mCredit: 0, yieldFace: 0 };   // a guest's piece on now: its fade, its credit's, and the singer's big picture making way
+  gl.uniform1f(U("mGuest"), gs.mGuest); gl.uniform1f(U("mCredit"), gs.mCredit); if (gs.yieldFace) gl.uniform1f(U("mFace"), (m.face || 0) * (1 - gs.yieldFace));
+  gl.uniform1f(U("CHAIN"), force && force.chainAt !== undefined ? force.chainAt : Math.min(1, Math.max(0, (ts - CHAIN0) / (CHAIN1 - CHAIN0)))); useChain(EXTRA);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); return new Promise((r) => requestAnimationFrame(() => r(m))); };
 window.__modeAt = modeAt;
+/* another song on the same wall (the 3D show's setlist): its map and beats, its score, when its chain draws; the
+   live show never calls this, so Internet Friend's wall is as it was */
+const SCORE0 = SCORE, CHAIN00 = [CHAIN0, CHAIN1];   // Internet Friend's own, for a setlist that comes back to it
+window.__song = (mapUrl, beatsUrl, score, chain, extra) => { if (score) SCORE = score === "default" ? SCORE0 : score; [CHAIN0, CHAIN1] = chain || CHAIN00; EXTRA = extra || null;
+  GW.song((mapUrl.match(/analysis\/([^/]+)\//) || [])[1] || ""); return PERFORM.load(mapUrl, beatsUrl); };
+/* guest artists (dev/guest.js): book pieces for stretches of the song; "film" makes each frame wait for the piece's
+   own frame (__guestSync(t) before __frame(t)); __guestNow(t) is the credit on now, for the show to put on screen */
+window.__guests = (list) => GW.book(list);
+window.__guestMode = (m) => GW.mode(m);
+window.__guestOn = (v) => GW.on(v);
+window.__guestSection = (s) => GW.section(s);
+window.__guestSync = (ts) => GW.sync(ts, levelsAt(ts));
+window.__guestNow = (ts) => GW.now(ts);
 </script>
 </body>
 </html>

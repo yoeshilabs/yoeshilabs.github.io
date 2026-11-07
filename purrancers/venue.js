@@ -17,6 +17,7 @@ export function buildVenue({ scene, STAGE, fanTex, fanMeta, pinFaces }) {
 
   /* the concourse deck, its front face, the edge light and the railing */
   const deck = new THREE.Mesh(new THREE.RingGeometry(R_IN, R_OUT, 120, 1, Math.PI / 2 - A_MAX - 0.06, 2 * A_MAX + 0.12).rotateX(-Math.PI / 2), std(0x2a1730, 0.55));
+  deck.name = "concourse";   // (the 3D show re-skins it by name)
   deck.position.set(STAGE.x, DECK, STAGE.z); group.add(deck);
   const front = new THREE.Mesh(new THREE.CylinderGeometry(R_IN, R_IN, DECK, 120, 1, true, Math.PI - A_MAX - 0.06, 2 * A_MAX + 0.12), std(0x170c1c, 0.8));
   front.material.side = THREE.DoubleSide; front.position.set(STAGE.x, DECK / 2, STAGE.z); group.add(front);
@@ -27,15 +28,15 @@ export function buildVenue({ scene, STAGE, fanTex, fanMeta, pinFaces }) {
   const posts = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.025, 0.025, 1.0, 6), std(0xc9c3d6, 0.3, 0.9), 70);
   for (let i = 0; i < 70; i++) { let a = -A_MAX + i * (2 * A_MAX) / 69; if (Math.abs(a) < GAP) a = Math.sign(a || 1) * GAP; const m = new THREE.Matrix4().setPosition(P(R_IN + 0.25, a, DECK + 0.5)); posts.setMatrixAt(i, m); } group.add(posts);
   const wall = new THREE.Mesh(new THREE.CylinderGeometry(R_OUT + 0.2, R_OUT + 0.2, 6, 120, 1, true, Math.PI - A_MAX - 0.06, 2 * A_MAX + 0.12), std(0x1c0f24, 0.9));
-  wall.material.side = THREE.DoubleSide; wall.position.set(STAGE.x, DECK + 3, STAGE.z); group.add(wall);
+  wall.material.side = THREE.DoubleSide; wall.position.set(STAGE.x, DECK + 3, STAGE.z); wall.name = "backwall"; group.add(wall);   // (the 3D show re-skins it by name)
   group.add(new THREE.Mesh(new THREE.TubeGeometry(new Arc(R_OUT + 0.1, DECK + 3.6), 200, 0.03, 6), glow(0x7fe6ff)));
 
   /* the centre aisle: from the concourse down the middle of the floor to an open pocket at the barrier */
   const carpet = std(0x5a1430, 0.9), nose = glow(0xffd36e);
   const flat = new THREE.Mesh(new THREE.BoxGeometry(AISLE * 2, 0.03, 10.6 - 8.4), carpet); flat.position.set(STAGE.x, 0.015, STAGE.z - (8.4 + 10.6) / 2); group.add(flat);
   for (let r = 8.6 + 0.82 * 3; r < 19.7; r += 0.82) { const z = (r - 10.5) * 0.24; if (z <= 0) continue;   // each tier's tread under the aisle, carpeted, its edge lit
-    const st_ = new THREE.Mesh(new THREE.BoxGeometry(AISLE * 2, 0.04, 0.82), carpet); st_.position.set(STAGE.x, z + 0.02, STAGE.z - r); group.add(st_);
-    const ns = new THREE.Mesh(new THREE.BoxGeometry(AISLE * 2 - 0.2, 0.025, 0.04), nose); ns.position.set(STAGE.x, z + 0.045, STAGE.z - r + 0.39); group.add(ns); }
+    const st_ = new THREE.Mesh(new THREE.BoxGeometry(AISLE * 2, 0.04, 0.82), carpet); st_.position.set(STAGE.x, z + 0.02, STAGE.z - r); st_.name = "aisle step"; group.add(st_);
+    const ns = new THREE.Mesh(new THREE.BoxGeometry(AISLE * 2 - 0.2, 0.025, 0.04), nose); ns.position.set(STAGE.x, z + 0.045, STAGE.z - r + 0.393); ns.name = "aisle edge"; group.add(ns); }   // its front 3 mm proud of the carpet's (sharing it, the two flickered)
   const pocket = new THREE.Mesh(new THREE.CircleGeometry(POCKET, 48).rotateX(-Math.PI / 2), carpet); pocket.position.copy(P(9.9, 0, 0.012)); group.add(pocket);
 
   /* a canvas texture, glowing or plain */
@@ -64,14 +65,17 @@ export function buildVenue({ scene, STAGE, fanTex, fanMeta, pinFaces }) {
     const sg = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.69), new THREE.MeshBasicMaterial({ map: sign(d.title, d.colours), transparent: true, toneMapped: false, fog: false }));
     sg.position.set(0, 3.45, 0.45); g.add(sg);
     const mb = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.0), new THREE.MeshBasicMaterial({ map: menu(d.items, d.colours[0]), toneMapped: false })); mb.position.set(0.75, 2.0, -1.14); g.add(mb);
-    d.items.forEach((k, i) => { const t = new THREE.CanvasTexture(itemCanvas(k)); t.colorSpace = THREE.SRGBColorSpace;   // the goods, standing on the counter
-      const m = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.42), new THREE.MeshBasicMaterial({ map: t, transparent: true, alphaTest: 0.3 })); m.position.set(-0.8 + i * 0.8, 1.27, 0.15); g.add(m); });
+    const goods = d.items.map((k, i) => { const t = new THREE.CanvasTexture(itemCanvas(k)); t.colorSpace = THREE.SRGBColorSpace;   // the goods, standing on the counter
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.42), new THREE.MeshBasicMaterial({ map: t, transparent: true, alphaTest: 0.3 })); m.position.set(-0.8 + i * 0.8, 1.27, 0.15); g.add(m); return m; });
     /* a Prancer behind the counter, one of the fans, dancing */
     const vt = fanTex.clone(); vt.repeat.set(1 / fanMeta.cols, 1 / fanMeta.rows); vt.needsUpdate = true;
     const vendor = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 1.53), new THREE.MeshBasicMaterial({ map: vt, transparent: true, alphaTest: 0.35 })); vendor.position.set(-0.75, 1.05, -0.65); g.add(vendor);   // standing behind the counter, head and shoulders above it
     const light = new THREE.PointLight(c1, 6, 6, 1.8); light.position.set(0, 2.6, 0.6); g.add(light);
-    const front = P(23.9, d.a, DECK); colliders.push({ x: g.position.x, z: g.position.z, r: 1.75 });
-    return { ...d, group: g, front, vendor: { tex: vt, kind: (si * 7 + 3) % fanMeta.fronts }, next: 0 }; });
+    /* you cannot walk through the counter: three rounds along it, so you can come right up to its front (one big round
+       held you a metre and a half off) and its ends and the vendor's step stay closed */
+    const front = P(23.9, d.a, DECK); g.updateMatrixWorld(true);
+    for (const lx of [-1.05, 0, 1.05]) { const w = g.localToWorld(new THREE.Vector3(lx, 0, -0.25)); colliders.push({ x: w.x, z: w.z, r: 1.15 }); }
+    return { ...d, group: g, front, goods, vendor: { tex: vt, kind: (si * 7 + 3) % fanMeta.fronts }, next: 0, aim: 0, aimOn: false }; });
 
   /* the archway at the top of the aisle */
   { const ag = new THREE.Group(); ag.position.copy(P(R_IN + 0.2, 0, DECK)); group.add(ag);
@@ -95,10 +99,11 @@ export function buildVenue({ scene, STAGE, fanTex, fanMeta, pinFaces }) {
   fohG.rotation.y = Math.PI - 0.42; colliders.push({ x: FOH.x, z: FOH.z, r: 2.0 });                     // the engineer faces the stage
 
   /* the Prancer Art Hall: the Purranchise on the back wall at the left end of the concourse, each piece lit, with a plaque */
-  const HALL = [["01-prancers", "Prancers", "Chapter 01 · Aleatory"], ["02-pads", "Prancer Pads", "Chapter 02 · Aleatory"], ["03-pfp", "Prancer PFP", "Chapter 03 · Aleatory"],
+  const HALL = [["01-prancers", "Prancers", "Chapter 01 · Aleatory"], ["02-pads", "Prancer Pads", "Chapter 02 · Aleatory"], ["03-pfp", "Prancer Portraits", "Chapter 03 · Aleatory"],
     ["04-wild-ride", "Wild Ride", "Chapter 04 · with scuni"], ["05-prance-trance", "Prance Trance", "Prancers On Objkt"], ["06-post", "Prancer Post", "Chapter 05 · Aleatory"],
-    ["07-prance-or-treat", "Prance Or Treat!", "Prancers On Objkt"]];   // the Purranchise only (heART Tarot stays out, Yoeshi 2026-11-01)
-  const loader = new THREE.TextureLoader(), A0 = -1.38, A1 = -1.03;
+    ["07-prance-or-treat", "Prance Or Treat!", "Prancers On Objkt"], ["08-purrancers-debut", "The Purrancers Debut", "Chapter 06 · Prancers On Objkt"],
+    ["09-prancer-3d", "Prancer 3D", "Chapter 07 · coming soon"]];   // the Purranchise only (heART Tarot stays out, Yoeshi 2026-11-01); 06 and 07 added 2026-11-07 (Yoeshi)
+  const loader = new THREE.TextureLoader(), A0 = -1.38, A1 = A0 + 0.05 * HALL.length;   // a frame every 0.05 rad (1.33 m), the hall growing toward the food stand
   const hs = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.62), new THREE.MeshBasicMaterial({ map: sign("Prancer Art Hall", ["#c38bff", "#7fe6ff"]), transparent: true, toneMapped: false, fog: false }));
   hs.position.copy(P(R_OUT - 0.05, (A0 + A1) / 2, DECK + 3.15)); hs.rotation.y = -(A0 + A1) / 2; group.add(hs);
   HALL.forEach(([file, title, line], i) => { const a = A0 + (i + 0.5) * (A1 - A0) / HALL.length, g = new THREE.Group(); g.position.copy(P(R_OUT - 0.08, a, DECK)); g.rotation.y = -a; group.add(g);
@@ -106,7 +111,7 @@ export function buildVenue({ scene, STAGE, fanTex, fanMeta, pinFaces }) {
     const fr = new THREE.Mesh(new THREE.BoxGeometry(1.12, 1.12, 0.06), std(0xd9b45a, 0.35, 0.8)); fr.position.set(0, 1.75, 0); g.add(fr);
     const art = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.0), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false })); art.position.set(0, 1.75, 0.035); g.add(art);
     const pl = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.2), new THREE.MeshBasicMaterial({ map: canvasTex(512, 114, (c, w, h) => { c.fillStyle = "#1a0b24"; c.fillRect(0, 0, w, h);
-      c.fillStyle = "#ffd36e"; c.font = 'bold 40px "Arial Rounded MT Bold", sans-serif'; c.textAlign = "center"; c.fillText(title, w / 2, 48); c.fillStyle = "#fff7ef"; c.font = '28px "Arial Rounded MT Bold", sans-serif'; c.fillText(line, w / 2, 92); }), toneMapped: false }));
+      c.fillStyle = "#ffd36e"; let fs = 40; c.font = `bold ${fs}px "Arial Rounded MT Bold", sans-serif`; while (c.measureText(title).width > w - 28) c.font = `bold ${(fs -= 2)}px "Arial Rounded MT Bold", sans-serif`; c.textAlign = "center"; c.fillText(title, w / 2, 48); c.fillStyle = "#fff7ef"; let fl = 28; c.font = `${fl}px "Arial Rounded MT Bold", sans-serif`; while (c.measureText(line).width > w - 28) c.font = `${(fl -= 2)}px "Arial Rounded MT Bold", sans-serif`; c.fillText(line, w / 2, 92); }), toneMapped: false }));
     pl.position.set(0, 1.02, 0.03); g.add(pl);
     const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.04, 0.12), glow(0xfff1c4)); lamp.position.set(0, 2.42, 0.12); g.add(lamp); });
   const hallLight = new THREE.PointLight(0xfff1c4, 10, 9, 1.4); hallLight.position.copy(P(R_OUT - 2.5, (A0 + A1) / 2, DECK + 2.8)); group.add(hallLight);

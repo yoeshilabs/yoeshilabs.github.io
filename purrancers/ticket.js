@@ -11,6 +11,9 @@
    is the right trade. ticket.json with an empty contract leaves the doors open to everyone. */
 const OFF = ["requestOperation", "requestEncryptPayload", "requestBroadcast", "requestProofOfEventChallenge", "requestSimulatedProofOfEventChallenge"];
 const PASS = "purrancers-pass";
+/* on this Mac (localhost or 127.0.0.1) the doors open without a ticket, for testing (a wallet cannot sign in the app's
+   own browser); ?ticket=check tries the real door here. The published show is never on these addresses. */
+export const testDoor = () => /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).get("ticket") !== "check";
 const session = { get() { try { return JSON.parse(sessionStorage.getItem(PASS)); } catch (e) { return null; } }, set(v) { try { sessionStorage.setItem(PASS, JSON.stringify(v)); } catch (e) {} } };
 
 /* ticket.json: { tickets: [{ name, contract, tokenId }], need, get }; holding any one of them is a ticket. ticket.contract is
@@ -29,6 +32,12 @@ async function holds(cfg, address) {   // read-only: does this wallet hold any o
 /* a Micheline string, as Tezos wallets expect a signed message: 05 01, the length, then the text */
 function micheline(text, stringToBytes) { const hex = stringToBytes(text); return "0501" + (hex.length / 2).toString(16).padStart(8, "0") + hex; }
 
+/* sign in: the wallet shares its address, signs one free off-chain message, and the signature is checked here against
+   the wallet's public key and the key against the address. The proven address is kept for this tab's session, so the
+   doors ask once whatever asks first (bringing your own Prancer, or the ticket). ui: { status(text, stop) }.
+   Returns the address, or null (ui has been told why). */
+const WHO = "purrancers-who", ADDR = /^tz[1-4][1-9A-HJ-NP-Za-km-z]{33}$/;
+const who = { get() { try { const v = JSON.parse(sessionStorage.getItem(WHO)); return v && ADDR.test(v.address || "") ? v : null; } catch (e) { return null; } }, set(v) { try { sessionStorage.setItem(WHO, JSON.stringify(v)); } catch (e) {} } };
 /* Some browsers offer the Web Locks API and then refuse it: Firefox inside another site's frame (the TezTowers Sphere),
    with strict tracking protection, or in a private window ("LockManager.query: query() is not allowed in this context",
    a holder at the door, 2026-11-07). The wallet library's tab coordination (broadcast-channel) uses Web Locks whenever
@@ -41,11 +50,8 @@ async function guardLocks() {
   try { Object.defineProperty(navigator, "locks", { value: undefined, configurable: true }); } catch (e) {}
   try { if (navigator.locks) Object.defineProperty(Object.getPrototypeOf(navigator), "locks", { get: () => undefined, configurable: true }); } catch (e) {}
 }
-/* ui: { status(text), done() } — returns true when the visitor may enter */
-export async function checkTicket(cfg, ui) {
-  if (!cfg.contract) return true;                                                               // no ticket set yet: doors open
-  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).get("ticket") === "skip") return true;   // checking the show locally
-  const pass = session.get(); if (pass && pass.contract === cfg.contract) return true;
+export async function signIn(ui, why = "Sign in to show your ticket.") {
+  const known = who.get(); if (known) return known.address;
   ui.status("Opening your wallet…");
   await guardLocks();
   const W = await import("./lib/ticket-wallet.js");
@@ -55,17 +61,27 @@ export async function checkTicket(cfg, ui) {
     await client.clearActiveAccount();
     const perm = await client.requestPermissions({ scopes: [W.PermissionScope.SIGN] });
     const address = perm && (perm.address || perm.accountInfo?.address); let publicKey = perm && (perm.publicKey || perm.accountInfo?.publicKey);
-    if (!/^tz[1-4][1-9A-HJ-NP-Za-km-z]{33}$/.test(address || "")) throw new Error("No address came back from the wallet.");
+    if (!ADDR.test(address || "")) throw new Error("No address came back from the wallet.");
     if (!publicKey) { const r = await fetch(`https://api.tzkt.io/v1/accounts/${address}?select=publicKey`); publicKey = r.ok ? await r.json() : null; }
     ui.status("Sign the message in your wallet. It is free and moves nothing.");
     const code = Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => b.toString(16).padStart(2, "0")).join("");
-    const text = `Tezos Signed Message: ${location.origin} ${new Date().toISOString()} The Purrancers, live in the Sphere. Sign in to show your ticket. This is free and does not move anything. Address: ${address} Code: ${code}`;   // the site and the time first, the way Tezos sign-in messages name where they come from
+    const text = `Tezos Signed Message: ${location.origin} ${new Date().toISOString()} The Purrancers, live in the Sphere. ${why} This is free and does not move anything. Address: ${address} Code: ${code}`;   // the site and the time first, the way Tezos sign-in messages name where they come from
     const payload = micheline(text, W.stringToBytes);
     const { signature } = await client.requestSignPayload({ signingType: W.SigningType.MICHELINE, payload, sourceAddress: address });
     if (!publicKey || W.getPkhfromPk(publicKey) !== address || !W.verifySignature(payload, publicKey, signature)) throw new Error("That signature did not match the wallet. Try again.");
+    who.set({ address, at: Date.now() }); return address;
+  } catch (e) { ui.status(/abort|reject|declin|cancel/i.test(e?.message || e?.errorType || "") ? "No problem. Connect again whenever you are ready." : (e?.message || "Something went wrong. Try again."), true); return null; }
+  finally { try { await client.clearActiveAccount(); await client.disconnect?.(); } catch (e) {} } }
+
+/* ui: { status(text, stop) } — returns true when the visitor may enter */
+export async function checkTicket(cfg, ui) {
+  if (!cfg.contract) return true;                                                               // no ticket set yet: doors open
+  if (testDoor()) return true;   // testing on this Mac
+  const pass = session.get(); if (pass && pass.contract === cfg.contract) return true;
+  const address = await signIn(ui); if (!address) return false;
+  try {
     ui.status("Checking your ticket…");
     if (!(await holds(cfg, address))) { ui.status(`This wallet does not hold a ticket yet: ${cfg.need || "the concert film"}.`, true); return false; }
     session.set({ contract: cfg.contract, address, at: Date.now() });
     return true;
-  } catch (e) { ui.status(/abort|reject|declin|cancel/i.test(e?.message || e?.errorType || "") ? "No problem. Connect again whenever you are ready." : (e?.message || "Something went wrong. Try again."), true); return false; }
-  finally { try { await client.clearActiveAccount(); await client.disconnect?.(); } catch (e) {} } }
+  } catch (e) { ui.status(e?.message || "Something went wrong. Try again.", true); return false; } }

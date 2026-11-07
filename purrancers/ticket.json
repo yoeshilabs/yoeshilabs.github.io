@@ -1,8 +1,11 @@
 {
-  "_about": "Who may enter: a wallet holding any token below (tokenId empty = any token from that contract). The ticket is the concert film. An empty list leaves the doors open to everyone.",
-  "tickets": [
-    { "name": "The Purrancers Debut - Internet Friend", "contract": "KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH", "tokenId": "3" }
-  ],
-  "need": "The Purrancers Debut - Internet Friend",
-  "get": "https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3"
+ "tickets": [
+  {
+   "name": "The Purrancers Debut - Internet Friend",
+   "contract": "KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH",
+   "tokenId": "3"
+  }
+ ],
+ "need": "The Purrancers Debut - Internet Friend",
+ "get": "https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3"
 }

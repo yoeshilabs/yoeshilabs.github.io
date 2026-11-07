@@ -4,6 +4,7 @@
    eight band pins to find, confetti to catch with your paws up, and a card at the end of the night.
      E (or Use)        take something / eat or drink it / put the glow stick away
      Space (or Paws up) paws in the air, hold it                                                                  */
+import * as THREE from "three";
 import { ITEMS } from "./items.js";
 import { floorAt } from "./venue.js";
 
@@ -23,7 +24,7 @@ const CHORUS = [[54, 82], [119, 147], [184, 211], [211.3, 236]], inChorus = (t) 
 const INK = "#120d16", $ = (id) => document.getElementById(id);
 const store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
 
-export function createGame({ cam, me, venue, STAGE, keys, view, conf }) {
+export function createGame({ cam, me, venue, STAGE, keys, view, conf, paws = () => true, crumbs = () => true }) {   // paws(): false hides the drawn paws (the 3D show's third person: your own cat is in view)
   const cv = $("paws"), g = cv.getContext("2d"); let W = 0, H = 0, S = 0;
   const fit = () => { const d = Math.min(devicePixelRatio, 2); W = innerWidth; H = innerHeight; S = Math.min(W, H) * (W > H ? 1 : 1.25); cv.width = W * d; cv.height = H * d; g.setTransform(d, 0, 0, d, 0, 0); };
   fit(); addEventListener("resize", fit);
@@ -40,12 +41,19 @@ export function createGame({ cam, me, venue, STAGE, keys, view, conf }) {
 
   /* ------------------------------------------------ what's in reach */
   const fwd = () => ({ x: -Math.sin(me.yaw), z: -Math.cos(me.yaw) });
-  function nearStand() { const f = fwd(); for (const s of venue.stands) { const dx = s.front.x - me.x, dz = s.front.z - me.z, d = Math.hypot(dx, dz);
-      if (d < 3.2 && (dx * f.x + dz * f.z) / (d || 1) > 0.35) return s; } return null; }
+  /* at a stand: standing in front of its counter (its own frame: +z out toward you), within reach of it, facing it */
+  const SL = new THREE.Vector3(), toLocal = (s, x, z) => { const c = Math.cos(s.a), n = Math.sin(s.a); return [x * c + z * n, -x * n + z * c]; };   // a world direction in the stand's frame
+  function nearStand() { const f = fwd(); for (const s of venue.stands) { s.group.worldToLocal(SL.set(me.x, 0, me.z)); const [, fz] = toLocal(s, f.x, f.z);
+      if (SL.z > 0.3 && SL.z < 2.2 && Math.abs(SL.x) < 1.9 && fz < -0.35) return s; } return null; }
+  /* which of the stand's goods you are looking at: where your line of sight crosses the counter top, nearest one wins
+     (so you choose by looking along the counter); looking away from it, the one nearest in front of you */
+  function aimAt(s) { s.group.worldToLocal(SL.set(me.x, me.eye + me.jy, me.z)); const cp = Math.cos(me.pitch), [dx, dz] = toLocal(s, -Math.sin(me.yaw) * cp, -Math.cos(me.yaw) * cp);
+    let x = SL.x; if (dz < -1e-3) { const k = (0.18 - SL.z) / dz; if (k > 0 && k < 6) x = SL.x + dx * k; }
+    return Math.max(0, Math.min(s.items.length - 1, Math.round(x / 0.82) + 1)); }
   function use() { if (st.anim) return; const h = st.holding;
     if (h && (ITEMS[h.key].kind === "food" || ITEMS[h.key].kind === "drink")) { st.anim = { kind: "eat", t: 0, dur: 0.75, bit: false }; return; }
     if (h && h.key === "glow") { st.holding = null; return; }
-    const s = nearStand(); if (s && !h) { const key = s.items[s.next % s.items.length]; s.next++; st.anim = { kind: "reach", t: 0, dur: 0.8, key, got: false }; } }
+    const s = nearStand(); if (s && !h) { const key = s.items[s.aim || 0]; st.anim = { kind: "reach", t: 0, dur: 0.8, key, got: false }; } }   // the one you are looking at
   addEventListener("keydown", (e) => { if (e.code === "KeyE" && !e.repeat) use(); if (e.code === "Space") { st.upHeld = true; if (!e.repeat && e.isTrusted) me.jumpReq = true; e.preventDefault(); } });   // Space: a jump, and paws up while it is held
   addEventListener("keyup", (e) => { if (e.code === "Space") st.upHeld = false; });
   $("use").addEventListener("pointerdown", (e) => { e.preventDefault(); use(); });
@@ -110,7 +118,7 @@ export function createGame({ cam, me, venue, STAGE, keys, view, conf }) {
       g.save(); g.translate(hx, hy); g.rotate(Math.atan2(hy - qy, hx - qx) + Math.PI / 2); g.beginPath(); g.moveTo(-T * 0.72, -T * 0.12); g.lineTo(T * 0.72, -T * 0.12); g.lineWidth = 2.5; g.strokeStyle = "#ffd36e"; g.stroke(); g.restore();
       const [fx_, fy_] = sl[Math.round(sl.length / 2)]; g.beginPath(); g.moveTo(fx_ - T * 0.3, fy_ + T * 0.1); g.quadraticCurveTo(fx_, fy_ - T * 0.1, fx_ + T * 0.25, fy_ + T * 0.15); g.lineWidth = 2; g.strokeStyle = "rgba(120,20,70,.6)"; g.stroke(); }
   }
-  function drawPaws(t, b, dt, now, moving) { g.clearRect(0, 0, W, H);
+  function drawPaws(t, b, dt, now, moving, show = true) { g.clearRect(0, 0, W, H);
     const pulse = Math.exp(-(((b % 1) + 1) % 1) * 5), pulse2 = Math.exp(-((((b + 0.5) % 1) + 1) % 1) * 5);
     st.up += ((st.upHeld ? 1 : 0) - st.up) * Math.min(1, dt * 9); const U = ease(st.up);
     st.stride += dt * 7 * moving; const sw = Math.sin(st.stride) * S * 0.025 * moving;
@@ -123,11 +131,12 @@ export function createGame({ cam, me, venue, STAGE, keys, view, conf }) {
       if (a.kind === "reach") { rx = lerp(rx, W * 0.56, e); ry = lerp(ry, H * 0.58, e); rs = lerp(1, 0.7, e); if (k > 0.5 && !a.got) { a.got = true; got(a.key); } }
       if (a.kind === "eat") { rx = lerp(rx, W * 0.53, e); ry = lerp(ry, H * 1.02, e); rs = lerp(1, 1.25, e); if (k > 0.5 && !a.bit) { a.bit = true; bite(); } }
       if (k >= 1) st.anim = null; }
-    const h = st.holding; arm(-1, lx, ly, 1); arm(1, rx, ry, rs);
-    if (h) { g.save(); g.translate(rx, ry - S * 0.06 * rs); if (h.key === "glow") g.rotate(Math.sin(now / 1000 * 7) * 0.5 * U); ITEMS[h.key].draw(g, S * 0.2 * rs, h.used, now / 1000); g.restore(); }   // what you hold, whole, in front of your paw
-    for (const c of st.crumbs) { c.vy += 600 * dt; c.x += c.vx * dt; c.y += c.vy * dt; c.life -= dt * 0.9; g.fillStyle = c.c; g.globalAlpha = Math.max(0, c.life); g.fillRect(c.x, c.y, 6, 5); } g.globalAlpha = 1;
+    const h = st.holding; st.view = { U, lx: lx / W, ly: ly / H, rx: rx / W, ry: ry / H, rs, wave: wave / S, anim: a && { kind: a.kind, k: Math.min(1, a.t / a.dur) } };   // where the paws are, for a 3D view of them
+    if (show) { arm(-1, lx, ly, 1); arm(1, rx, ry, rs); }
+    if (h && show) { g.save(); g.translate(rx, ry - S * 0.06 * rs); if (h.key === "glow") g.rotate(Math.sin(now / 1000 * 7) * 0.5 * U); ITEMS[h.key].draw(g, S * 0.2 * rs, h.used, now / 1000); g.restore(); }   // what you hold, whole, in front of your paw
+    if (crumbs()) for (const c of st.crumbs) { c.vy += 600 * dt; c.x += c.vx * dt; c.y += c.vy * dt; c.life -= dt * 0.9; g.fillStyle = c.c; g.globalAlpha = Math.max(0, c.life); g.fillRect(c.x, c.y, 6, 5); } g.globalAlpha = 1;
     st.crumbs = st.crumbs.filter((c) => c.life > 0 && c.y < H + 20);
-    if (st.cap) { g.beginPath(); g.moveTo(-10, -10); g.lineTo(W + 10, -10); g.lineTo(W + 10, H * 0.04); g.quadraticCurveTo(W / 2, H * 0.13, -10, H * 0.04); g.closePath();   // the brim, just in view
+    if (st.cap && show) { g.beginPath(); g.moveTo(-10, -10); g.lineTo(W + 10, -10); g.lineTo(W + 10, H * 0.04); g.quadraticCurveTo(W / 2, H * 0.13, -10, H * 0.04); g.closePath();   // the brim, just in view
       g.fillStyle = "#d9437f"; g.fill(); g.lineWidth = 4; g.strokeStyle = INK; g.stroke(); g.setLineDash([10, 8]); g.beginPath(); g.moveTo(0, H * 0.035); g.quadraticCurveTo(W / 2, H * 0.105, W, H * 0.035);
       g.strokeStyle = "rgba(255,211,110,.7)"; g.lineWidth = 2; g.stroke(); g.setLineDash([]); }
     if (st.fx.candy > now) { const gr = g.createRadialGradient(W / 2, H / 2, S * 0.3, W / 2, H / 2, Math.max(W, H) * 0.7); gr.addColorStop(0, "rgba(255,156,203,0)"); gr.addColorStop(1, "rgba(255,156,203,.45)"); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
@@ -154,10 +163,13 @@ export function createGame({ cam, me, venue, STAGE, keys, view, conf }) {
       p.got = true; p.sprite.visible = false; p.halo.intensity = 0;   // dim the light, never remove it: a change in the number of lights rebuilds every shader (a half-second stall)
        st.pins++; hud(); toast(`Band pin ${st.pins} of 8`, `The ${p.who === "me" ? "singer" : p.who} pin`); if (st.pins === 8) award("pins"); }
     const s = !st.anim && nearStand(), h = st.holding;
+    for (const x of venue.stands) { x.aimOn = x === s && !h; if (x.aimOn) x.aim = aimAt(x);   // the goods you are looking at, lifted a little (the 3D show lifts its own goods)
+      if (x.goods) x.goods.forEach((m, i) => { const on = x.aimOn && i === x.aim; m.scale.setScalar(on ? 1.25 : 1); m.position.y = on ? 1.34 : 1.27; }); }
+    if (s && !h && !st.hintedStand) { st.hintedStand = true; toast("Look along the counter to choose", "E takes what you are looking at"); }
     promptEl.textContent = h && ITEMS[h.key].kind !== "hold" ? `E  ${ITEMS[h.key].kind === "drink" ? "Drink" : "Eat"} the ${ITEMS[h.key].name.toLowerCase()}`
-      : h ? "E  Put the glow stick away" : s ? `E  Grab ${s.key === "merch" ? "" : "a "}${ITEMS[s.items[s.next % s.items.length]].name.toLowerCase()}` : "";
+      : h ? "E  Put the glow stick away" : s ? `E  Grab ${s.key === "merch" ? "" : "a "}${ITEMS[s.items[s.aim || 0]].name.toLowerCase()}` : "";
     promptEl.classList.toggle("on", !!promptEl.textContent);
-    drawPaws(t, b, dt, now, moving); }
+    drawPaws(t, b, dt, now, moving, paws()); }
 
   function recap() { award("end"); store.set("purrancers-badges", [...st.badges]);
     const v = document.createElement("div"); v.className = "veil";
@@ -166,5 +178,5 @@ export function createGame({ cam, me, venue, STAGE, keys, view, conf }) {
       <p>Band pins ${st.pins} of 8 · confetti caught ${st.caught.size}</p><button>See it again</button></div>`;
     document.body.appendChild(v); return v; }
   function setCoat(i) { st.coat = COATS[i]; store.set("purrancers-coat", i); }
-  return { update, recap, setCoat, coatIndex: () => COATS.indexOf(st.coat) };
+  return { update, recap, setCoat, coatIndex: () => COATS.indexOf(st.coat), pawsUp: () => st.up, state: () => st, toast };
 }

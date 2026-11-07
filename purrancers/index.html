@@ -34,6 +34,9 @@
   .warn { margin: 18px auto 0; max-width: 360px; font-size: 13px; line-height: 1.45; color: var(--dim); } .warn b { color: var(--ink); }
   .recap ul { list-style: none; padding: 0; margin: 0 0 14px; text-align: left; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; max-height: 46vh; overflow: auto; }
   .recap li { color: rgba(255, 247, 239, .4); font-size: 13px; } .recap li.got { color: var(--ink); } .recap li b { display: block; font-size: 14px; } .recap li.got b { color: var(--gold); }
+  .pick { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; margin: 0 0 14px; font-size: 13px; color: var(--dim); }
+  .pick a { display: inline-block; padding: 6px 12px; border-radius: 999px; color: var(--ink); background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .18); text-decoration: none; }
+  .pick a.on { color: #2a0f3c; background: linear-gradient(var(--pink), var(--gold)); border-color: transparent; } .pick small { flex-basis: 100%; font-size: 12px; }
   @media (pointer: coarse) { #stick { display: block; } .keys { display: none; } .act { display: block; } #prompt { bottom: 40%; } }
   @media (pointer: fine) { .touch { display: none; } }
 </style>
@@ -56,6 +59,7 @@
       <span class="touch"><br>The stick to walk, drag to look, Use and Paws up buttons.</span></p>
     <p style="margin:0 0 10px">You are a Prancer tonight. Pick your coat:</p>
     <div class="coats" id="coats"></div>
+    <div class="pick" id="pick3d"><span>Tonight in</span><a class="on">The original show</a><a href="3d/" rel="noopener">The 3D show</a><small>New: you as your own 3D Prancer on the floor, two songs. For computers and newer phones.</small></div>
     <button id="enter" disabled>Doors opening…</button>
     <p id="ticketmsg" hidden style="margin:14px 0 0"></p>
     <a id="ticketget" hidden target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;color:var(--gold)">Get your ticket</a>
