@@ -178,5 +178,5 @@ export function createGame({ cam, me, venue, STAGE, keys, view, conf, paws = () 
       <p>Band pins ${st.pins} of 8 · confetti caught ${st.caught.size}</p><button>See it again</button></div>`;
     document.body.appendChild(v); return v; }
   function setCoat(i) { st.coat = COATS[i]; store.set("purrancers-coat", i); }
-  return { update, recap, setCoat, coatIndex: () => COATS.indexOf(st.coat), pawsUp: () => st.up, state: () => st, toast };
+  return { update, recap, setCoat, coatIndex: () => COATS.indexOf(st.coat), pawsUp: () => st.up, state: () => st, toast, badges: () => BADGES };   // badges: the list, for the 3D show's night card
 }
