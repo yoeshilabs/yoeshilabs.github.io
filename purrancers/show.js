@@ -18,7 +18,7 @@ import { OutputPass } from "./lib/jsm/postprocessing/OutputPass.js";
 import { RoomEnvironment } from "./lib/jsm/environments/RoomEnvironment.js";
 import { buildVenue, makePinFaces, floorAt, A_MAX } from "./venue.js";
 import { createGame, COATS } from "./game.js";
-import { loadTicket, checkTicket } from "./ticket.js";
+import { loadTicket, checkTicket, frameNote } from "./ticket.js";
 
 const $ = (id) => document.getElementById(id);
 const B = ([x, y, z]) => new THREE.Vector3(x, z, -y);
@@ -215,6 +215,7 @@ const ticket = await loadTicket();   // ticket.js: a signed sign-in message, the
 const tmsg = $("ticketmsg"), tget = $("ticketget");
 const ticketUi = { status(text, stop) { tmsg.textContent = text; tmsg.hidden = false; if (stop) { enter.disabled = false; enter.textContent = ticket.contract ? "Try again" : "Enter the show"; tget.hidden = !ticket.get; } } };
 if (ticket.get) tget.href = ticket.get;
+frameNote(tget, ticket);   // inside TezTowers: Temple cannot connect there; the phone or the show in its own tab (ticket.js)
 const enter = $("enter");
 band.addEventListener("loadeddata", () => { band.addEventListener("seeked", () => { makePinFaces(band, pinCanvases); venue.pins.forEach((p) => (p.sprite.material.map.needsUpdate = true));
     band.currentTime = START; enter.disabled = false; enter.textContent = ticket.contract ? "Show your ticket" : "Enter the show"; }, { once: true }); band.currentTime = 70; }, { once: true }); band.load();

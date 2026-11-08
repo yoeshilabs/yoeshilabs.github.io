@@ -14,6 +14,18 @@ const PASS = "purrancers-pass";
 /* on this Mac (localhost or 127.0.0.1) the doors open without a ticket, for testing (a wallet cannot sign in the app's
    own browser); ?ticket=check tries the real door here. The published show is never on these addresses. */
 export const testDoor = () => /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).get("ticket") !== "check";
+/* Inside another site's frame (TezTowers' Sphere, for now the only public way in), browser wallets such as Temple cannot
+   connect: since Temple 2.0.34 (2026-11-02) its extension answers only the site open in the tab itself, and the show is
+   another site inside it (a visitor at the door, 2026-11-08). Phones and other wallets still connect through the
+   wallet window. frameNote(after) puts a short line under the door's ticket link saying so, with the show in its own tab
+   (where Temple works) as the other way in. Nothing happens outside a frame or with the doors open to everyone. */
+export function frameNote(after, cfg) {
+  let framed = false; try { framed = window.top !== window.self && !window.top.location.href; } catch (e) { framed = true; }   // (another site's frame: reading where the top page is throws)
+  if (!framed || !cfg || !cfg.contract || !after || document.getElementById("framenote")) return;
+  const p = document.createElement("p"); p.id = "framenote"; p.style.cssText = "margin:10px 0 0;font-size:13px;opacity:.85";
+  const a = document.createElement("a"); a.href = location.href.split("#")[0]; a.target = "_blank"; a.rel = "noopener"; a.textContent = "open the show in its own tab"; a.style.color = "var(--gold)";
+  p.append("Using Temple? It cannot connect inside TezTowers (a Temple safety rule since 2 November). Choose your phone in the wallet window, or ", a, ".");
+  after.after(p); }
 const session = { get() { try { return JSON.parse(sessionStorage.getItem(PASS)); } catch (e) { return null; } }, set(v) { try { sessionStorage.setItem(PASS, JSON.stringify(v)); } catch (e) {} } };
 
 /* ticket.json: { tickets: [{ name, contract, tokenId }], need, get }; holding any one of them is a ticket. ticket.contract is
