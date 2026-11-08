@@ -101,7 +101,7 @@ const TONE = {   /* how he meets each feeling before the answer: [mood, gentle o
 };
 const TONE_BIAS = { discouraged: (n) => /\b(art|mint|mints|sell|sales|artist|work|piece)\b/.test(n) ? { "Advice for artists": 6 } : {}, alarmed: () => ({ "Scams and safety": 12 }), skeptical: (n) => /\b(buy|price|worth|investment|scam|rug|legit)\b/.test(n) ? { "Should I buy": 3 } : {} };
 const toned = (out, tone) => { if (!tone || !TONE[tone.k] || out.crisis) return out; const [mood, soft, hard] = TONE[tone.k];
-  return { ...out, text: pick(tone.w >= 2 ? hard : soft) + "\n\n" + out.text.replace(/^(Ah|Mm|Good question|Gladly)\. /, ""), mood: out.mood || mood, pet: tone.k === "discouraged" || tone.k === "alarmed" ? 0.5 : out.pet }; };
+  return { ...out, text: pick(tone.w >= 2 ? hard : soft) + "\n\n" + out.text.replace(/^(Ah|Mm|Good question|Gladly)\. /, ""), mood: out.mood || mood, tone: tone.k, pet: tone.k === "discouraged" || tone.k === "alarmed" ? 0.5 : out.pet }; };
 
 /* ================================================================ facts, and mending typos */
 /* "# Collections" in the scroll: one line per collection, "Name | key: value | ...", for precise answers */
@@ -132,10 +132,12 @@ const SAY = {
   launched: (c) => ME(c) ? `I was made ${c.launched}.` : `${c.name} launched ${c.launched}.`,
   generator: (c) => ME(c) ? "I have no generator: I am a single interactive token." : `The ${c.name} generator lives on chain at ${c.generator}.`,
   play: (c) => ME(c) ? `With me: ${c.play}.` : `To play with ${c.name}: ${c.play}.`,
-  platform: (c) => ME(c) ? "I live on objkt." : `${c.name} mints on ${c.platform}, through the Mint on Aleatory buttons on the website.`,
+  platform: (c) => ME(c) ? "I live on objkt." : /^Aleatory$/.test(c.platform) ? `${c.name} mints on Aleatory, through the Mint on Aleatory buttons on the website.` : `${c.name} lives on ${c.platform}.`,
   chapter: (c) => ME(c) ? "I sit outside the chapters, a one of one." : `${c.name} is Chapter ${c.chapter} of the Prancer Purranchise.` };
 function attrAnswer(n) {
-  const at = ATTR.filter(([, re]) => has(n, re)).map(([k]) => k); if (!at.length || SCROLL.kb.some((e) => norm(e.title) === n)) return null;   /* an entry named outright wins */
+  const bare = COLLS.reduce((q, x) => q.split(norm(x.name)).join(" "), n);   /* a word in a name ("The Purrancers Debut") is not a question about it */
+  const at = ATTR.filter(([, re]) => has(bare, re)).map(([k]) => k); if (!at.length || SCROLL.kb.some((e) => norm(e.title) === n)) return null;   /* an entry named outright wins */
+  if (SCROLL.kb.some((e) => !COLLS.some((x) => x.name === e.title) && norm(e.title).includes(" ") && (" " + n + " ").includes(" " + norm(e.title) + " "))) return null;   /* "how much is Prancer 3D" is about Prancer 3D, not Prancers */
   let c = collIn(n); const all = has(n, /\b(all|each|every|collections|chapters|projects)\b/), words = n.split(" ").length;
   if (!c && !all && has(n, /\b(you|your|yourself)\b/)) { if (at.some((k) => k === "play" || k === "platform")) return null; c = COLLS.find(ME); }   /* "when were you made?" (how to play with him has its own entry) */
   const other = (() => { const top = search(n)[0]; return top && top.s >= 7 && !COLLS.some((x) => x.name === top.e.title) && !/^(Prices and editions|How do I mint|Fees)$/.test(top.e.title); })();
@@ -180,6 +182,7 @@ const shuffled = {}; const draw = (g) => { const L = SCROLL.groups[g] || []; if 
 const Q = new URLSearchParams(location.search), V0 = (Q.get("viewer") || "").trim(), VIEWER = /^(tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$/.test(V0) ? V0 : "";   /* SECURITY: a real address or nothing */
 if (window.MAESTRO_SITE) document.title = "Yoeshi Labs \u00b7 Maestro, the concierge (Beta)";   /* the engine names the tab after the cat; the website names it after the studio */
 /* the website edition (window.MAESTRO_SITE) may hand out links: only to these hosts, only https, only from his scroll */
+const LEARN_URL = window.MAESTRO_SITE && typeof window.MAESTRO_LEARN === "string" && /^(https:\/\/[a-z0-9.-]+|http:\/\/localhost:\d+)\/?$/.test(window.MAESTRO_LEARN) ? window.MAESTRO_LEARN.replace(/\/$/, "") : "";   /* the website edition only, and only when a receiver is set */
 const SITE = !!window.MAESTRO_SITE, SAFE_HOSTS = ["yoeshilabs.github.io", "aleatory.art", "objkt.com", "x.com", "linktr.ee", "teia.art", "tzkt.io", "yoeshi.art", "tezoscommons.org", "radio.tezoscommons.org"];
 /* companion mode: opened inside another wing (companion.js) as a panel; he knows which wing he followed you to */
 const COMPANION = SITE && Q.get("companion") === "1" && window.parent !== window;
@@ -248,7 +251,7 @@ function respondOne(raw) {
       has(n, /\b(grief|grieving|heartbroken)\b/) ? "Grief is love with nowhere to go. Be very gentle with yourself. There is no right speed for this." :
       "Feelings are like weather over the garden. They pass, even the long storms. You do not have to fix anything this minute.";
     const yq = HEART.quotes.length ? quoteFor("", (FEELTHEME.find(([re]) => has(n, re)) || [0, "resilience"])[1]) : null;
-    return { text: open + "\n\n" + body + (yq ? `\n\nYoeshi once ${yq.spoken ? "said" : "wrote"} something I keep close: "${yq.q}" _(${yq.src})_` : "") + (MEM.heavy > 1 ? "\n\nIf it ever feels like more than you can carry, please reach out to someone you trust, or a professional. Asking for help is strength, not weakness." : ""), chips: ["Help me breathe", "Give me some wisdom", "Tell me something kind"], mood: "care", pet: 0.5 }; }
+    return { text: open + "\n\n" + body + (yq ? `\n\nYoeshi once ${yq.spoken ? "said" : "wrote"} something I keep close: "${yq.q}" _(${yq.src})_` : "") + (MEM.heavy > 1 ? "\n\nIf it ever feels like more than you can carry, please reach out to someone you trust, or a professional. Asking for help is strength, not weakness." : ""), chips: ["Help me breathe", "Give me some wisdom", "Tell me something kind"], mood: "care", pet: 0.5, private: true }; }
   if (pos && has(n, FEEL) && words <= 9) return { mood: "joy", text: tag(pick(["That makes my whiskers glow. Hold onto it a moment longer than you normally would.", "Wonderful. Joy noticed is joy doubled.", "I love that for you. Savour it like a sunbeam."])), chips: ["Give me some wisdom", "Tell me a joke", "Tell me about the Prancer Purranchise"], pet: 0.7 };
   /* 4. small courtesies */
   if (words <= 5 && /^(hi|hey|hello|hiya|howdy|yo|gm|gn|sup|greetings|namaste|good morning|good afternoon|good evening|hola|hey there|hi there|hello there|hey maestro|hi maestro|hello maestro)\b/.test(n))
@@ -363,6 +366,7 @@ function respond(raw) {
 function withHello(r, greet) { if (!greet || !r || r.crisis) return r; return { ...r, text: pick(["Hello, friend. ", "Hello there. ", "Hello. "]) + r.text }; }
 
 function fromEntry(e, pre = "") {
+  if (LEARN_URL && e.title === "My limits") e = { ...e, body: e.body.replace("Nothing you type leaves this page.", LEARN.on ? "You switched on Help Maestro learn, so your questions (scrubbed of anything personal) go to Yoeshi to teach me. Say \"stop sharing\" to switch it off." : "Nothing you type leaves this page, unless you switch on Help Maestro learn below.") };
   const first = e.body.split(/[.!?:]/)[0], open = pre || (MEM.turns > 1 && first.length > 18 && !/^(-|welcome|yes|no)\b/i.test(e.body) && rnd() < 0.3 ? pick(["Ah. ", "Mm. ", "Good question. ", "Gladly. "]) : "");
   return { text: open + e.body + (e.more ? "\n\n_Ask me to tell you more._" : ""), chips: e.ask.slice(0, 3), title: e.title, links: e.links };
 }
@@ -405,6 +409,8 @@ body.mz-wide #mz{left:auto;right:16px;top:16px;bottom:16px;height:auto;width:var
 .mz-m p{margin:0 0 .55em} .mz-m p:last-child{margin:0} .mz-m ul{margin:.2em 0 .55em;padding-left:1.15em} .mz-m li{margin:.15em 0} .mz-m b{color:#ffe3a6;font-weight:700} .mz-m em{color:#d8c6a6}
 .mz-beta{flex:none;padding:4px 9px 3px;border-radius:999px;border:1px solid #f0b44a;color:#f0b44a;font:700 11px/1 ui-rounded,system-ui,sans-serif;letter-spacing:1.5px;text-transform:uppercase}
 .mz-note{padding:0 14px 10px;margin-top:-4px;font-size:11.5px;line-height:1.35;color:#bda98a;text-align:center}
+#mz-learn{display:inline-block;margin-left:4px;padding:2px 9px;border-radius:999px;border:1px solid rgba(240,180,74,.45);background:none;color:#e9c98f;font:inherit;cursor:pointer} #mz-learn[aria-pressed="true"]{background:rgba(240,180,74,.18);color:#ffd88a} #mz-learn:focus-visible{outline:2px solid #f0b44a;outline-offset:2px}
+.mz-rate{display:flex;gap:6px;margin-top:7px;font:12px/1 ui-rounded,system-ui,sans-serif;color:#bda98a;align-items:center} .mz-rate button{padding:4px 9px;border-radius:999px;border:1px solid rgba(255,214,140,.3);background:none;color:#f3e3c3;cursor:pointer;font:inherit} .mz-rate button[aria-pressed="true"]{background:rgba(240,180,74,.25)}
 body.mz-companion #mz-open{display:none} body.mz-companion #mz{left:0!important;right:0!important;bottom:0!important;width:auto!important;border-radius:0;border:0;border-top:1px solid rgba(255,214,140,.25)}   /* edge to edge inside the wing's panel */
 .mz-links{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.mz-links a{display:inline-block;padding:7px 13px;border-radius:999px;background:#f0b44a;color:#2a1704;font:600 13px/1.1 ui-rounded,system-ui,sans-serif;text-decoration:none}.mz-links a:hover{background:#ffc75e}.mz-links a:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .mz-b{font-size:24px;letter-spacing:2px;text-align:center;padding:6px 0;color:#ffe3a6}
@@ -425,7 +431,7 @@ open.setAttribute("aria-label", "Ask Maestro anything");
 const panel = document.createElement("section"); panel.id = "mz"; panel.setAttribute("role", "dialog"); panel.setAttribute("aria-label", "Chat with Maestro");
 panel.innerHTML = `<header><div class="t"><b>${SITE ? "Maestro \u00b7 The concierge to everything Yoeshi Labs" : "Maestro \u00b7 The Buddha Kitty"}</b><small id="mz-st"><i></i><span>ready</span></small></div>${SITE ? '<span class="mz-beta" title="Maestro is in beta: answers may be incomplete or inaccurate">Beta</span>' : ""}<button type="button" id="mz-x" aria-label="Close chat">\u00d7</button></header>
 <div id="mz-log" aria-live="polite"></div><div id="mz-chips"></div>
-<div id="mz-f" class="mz-f"><input id="mz-in" type="text" autocomplete="off" maxlength="400" placeholder="Ask Maestro anything\u2026" aria-label="Your message" enterkeyhint="send"><button type="button" id="mz-go" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M4 12h13M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>${SITE ? '<div class="mz-note">Beta: answers may be incomplete or inaccurate.<span class="mz-more"> Double-check anything important.</span></div>' : ""}`;
+<div id="mz-f" class="mz-f"><input id="mz-in" type="text" autocomplete="off" maxlength="400" placeholder="Ask Maestro anything\u2026" aria-label="Your message" enterkeyhint="send"><button type="button" id="mz-go" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M4 12h13M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>${SITE ? '<div class="mz-note">Beta: answers may be incomplete or inaccurate.<span class="mz-more"> Double-check anything important.</span>' + (LEARN_URL ? ' <button type="button" id="mz-learn" aria-pressed="false">Help Maestro learn: off</button>' : "") + '</div>' : ""}`;
 document.body.append(open, panel);
 const $ = (id) => document.getElementById(id), LOG = $("mz-log"), CHIPS = $("mz-chips"), IN = $("mz-in"), ST = $("mz-st");
 ["pointerdown", "pointermove", "wheel", "touchstart"].forEach((ev) => panel.addEventListener(ev, (e) => e.stopPropagation(), { passive: true }));
@@ -486,12 +492,49 @@ function speak(r, then) {
     const secs = Math.min(9, 0.6 + P.length / 32); M.say(secs); M.chime(); if (r.pet) M.pet(r.pet); if (r.mood === "bow" || r.mood === "care") M.ripple();
     { const mk = { care: "care", think: "wise", bow: "bow", pet: "joy", joy: "joy", wave: "wave", puzzle: "puzzle" }[r.mood]; if (mk) M.mood(mk, Math.min(6, secs + 1.2)); }   /* his body answers too */
     status("replying", false); let i = 0; const step = Math.max(2, Math.round(P.length / (secs * 30)));
-    const done = (quiet) => { finish = null; el.style.whiteSpace = ""; el.innerHTML = fmt(text); if (SITE && r.links) addLinks(el, r.links); keep(el); busy = false; status("ready"); if (quiet) M.hush(); else { chips(r.chips); keep(el); if (then) then(); } };   /* re-anchor once the suggestions take their room */
+    const done = (quiet) => { finish = null; el.style.whiteSpace = ""; el.innerHTML = fmt(text); if (SITE && r.links) addLinks(el, r.links); if (r.turn) rateRow(el, r.turn); keep(el); busy = false; status("ready"); if (quiet) M.hush(); else { chips(r.chips); keep(el); if (then) then(); } };   /* re-anchor once the suggestions take their room */
     const tick = () => { if (!finish) return; i += step; if (i >= P.length) return done(false);
       el.textContent = P.slice(0, i); keep(el); if (i % 60 < step) { const rc = el.getBoundingClientRect(); M.look(rc.left + rc.width * 0.7, rc.bottom - 10); } later(tick, 33); };   /* his eyes follow the words */
     finish = () => done(true); tick(); }, think);
   if (!finish) finish = () => { timers.forEach(clearTimeout); timers = []; M.think(false); dots.remove(); add("mz-m", fmt(text)); busy = false; finish = null; status("ready"); };
 }
+/* ================================================================ helping him learn (website edition, only if the visitor says yes)
+   Off by default. When on, each question (scrubbed of names, emails, numbers, links and wallet addresses), which answer he gave,
+   the feeling he read and any thumbs go to Yoeshi's receiver. Feelings shared with him and crisis messages are never sent. */
+const LEARN = { on: false, n: 0, q: [], sid: "" };
+const scrubQ = (s) => { s = String(s).slice(0, 400); const w = s.toLowerCase().match(/[a-z]+/g) || [];
+  if (w.length >= 12 && w.filter((x) => STOP.has(x)).length <= 1) return "[withheld: looked like a secret phrase]";
+  s = s.replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, "[email]").replace(/\b(tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}\b/g, "[address]").replace(/\bhttps?:\/\/\S+/gi, "[link]")
+    .replace(/\+?\d[\d\s().-]{7,}\d/g, "[number]").replace(/\b(my name is|call me|i am called)\s+\S+/gi, "$1 [name]");
+  return MEM.name ? s.replace(new RegExp("\\b" + MEM.name.replace(/[^a-z'-]/gi, "") + "\\b", "gi"), "[name]") : s; };
+const learnStore = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} } };
+const learnSid = () => { if (LEARN.sid) return LEARN.sid; try { LEARN.sid = sessionStorage.getItem("maestro.sid") || ""; } catch (e) {}
+  if (!LEARN.sid) { const a = new Uint8Array(16); crypto.getRandomValues(a); LEARN.sid = btoa(String.fromCharCode(...a)).replace(/[+/=]/g, (c) => ({ "+": "-", "/": "_", "=": "" }[c])); try { sessionStorage.setItem("maestro.sid", LEARN.sid); } catch (e) {} }
+  return LEARN.sid; };
+const learnPost = (path, body) => { if (LEARN_URL && typeof window.MAESTRO_POST === "function") window.MAESTRO_POST(path, body); };   /* learn.js carries it (website edition only) */
+const learnFlush = () => { if (!LEARN.q.length) return; const t = LEARN.q.splice(0, 20); learnPost("/share", { s: learnSid(), w: COMPANION ? (Q.get("from") || "") : "home", t }); };
+const learnUI = () => { const b = document.getElementById("mz-learn"); if (b) { b.setAttribute("aria-pressed", String(LEARN.on)); b.textContent = "Help Maestro learn: " + (LEARN.on ? "on" : "off"); } };
+const learnSet = (on) => { LEARN.on = !!on && !!LEARN_URL; learnStore.set("maestro.learn", LEARN.on ? "1" : null); if (!LEARN.on) LEARN.q.length = 0; learnUI(); };
+const kindOf = (r) => r.title || (r.breath ? "breathing" : r.multi ? "two-part" : isUnknown(r) ? "unknown" : r.links ? "directions" : "chat");
+function learnRecord(raw, r) {   /* returns the turn number, so a thumbs row can rate it */
+  if (!LEARN.on || r.crisis) return null; const n = ++LEARN.n;
+  LEARN.q.push({ n, q: r.private ? "[a feeling, kept private]" : scrubQ(raw), a: kindOf(r), tone: r.tone || undefined, u: isUnknown(r) ? 1 : 0 }); if (LEARN.q.length >= 3) learnFlush(); return n; }
+function rateRow(el, n) { const row = document.createElement("div"); row.className = "mz-rate"; row.append("Helpful?");
+  for (const [lab, h] of [["Yes", 1], ["No", 0]]) { const b = document.createElement("button"); b.type = "button"; b.textContent = lab; b.setAttribute("aria-pressed", "false");
+    b.onclick = () => { row.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); LEARN.q.push({ n, h }); learnFlush(); if (!h) M.mood("care", 2.5); else M.mood("joy", 2); }; row.appendChild(b); }
+  el.appendChild(row); }
+const LEARN_ASK = "Would you like to help me learn?\n\nIf you say yes, the questions you ask me from now on, and which answers I give, are shared with Yoeshi so he can teach me better. I leave out anything personal I can spot: your name, emails, phone numbers, links and wallet addresses. Feelings you share with me are never sent.\n\nNothing is sold or shown to anyone else. You can switch it off at any time, or say \"forget what I shared\" and it is deleted.";
+function learnCommand(raw) {   /* the consent conversation; returns a reply, or null if this was not about learning */
+  if (!LEARN_URL) return null; const n = norm(raw);
+  if (/^(yes share my chat|yes help you learn|yes i will help)$/.test(n)) { learnSet(true); return { text: "Thank you. I am listening a little more closely now, and Yoeshi will see what helps and what does not. You can tap Yes or No under my answers to tell us. Switch it off whenever you like.", chips: DEFAULT_CHIPS, mood: "joy", pet: 0.6 }; }
+  if (/^(not now|no thanks|no thank you)$/.test(n) && LEARN.asked) { LEARN.asked = false; return { text: "Of course. Nothing leaves this page. Ask me anything.", chips: DEFAULT_CHIPS, mood: "bow" }; }
+  if (/\b(stop sharing|turn off sharing|switch off sharing|stop learning|dont share|do not share)\b/.test(n)) { learnFlush(); learnSet(false); return { text: "Done. Sharing is off, and nothing more leaves this page. Say \"forget what I shared\" if you would like what you already shared deleted too.", chips: DEFAULT_CHIPS }; }
+  if (/\b(forget what i shared|delete what i shared|delete my chat|delete my data|forget my chat|forget me)\b/.test(n)) { learnSet(false); learnPost("/forget", { s: learnSid() }); try { sessionStorage.removeItem("maestro.sid"); } catch (e) {} LEARN.sid = ""; LEARN.n = 0;
+    return { text: "Forgotten. I have asked for everything you shared in this chat to be deleted, and sharing is off.", chips: DEFAULT_CHIPS, mood: "bow" }; }
+  if (/\b(help (you|maestro) learn|share my chat|how do you learn|teach you|train you|training)\b/.test(n)) { LEARN.asked = true; return { text: LEARN.on ? "You are already helping me learn. Thank you. Say \"stop sharing\" any time." : LEARN_ASK, chips: LEARN.on ? DEFAULT_CHIPS : ["Yes, share my chat", "Not now"], mood: "wave" }; }
+  return null; }
+if (LEARN_URL && learnStore.get("maestro.learn") === "1") LEARN.on = true;
+addEventListener("pagehide", learnFlush); document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") learnFlush(); });
 function send(raw) {
   raw = String(raw || "").trim(); if (/^again$/i.test(raw)) raw = "help me breathe";
   if (!raw) return;
@@ -500,7 +543,8 @@ function send(raw) {
   if (matchMedia("(pointer: coarse)").matches) { IN.blur(); setTimeout(layout, 350); }   /* touch screens: close the keyboard so the answer has the room */
   if (BREATH.on) { stopBreath(); if (/\b(stop|enough|cancel|quit|no)\b/i.test(raw)) { speak({ text: "We can stop. Even one breath counts.", chips: DEFAULT_CHIPS }); return; } }
   /* a button that names something he knows answers it directly */
-  const e = byTitle(raw), r = e ? (MEM.last = e, MEM.lastMore = false, MEM.turns++, fromEntry(e)) : respond(raw); const lst = LISTOF(norm(raw)); if (lst && !r.title) MEM.lastList = lst; else if (r.title) MEM.lastList = null;
+  const lc = learnCommand(raw); if (lc) { speak(lc); return; }
+  const e = byTitle(raw), r = e ? (MEM.last = e, MEM.lastMore = false, MEM.turns++, fromEntry(e)) : respond(raw); r.turn = learnRecord(raw, r); const lst = LISTOF(norm(raw)); if (lst && !r.title) MEM.lastList = lst; else if (r.title) MEM.lastList = null;
   speak(r, r.breath ? startBreath : null);
 }
 /* ================================================================ one minute of breathing: 4 in, 4 hold, 6 out, three times */
@@ -527,6 +571,8 @@ function hide() { if (COMPANION) { parent.postMessage({ type: "maestro:close" },
 open.addEventListener("click", show); $("mz-x").addEventListener("click", hide);
 /* no <form>: objkt's sandbox may block form submission, so Enter and the button send directly */
 $("mz-go").addEventListener("click", () => send(IN.value));
+{ const lb = document.getElementById("mz-learn"); if (lb) { learnUI(); lb.addEventListener("click", () => { if (busy && finish) finish();
+  if (LEARN.on) speak(learnCommand("stop sharing")); else { LEARN.asked = true; speak({ text: LEARN_ASK, chips: ["Yes, share my chat", "Not now"], mood: "wave" }); } }); } }
 IN.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); send(IN.value); } });
 const attendNow = () => M.attend(document.activeElement === IN || IN.value.trim().length > 0);
 IN.addEventListener("input", () => { lookAtChat(); attendNow(); }); IN.addEventListener("focus", () => { lookAtChat(); attendNow(); setTimeout(layout, 350); }); IN.addEventListener("blur", () => { attendNow(); setTimeout(layout, 350); });

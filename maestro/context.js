@@ -12,20 +12,23 @@
  *                      "=> @unknown" marks questions from outside the garden (sports, news, weather).
  *   # Tones            "- tone: phrase | phrase": how a question feels (discouraged, alarmed, frustrated, skeptical, newcomer,
  *                      excited). He meets the feeling first, then answers.
- * Facts are as of October 2026, when Maestro was made. Never put back-ticks in this file.
+ * Facts are as of November 2026 (Maestro was made in October 2026). Never put back-ticks in this file.
  */
 window.MAESTRO_CONTEXT = `
 # Knowledge
 
 ## Where can I go
 keys: where can i go, directory, show me around, tour, give me a tour, branches, sections, what is here, guide me, menu, places, navigate, what can i see, explore, lobby, front desk, map
-ask: The Prancer Purranchise | Yoeshi Labs music | Who is Yoeshi?
+ask: The Prancer Purranchise | The Purrancers | Who is Yoeshi?
+link: Yoeshi Labs | https://yoeshilabs.github.io/
 link: The Prancer Purranchise | https://yoeshilabs.github.io/prancers-site/
+link: The Purrancers live | https://yoeshilabs.github.io/purrancers/
 link: heART Tarot | https://aleatory.art/generator/KT1Jqm8pRaxs61nyK8TMdURpNNNa2hsd9wnH
 link: Yoeshi on objkt | https://objkt.com/@yoeshilabs
 link: yoeshi.art (coming soon) | https://yoeshi.art/
 Welcome to the lobby. Here is what is open right now:
-- **The Prancer Purranchise**: four chapters of living cats on Tezos, with the Lab and Desk Prancers.
+- **The Prancer Purranchise**: six chapters of living cats on Tezos, with the Lab and Desk Prancers.
+- **The Purrancers**: the house band, live in the Sphere at TezTowers, in the original show and in 3D.
 - **heART Tarot**: a generative reading dealt from 583 of Yoeshi's real mints.
 - **Yoeshi's art and music on objkt**: five years of collections, from the first Hic et Nunc mints to HeArt Strong.
 
@@ -464,15 +467,18 @@ The result is a lot of art from one artist, made fast, with the care still in it
 
 ## The Prancer Purranchise
 keys: purranchise, prancer purranchise, franchise, the collections, all projects, your projects, family, universe, prancer family, what projects, overview, chapters
-ask: Tell me about Prancers | Tell me about Prancer Pads | Tell me about Wild Ride
+ask: Tell me about Prancers | The Purrancers | Prancers On Objkt
 link: Visit the Purranchise | https://yoeshilabs.github.io/prancers-site/
 The Purranchise is Yoeshi Labs' family of living cats on Tezos, told as a story in chapters:
 - **Chapter 01, Prancers**: it started with a cat that walked on the beat.
 - **Chapter 02, Prancer Pads**: then they got homes of their own.
 - **Chapter 03, Prancer Portraits**: picture day, and they came dressed to impress.
 - **Chapter 04, Wild Ride**: then a Prancer met an otter (with scuni).
+- **Chapter 05, Prancer Post**: Heartstrong took a paper route, and you can ride it.
+- **Chapter 06, The Purrancers Debut**: the house band played its first show, and the concert film is the ticket.
+- **Chapter 07, Prancer 3D**: coming soon.
 
-Around them sit **Desk Prancers**, where holders let their cats roam the website, and **the Lab**, which makes a GIF of any cat. All four chapters are live on Aleatory, and then there is me, a 1/1 on objkt.
+Around them sit **Prancers On Objkt**, the home for the moving Prancer works, **Desk Prancers**, where holders let their cats roam the website, and **the Lab**, which makes a GIF of any cat. Chapters 01 to 05 are generators on Aleatory, and then there is me, a 1/1 on objkt.
 
 ## Prancers
 keys: prancers, chapter 1, chapter one, chapter 01, original prancers, first collection, walking cats, cat that walks, on the beat
@@ -554,6 +560,92 @@ The cats are wild here: twelve species (Lion, Tiger, Cheetah, Leopard, Jaguar, S
 
 The otters come in every shade of brown the river has ever been, and once in a long while one comes down the bank pure white with ruby eyes. Once a loop, the cat glances back at its rider and they share a slow blink: still here, still going. The generator is KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY.
 
+## Prancer Post
+keys: prancer post, paper route, paperboy, paper boy, paper delivery, the game, prancer game, heartstrong, heartstrong game, newspaper game, taco butler, front page, high score, best score, chapter 5, chapter five, chapter 05, play a game
+ask: Prices and editions | Prancer Pads | How do I mint?
+link: Ride the route | https://yoeshilabs.github.io/prancers-site/#post
+link: Prancer Post on Aleatory | https://aleatory.art/generator/KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En
+Prancer Post is Chapter 05 of the Purranchise, and you can play it. Heartstrong has taken a paper route through the Prancer neighbourhood. Each mint seeds its own street: the Prancer Pads houses, the time and weather, the sky, the cats, the rules of the ride and a theme song of its own. It is the same street every time you ride it, so your best score counts.
+
+Land papers on subscribers' doormats, hit the flagged mailboxes to win new readers, ring the bell to clear cats from your lane, and meet the Taco Butler to keep your heart pumping.
++++
+On a keyboard, up and down change lanes, left and right set your speed, space throws a paper and B rings the bell. On a phone, tap to ride and throw, and swipe to change lanes. Set a best, sign it with your initials, and press S to save the morning's front page. 256 streets, 4 tez each, launched on Aleatory on 23 October 2026. The generator is KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En.
+
+I tried it once. I threw the paper at the bell, rang a cat, and stopped to meditate in the left lane. My best score is a koan.
+
+## Prancers On Objkt
+keys: prancers on objkt, objkt collection, objkt branch, prance trance, the objkt prancers, moving prancers, gifted, gift, airdrop to collectors, fractal visualizer
+ask: Prance Or Treat! | Prancelot | The Purrancers
+link: Prancers On Objkt | https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH
+Prancers On Objkt is the home for the moving Prancer works, opened on 21 October 2026. Where the chapters are generators on Aleatory, these are single pieces with motion and sound, minted on objkt.
+
+The first was **Prance Trance**, a fractal visualizer in 100 editions, gifted to every Purranchise collector as a thank you. Then came **Prance Or Treat!**, **The Purrancers Debut** concert film and **Prancelot**.
++++
+The collection is KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH. Sound on for every piece in it.
+
+## Prance Or Treat
+keys: prance or treat, prance or treat!, halloween, trick or treat, trick or treating, midnight mass, 617 gallery, haunted, haunted pads, spooky, costume, costumes
+ask: Prancers On Objkt | Prancer Portraits | Prancer Pads
+Prance Or Treat! is Yoeshi's entry in Midnight Mass 2026 by 617 Gallery: Prancer Portraits in costume, trick or treating down a street of haunted Pads. It was minted on 27 October 2026 in Prancers On Objkt, 13 editions.
+
+I stayed home that night and handed out catnip. Nobody wanted catnip.
+
+## The Purrancers
+keys: purrancers, the purrancers, the band, house band, prancer band, cat band, frontcat, the frontcat, ozzy pawton, captain bagel von meow, moxie, leo hornsby, toast, billie whiskerstein, zoomie mcsnoozes, band members, who is in the band, singer, internet friend, decentralize, setlist, songs they play
+ask: The live show | The Purrancers Debut | Yoeshi Labs music
+link: Meet The Purrancers | https://yoeshilabs.github.io/#band
+The Purrancers are the Yoeshi Labs house band: eight cats who play Yoeshi's songs. They can play any style and any part a song asks for, and every one of them sings. The songs are always his.
+- **The Frontcat**: lead vocals and guitar.
+- **Ozzy Pawton**: guitars.
+- **Captain Bagel von Meow**: bass.
+- **Moxie**: hand percussion.
+- **Leo Hornsby**: horns.
+- **Toast**: strings.
+- **Billie Whiskerstein**: beats.
+- **Zoomie McSnoozes**: keys.
+
+Their setlist is two of Yoeshi's songs: Internet Friend, which opened their debut, and Decentralize, his new song, which follows it.
++++
+Every light, confetti cannon and move of the band follows the music. They are now in 3D as well: the same eight cats, built in code, playing every note on stage in the Sphere. Zoomie naps on the bench and wakes on the count-in. I respect that deeply.
+
+## The Purrancers Debut
+keys: purrancers debut, the debut, debut, concert film, the concert film, internet friend film, the ticket, ticket, chapter 6, chapter six, chapter 06, how do i get a ticket, do i need a ticket
+ask: The live show | The Purrancers | Prancers On Objkt
+link: The concert film on objkt | https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3
+The Purrancers Debut is Chapter 06: the concert film of The Purrancers playing Internet Friend live in the Sphere. It was minted on 3 November 2026 in Prancers On Objkt, 250 editions, and airdropped to holders of Internet Friend and the Purranchise.
+
+The film is also your ticket. Holding it lets you into the live show in the Sphere to walk the floor while the band plays.
+
+## The live show
+keys: live show, the show, the sphere, sphere, teztowers, tez towers, concert, walk the sphere, walkable show, 3d show, the 3d show, enter the show, get in, doors, the doors, emotes, photo button, how do i get in, walk in as my cat, walk in as my prancer
+ask: The Purrancers Debut | The Purrancers | Prancer Portraits
+link: Enter at TezTowers | https://teztowers.com/
+link: Open the show | https://yoeshilabs.github.io/purrancers/
+The Purrancers play live in the Sphere at TezTowers, and you can walk the floor while they play. There are two ways to see it: the original show, and the new 3D show, with both songs on the setlist.
+
+In the 3D show you walk in as your own Prancer: one of your Prancer Portraits, or a cat of your own. Dance and emote with the crowd, take photos, and stay for both songs.
+
+To get in: go to TezTowers, tap the Sphere, show your ticket with a free sign-in, pick The 3D show at the doors, and walk in.
++++
+The sign-in only proves you hold the ticket. It is one free message, never a transaction, and it never moves anything in your wallet. You can also open the show on its own at yoeshilabs.github.io/purrancers.
+
+## Prancelot
+keys: prancelot, pepper yarnmore, pepper, knight on a pony, sword knight 3d, pony, horse, knight, castle, meadow, first 3d piece, first prancer 3d piece
+ask: Prancers On Objkt | Mythics | Prancer 3D
+link: Prancers On Objkt | https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH
+Prancelot is the first Prancer 3D piece, minted on 4 November 2026 in Prancers On Objkt, 100 editions. Pepper Yarnmore rides out in celestial plate, with a sword nearly twice the size of the knight carrying it and a pony dressed to match.
+
+It is the Sword Knight from Prancer Portraits, grown into 3D.
++++
+Tap anywhere and the pony rears up. Double-tap to prance, and again to stop. Press and hold for a rest: the pony grazes and Pepper shoulders the sword. Drag to look all the way round the meadow, with its butterflies, bunnies, swallows and a castle on the hill. Scroll or pinch to zoom.
+
+## Prancer 3D
+keys: prancer 3d, prancer3d, 3d prancer, 3d prancers, chapter 7, chapter seven, chapter 07, 3d cat, mint a 3d cat, next chapter, coming soon
+ask: The live show | Prancelot | What is next
+Prancer 3D is coming soon as Chapter 07: mint your own dynamic, interactive 3D Prancer on Aleatory, with built-in emotes and game logic, then walk into the concert as your own cat.
+
+That is all I may say for now. I do not announce things before Yoeshi does, and the best way to hear first is to follow @YinYangYoeshi on X.
+
 ## Who is scuni
 keys: scuni, who is scuni, otter artist, collaborator, partner
 ask: Wild Ride | Yoeshi Labs
@@ -610,6 +702,8 @@ At launch:
 - **Prancer Pads**: 256 editions, 10 tez.
 - **Prancer Portraits**: open edition, 1 tez.
 - **Wild Ride**: 1,024 editions, 6 tez.
+- **Prancer Post**: 256 editions, 4 tez.
+- **The Purrancers Debut**: 250 editions, on objkt.
 - **Maestro** (me): one of one, on objkt.
 
 I live offline, so I cannot see how many are minted right now. The website shows live counters for every chapter.
@@ -693,15 +787,15 @@ The cats are grounded in real feline science:
 
 ## Music and sound
 keys: music, song, songs, sound, why do they sing, theme song, purr, meow, audio, singing bowl, hum
-ask: How to play with me | Prancers
-Every chapter makes music. Each Prancer sings its own theme song in purrs, paws and meows, every Pad has its own tune, and Wild Ride has a whole band playing outdoors: thumb pianos, marimba, flute, horns, and a cat that roars or chirps on the big moment.
+ask: The Purrancers | How to play with me | Prancers
+Every chapter makes music. Each Prancer sings its own theme song in purrs, paws and meows, every Pad has its own tune, and Wild Ride has a whole band playing outdoors: thumb pianos, marimba, flute, horns, and a cat that roars or chirps on the big moment. The Purrancers, the house band, play Yoeshi's own songs live in the Sphere.
 
 Me, I keep it simple: a purr when you pet me, and an om with a singing bowl when you tap.
 
 ## What is next
 keys: whats next, what is next, roadmap, future, plans, coming soon, next project, next chapter, upcoming
-ask: My purpose | Desk Prancers
-I do not announce things before Yoeshi does. What I can say: a Desk Prancers desktop app is on the roadmap, and I am the first prototype of the Yoeshi Labs assistant. The best way to hear news first is to follow @YinYangYoeshi on X and keep an eye on the website.
+ask: Prancer 3D | My purpose | Desk Prancers
+I do not announce things before Yoeshi does. What I can say: Prancer 3D is coming soon as Chapter 07, a Desk Prancers desktop app is on the roadmap, and I am the first prototype of the Yoeshi Labs assistant. The best way to hear news first is to follow @YinYangYoeshi on X and keep an eye on the website.
 
 ## Where to follow
 keys: follow, social, socials, contact, twitter, x account, objkt profile, how to reach, discord, where can i follow, community
@@ -788,7 +882,7 @@ objkt is the main marketplace and gallery for Tezos art. After you mint, your Pr
 keys: find my cats, see my cats, where can i see my cats, my cats, my prancers, where are my cats, what do i own, my collection, my holdings, show my cats, i minted, after minting
 ask: Desk Prancers | The Lab | objkt
 Three easy ways:
-- **On the website**, use the wallet sync at the top right (read-only) or paste your address or .tez name, and every cat you hold across all four chapters appears.
+- **On the website**, use the wallet sync at the top right (read-only) or paste your address or .tez name, and every cat you hold across every chapter appears.
 - **On objkt**, open your profile and look under your collection.
 - **In the Lab**, pick from your own cats in the dropdown to make a GIF of any of them.
 
@@ -804,6 +898,8 @@ ask: How to play with me | Music and sound
 - **Prancer Pads**: tap a cat to play with it, scroll to zoom in, and feed and pet the residents.
 - **Prancer Portraits**: move your pointer and it watches you, stroke it to make it purr, tap and it answers back.
 - **Wild Ride**: tap for sound, then watch the cat and its otter ride on the beat.
+- **Prancer Post**: up and down change lanes, left and right set your speed, space throws a paper and B rings the bell. On a phone, tap to throw and swipe to change lanes.
+- **Prancelot**: tap and the pony rears, double-tap to prance, press and hold for a rest, drag to look around.
 - **Me**: move, stroke, tap, or press Ask Maestro. Enter or the slash key opens the chat and Escape closes it.
 
 ## Accessibility
@@ -833,10 +929,18 @@ ask: The Prancer Purranchise | Trancers | Who is Yoeshi?
 - **8 October 2026**: the first laser-eyed Prancer is found and the secret comes out.
 - **October 2026**: Prancer Portraits, then Wild Ride with scuni the very next day.
 - **14 October 2026**: I am made, a one of one for objkt.
+- **21 October 2026**: Prancers On Objkt opens with Prance Trance, gifted to every Purranchise collector.
+- **23 October 2026**: Prancer Post, Chapter 05, takes Heartstrong on a paper route.
+- **27 October 2026**: Prance Or Treat! goes trick or treating for Midnight Mass 2026.
+- **3 November 2026**: The Purrancers debut live in the Sphere, and the concert film becomes the ticket.
+- **4 November 2026**: Prancelot, the first Prancer 3D piece.
 
 # Meanings
 - what is this place | what is this site | what is all this | what is this website | where do i start | first time here | new here | where am i | im lost here | what is this place even | whats this place => @Where can I go
 - what are you | who are you | what are you exactly => @Who is Maestro
+- how do i get into the show | get into the show | get in the show | enter the show | how do i enter the show | how do i get into the sphere | get into the concert => @The live show
+- how many editions will prancer 3d have | prancer 3d editions | prancer 3d price | prancer 3d launch date | when does prancer 3d launch | when does prancer 3d come out => @Prancer 3D
+- what is prancers on objkt | prancers on objkt | tell me about prancers on objkt => @Prancers On Objkt
 - see my wallet | access my wallet | read my wallet | take my tez | touch my wallet => @Is connecting my wallet safe
 - real person | a human | someone typing | person typing | chatbot | robot | language model | llm => @Are you an AI
 - how smart | understand me | do you learn | do you remember | can you think | how do you work | how do you know things => @My limits
@@ -899,6 +1003,9 @@ ask: The Prancer Purranchise | Trancers | Who is Yoeshi?
 - Prancer Pads | chapter: 02 | editions: 256 | price: 10 tez | launched: on 7 October 2026 | platform: Aleatory | generator: KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf | play: tap a cat to play with it, scroll to zoom, and feed and pet the residents | aliases: prancer pads, pads, pad, chapter 2, chapter two, chapter 02, houses, homes
 - Prancer Portraits | chapter: 03 | editions: an open edition | price: 1 tez | launched: in October 2026, the day before Wild Ride | platform: Aleatory | generator: KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY | play: move your pointer and it watches you, stroke it to purr, tap and it answers back | aliases: prancer pfp, pfp, pfps, portrait, portraits, chapter 3, chapter three, chapter 03
 - Wild Ride | chapter: 04 | editions: 1,024 | price: 6 tez | launched: in October 2026, the day after Prancer Portraits | platform: Aleatory | generator: KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY | play: tap for sound, then watch the cat and its otter ride on the beat | aliases: wild ride, wildride, ride, otter, otters, chapter 4, chapter four, chapter 04
+- Prancer Post | chapter: 05 | editions: 256 | price: 4 tez | launched: on 23 October 2026 | platform: Aleatory | generator: KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En | play: a game: ride Heartstrong's paper route, change lanes with up and down, throw papers with space, ring the bell with B; on phones tap to throw and swipe to change lanes | aliases: prancer post, post, paper route, paperboy, paper delivery, heartstrong paper route, chapter 5, chapter five, chapter 05
+- The Purrancers Debut | chapter: 06 | editions: 250 | price: set on objkt | launched: on 3 November 2026 | platform: objkt (Prancers On Objkt #3) | generator: none, it is a concert film in Prancers On Objkt: KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH token 3 | play: the concert film of The Purrancers playing Internet Friend live in the Sphere, sound on; holding it is the ticket to their walkable live show at https://yoeshilabs.github.io/purrancers/ | aliases: the purrancers debut, purrancers debut, the debut, internet friend concert film, the concert film, the ticket, chapter 6, chapter six, chapter 06
+- Prancers On Objkt | chapter: none, it is the objkt branch of the Purranchise | editions: set piece by piece (Prance Trance: 100) | price: set piece by piece on objkt | launched: on 21 October 2026 | platform: objkt | generator: none, it is an objkt collection: KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH | play: the moving Prancer works live here, sound on; the first is Prance Trance, the fractal visualizer | aliases: prancers on objkt, objkt collection, objkt branch, prance trance, the objkt prancers
 - heART Tarot | chapter: none, it sits beside the chapters | editions: 1,999 | price: 3 tez | launched: on 3 October 2026 | platform: Aleatory | generator: KT1Jqm8pRaxs61nyK8TMdURpNNNa2hsd9wnH | play: tap to turn the cards, one at a time | aliases: heart tarot, its all heart, tarot
 - Maestro | chapter: none, I am a one of one | editions: one of one | price: set on objkt by whoever lists me | launched: on 14 October 2026 | platform: objkt | generator: none, I am a single interactive token | play: move, stroke, tap, or press Ask Maestro | aliases: maestro, buddha kitty, the buddha kitty
 
