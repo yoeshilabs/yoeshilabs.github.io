@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Yoeshi</title>
-<meta name="description" content="Yoeshi is a singer songwriter who builds worlds for his songs with code: the Prancer Purranchise, Maestro, and The Purrancers, live in the Sphere.">
+<meta name="description" content="Yoeshi is a singer songwriter who builds worlds for his songs with code: the Prancer Purranchise, Maestro, and The Purrancers, live in the Sphere in 3D with Internet Friend and Decentralize.">
 <meta property="og:title" content="Yoeshi">
 <meta property="og:description" content="All code. Music at the core from day one, and still the whole goal.">
-<meta property="og:image" content="https://yoeshilabs.github.io/media/purrancers-trailer.jpg">
+<meta property="og:image" content="https://yoeshilabs.github.io/media/og-cinema.jpg">
 <meta property="og:url" content="https://yoeshilabs.github.io/">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#120a1c">
@@ -70,6 +70,9 @@
 
   /* listen */
   .listen .wrap { display: grid; grid-template-columns: 1.2fr .8fr; gap: 40px; align-items: center; }
+  .setlist { display: grid; grid-template-columns: .82fr 1.18fr; gap: 18px; margin-top: 28px; align-items: start; }
+  .setlist figure { margin: 0; } .setlist figcaption { font-size: 14.5px; color: var(--dim); margin-top: 10px; } .setlist figcaption b { color: var(--ink); }
+  @media (max-width: 860px) { .setlist { grid-template-columns: 1fr; } }
   .wide { border-radius: 20px; overflow: hidden; aspect-ratio: 16 / 9; background: #000; box-shadow: 0 0 0 1px var(--line); }
   .wide video { width: 100%; height: 100%; object-fit: cover; }
   .wide.square { aspect-ratio: 1; }
@@ -81,6 +84,17 @@
   .band .lead2 { max-width: 760px; }
   .sheet { position: relative; margin-top: 30px; border-radius: 22px; overflow: hidden; aspect-ratio: 16 / 9; background: #000; box-shadow: 0 30px 80px rgba(0, 0, 0, .45), 0 0 0 1px var(--line); }
   .sheet video { width: 100%; height: 100%; object-fit: cover; }
+  /* the band sheet both ways: drawn over 3D, cut away at the handle (drag anywhere, or the arrow keys) */
+  .compare { --x: 50%; }
+  .compare video { position: absolute; inset: 0; }
+  .compare .before { clip-path: inset(0 calc(100% - var(--x)) 0 0); }
+  .compare .divider { position: absolute; top: 0; bottom: 0; left: var(--x); width: 2px; margin-left: -1px; background: rgba(255, 247, 239, .92); box-shadow: 0 0 14px rgba(0, 0, 0, .55); pointer-events: none; }
+  .compare .knob { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 46px; height: 46px; border-radius: 50%; background: var(--grad); color: #2a0f3c; display: grid; place-items: center; font-weight: bold; font-size: 18px; box-shadow: 0 6px 22px rgba(0, 0, 0, .5); }
+  .compare .reveal { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; touch-action: pan-y; }
+  .compare .reveal:focus-visible ~ .divider .knob { outline: 3px solid var(--cyan); outline-offset: 3px; }
+  .compare .label { position: absolute; top: 14px; padding: 5px 12px; border-radius: 999px; font-size: 13px; letter-spacing: .04em; background: rgba(18, 10, 28, .74); color: var(--ink); pointer-events: none; }
+  .compare .label.l { left: 14px; } .compare .label.r { right: 14px; }
+  .compare .sound { z-index: 2; }
   .members { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 26px; }
   .member { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
   .member video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #1a0b24; }
@@ -110,13 +124,17 @@
   @media (max-width: 620px) { .cards { grid-template-columns: 1fr; } }
 
   /* the art hall strip */
-  .hall { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-top: 30px; }
+  .hall { display: grid; grid-template-columns: repeat(9, 1fr); gap: 12px; margin-top: 30px; }
   .hall a { display: block; text-decoration: none; }
   .hall img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 14px; border: 3px solid #d9b45a; box-shadow: 0 8px 24px rgba(0, 0, 0, .4); transition: transform .2s; }
   .hall a:hover img { transform: translateY(-4px) rotate(-1deg); }
   .hall span { display: block; font-size: 13px; margin-top: 8px; text-align: center; color: var(--dim); }
-  @media (max-width: 860px) { .hall { grid-template-columns: repeat(4, 1fr); } }
-  @media (max-width: 520px) { .hall { grid-template-columns: repeat(2, 1fr); } }
+  .hall .soon img { filter: saturate(.85); } .hall .soon span { color: var(--gold); }
+  @media (max-width: 960px) { .hall { grid-template-columns: repeat(5, 1fr); } }
+  @media (max-width: 520px) { .hall { grid-template-columns: repeat(3, 1fr); } }
+  .card.soon { border-style: dashed; border-color: rgba(255, 211, 110, .35); }
+  .tag.pink { background: rgba(255, 95, 168, .14); color: var(--pink); }
+  .also { margin-top: 18px; font-size: 15px; color: var(--dim); } .also a { color: var(--gold); }
 
   /* collect */
   .collect { background: var(--deep); }
@@ -147,11 +165,11 @@
     <h1>My songs performed by <span class="grad">cats</span>.</h1>
     <p class="lead">All code. Music at the core from day one, and still the whole goal.</p>
     <p>Once "just a singer songwriter". Now I build worlds where fictional bands play my songs, made independently, with code and AI.</p>
-    <a class="debut" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3" target="_blank" rel="noopener" style="text-decoration:none"><span class="live"></span><span><b>The Purrancers</b> are live in the Sphere at TezTowers. The concert film is your ticket.</span></a>
+    <a class="debut" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3" target="_blank" rel="noopener" style="text-decoration:none"><span class="live"></span><span><b>The Purrancers</b> are live in the Sphere at TezTowers, now in full 3D with Decentralize on the setlist. The concert film is your ticket.</span></a>
     <div class="row"><a class="btn main" href="#explore">Step into the world</a><a class="btn ghost" href="#listen">Listen</a></div>
   </div>
   <div class="screen">
-    <video id="trailer" src="media/purrancers-trailer.mp4" poster="media/purrancers-trailer.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The Purrancers trailer"></video>
+    <video id="trailer" src="media/hero-cinema.mp4" poster="media/hero-cinema.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The Purrancers in the Sphere, from the cinema cut of Decentralize"></video>
     <button class="sound" id="sound" aria-pressed="false">Sound on</button>
   </div>
 </div></header>
@@ -160,9 +178,14 @@
   <div class="kicker">The house band</div>
   <h2>Meet The Purrancers</h2>
   <p class="lead2">Eight cats, one house band. They play any style and any part a song asks for, and every one of them sings. Some songs I sing myself; on others the band carries them. The songs are always mine.</p>
+  <p class="lead2">Now in 3D as well: the same eight cats, built in code, playing every note of the song on stage in the Sphere. Drag across the sheet to see them both ways.</p>
   <ul class="styles" aria-label="Styles they play"><li>Bossa and neo soul</li><li>Rock</li><li>Reggae</li><li>Gospel</li><li>Country</li><li>Hip-hop and lo-fi</li><li>Orchestral</li><li>Electronic</li><li>A cappella</li></ul>
-  <div class="sheet">
-    <video id="sheet" src="media/band-sheet.mp4" poster="media/band-sheet.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The Purrancers, all eight in matching black suits, playing together"></video>
+  <div class="sheet compare" id="compare">
+    <video id="sheet3d" class="after" data-src="media/band-sheet-3d.mp4" poster="media/band-sheet-3d.jpg" muted loop playsinline preload="none" aria-label="The Purrancers in 3D, all eight in matching black suits, playing together"></video>
+    <video id="sheet" class="before" data-src="media/band-sheet.mp4" poster="media/band-sheet.jpg" muted loop playsinline preload="none" aria-label="The Purrancers as drawn, all eight in matching black suits, playing together"></video>
+    <input class="reveal" id="reveal" type="range" min="0" max="100" step="0.5" value="50" aria-label="Slide between the band as drawn and the band in 3D">
+    <div class="divider" aria-hidden="true"><span class="knob">&#8596;</span></div>
+    <span class="label l">Drawn</span><span class="label r">In 3D</span>
     <button class="sound" id="sheetsound" aria-pressed="false">Sound on</button>
   </div>
   <div class="members">
@@ -185,15 +208,18 @@
   </div>
 </div></section>
 
-<section class="listen" id="listen"><div class="wrap">
-  <div class="wide square"><video src="media/concert-drop.mp4" poster="media/concert-drop.jpg" controls playsinline preload="none" aria-label="Internet Friend, live in the Sphere: the held note into the big drop"></video></div>
-  <div>
-    <div class="kicker">Listen</div>
-    <h2>Internet Friend, live in the Sphere</h2>
-    <p>The Purrancers' first show is built around Internet Friend, one of my songs. Every light, every confetti cannon and every move of the band follows the music.</p>
-    <div class="row" style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn ghost" href="https://objkt.com/tokens/KT1HSDxtqEY4UpYWrzxJoUWq1UDLDTMaFU24/25" target="_blank" rel="noopener">Internet Friend on objkt</a>
-      <a class="btn ghost" href="https://objkt.com/tokens/KT1HSDxtqEY4UpYWrzxJoUWq1UDLDTMaFU24/17" target="_blank" rel="noopener">"Right Now, Right Here", the interactive album</a></div>
+<section class="listen" id="listen"><div class="wrap" style="display:block">
+  <div class="kicker">Listen</div>
+  <h2>The setlist: Internet Friend and Decentralize</h2>
+  <p>The Purrancers play two of my songs in the Sphere. Internet Friend opened their debut; Decentralize, my new song, follows it. Every light, every confetti cannon and every move of the band follows the music.</p>
+  <div class="setlist">
+    <figure><div class="wide square"><video src="media/concert-drop.mp4" poster="media/concert-drop.jpg" controls playsinline preload="none" aria-label="Internet Friend, live in the Sphere: the held note into the big drop"></video></div>
+      <figcaption><b>Internet Friend</b>, from the concert film: the held note into the big drop.</figcaption></figure>
+    <figure><div class="wide"><video src="media/decentralize-cinema.mp4" poster="media/decentralize-cinema.jpg" controls playsinline preload="none" aria-label="Decentralize, the cinema cut: the opening, and the start of the final shot"></video></div>
+      <figcaption><b>Decentralize</b>, the first frames of the cinema cut, rendered in Blender from the same show you can walk.</figcaption></figure>
   </div>
+  <div class="row" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px"><a class="btn ghost" href="https://objkt.com/tokens/KT1HSDxtqEY4UpYWrzxJoUWq1UDLDTMaFU24/25" target="_blank" rel="noopener">Internet Friend on objkt</a>
+    <a class="btn ghost" href="https://objkt.com/tokens/KT1HSDxtqEY4UpYWrzxJoUWq1UDLDTMaFU24/17" target="_blank" rel="noopener">"Right Now, Right Here", the interactive album</a></div>
 </div></section>
 
 <section id="explore"><div class="wrap">
@@ -201,12 +227,13 @@
   <h2>Come in, look around</h2>
   <p>Most of this world is free to visit. Wander, play, and listen.</p>
   <div class="cards two">
-    <a class="card" href="https://teztowers.com/" target="_blank" rel="noopener"><img src="media/sphere-floor.jpg" alt="The crowd and the stage inside the Sphere, confetti in the air" loading="lazy">
+    <a class="card" href="https://teztowers.com/" target="_blank" rel="noopener"><img src="media/show3d.jpg" alt="Your own Prancer on the walkway in the 3D show, the band on stage and confetti in the air" loading="lazy">
       <div class="body"><span class="tag gold">Ticket holders</span><h3>Walk the Sphere</h3>
-        <p>The live show you can walk through as a Prancer: find your spot on the floor, grab a donut at the stands, catch confetti on the drops and find all eight band pins.</p><span class="go">Enter at TezTowers</span></div></a>
+        <p>Now in full 3D: walk in as your own Prancer, one of your Prancer Portraits or a cat of your own, dance and emote with the crowd, take photos, and stay for both songs. The original show is still there too.</p><span class="go">Enter at TezTowers</span></div></a>
     <a class="card" href="prancers-site/"><img src="media/01-prancers.jpg" alt="A Prancer walking on the beat" loading="lazy">
       <div class="body"><span class="tag">Play</span><h3>The Prancer Purranchise</h3><p>Every chapter plays right in your browser: tap a Prancer and it reacts and sings, visit the Pads, ride with scuni, deliver the post.</p><span class="go">Visit the Purranchise</span></div></a>
   </div>
+  <p class="also">Or open the show on its own: <a href="purrancers/">yoeshilabs.github.io/purrancers</a>, and pick The 3D show at the doors.</p>
   <div class="hall">
     <a href="https://aleatory.art/generator/KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw" target="_blank" rel="noopener"><img src="media/01-prancers.jpg" alt="" loading="lazy"><span>Prancers</span></a>
     <a href="https://aleatory.art/generator/KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf" target="_blank" rel="noopener"><img src="media/02-pads.jpg" alt="" loading="lazy"><span>Prancer Pads</span></a>
@@ -215,6 +242,8 @@
     <a href="https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH" target="_blank" rel="noopener"><img src="media/05-prance-trance.jpg" alt="" loading="lazy"><span>Prance Trance</span></a>
     <a href="https://aleatory.art/generator/KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En" target="_blank" rel="noopener"><img src="media/06-post.jpg" alt="" loading="lazy"><span>Prancer Post</span></a>
     <a href="https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH" target="_blank" rel="noopener"><img src="media/07-prance-or-treat.jpg" alt="" loading="lazy"><span>Prance Or Treat!</span></a>
+    <a href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3" target="_blank" rel="noopener"><img src="media/08-purrancers-debut.jpg" alt="" loading="lazy"><span>The Purrancers Debut</span></a>
+    <a class="soon" href="#collect"><img src="media/09-prancer-3d.jpg" alt="" loading="lazy"><span>Prancer 3D, soon</span></a>
   </div>
 </div></section>
 
@@ -224,18 +253,24 @@
   <p>Exploring stays free. Collecting is how you support the songs and the world around them, and it opens doors to experiences made for collectors.</p>
   <div class="ticket">
     <img src="media/rockstars.jpg" alt="The Purrancers on stage, seen from the front of the crowd" loading="lazy">
-    <div class="body"><span class="tag gold">Your ticket</span><h3>The Purrancers concert film</h3>
-      <p>The concert film is also the ticket. Holding it is what lets you into the live show in the Sphere, to walk the floor while the band plays.</p>
-      <p>Go to TezTowers, tap the Sphere, show your ticket with a free sign-in, and walk in.</p>
+    <div class="body"><span class="tag gold">Your ticket · Chapter 06</span><h3>The Purrancers Debut</h3>
+      <p>The concert film is also the ticket. Holding it lets you into the live show in the Sphere, the original and the new 3D one, to walk the floor while the band plays.</p>
+      <p>Go to TezTowers, tap the Sphere, show your ticket with a free sign-in, pick The 3D show at the doors, and walk in.</p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px"><a class="btn main" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3" target="_blank" rel="noopener">Get the concert film</a><a class="btn ghost" href="https://teztowers.com/" target="_blank" rel="noopener">Go to TezTowers</a></div></div>
   </div>
   <div class="cards">
     <a class="card" href="https://aleatory.art/generator/KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY" target="_blank" rel="noopener"><img src="media/03-pfp.jpg" alt="" loading="lazy">
-      <div class="body"><span class="tag">Open edition</span><h3>Prancer Portraits</h3><p>The easiest way in: your own Prancer Portrait, ready to wear as your profile picture.</p><span class="go">Mint on Aleatory</span></div></a>
+      <div class="body"><span class="tag">Open edition</span><h3>Prancer Portraits</h3><p>The easiest way in: your own Prancer Portrait, ready to wear as your profile picture, and the cat you walk into the 3D show as.</p><span class="go">Mint on Aleatory</span></div></a>
     <a class="card" href="prancers-site/"><img src="media/02-pads.jpg" alt="" loading="lazy">
-      <div class="body"><span class="tag">The chapters</span><h3>Prancers, Pads, Wild Ride and Post</h3><p>Each chapter is a generator on Aleatory. Every mint is one of a kind, and collectors get holder extras on the Purranchise site, like Desk Prancers.</p><span class="go">See every chapter</span></div></a>
+      <div class="body"><span class="tag">The chapters</span><h3>Prancers, Pads, Wild Ride and Post</h3><p>Chapters 01 to 05. Each is a generator on Aleatory. Every mint is one of a kind, and collectors get holder extras on the Purranchise site, like Desk Prancers.</p><span class="go">See every chapter</span></div></a>
     <a class="card" href="https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH" target="_blank" rel="noopener"><img src="media/05-prance-trance.jpg" alt="" loading="lazy">
-      <div class="body"><span class="tag">On objkt</span><h3>Prancers On Objkt</h3><p>The home for moving Prancer works. Prance Trance was gifted to every Purranchise collector.</p><span class="go">Visit the collection</span></div></a>
+      <div class="body"><span class="tag">On objkt</span><h3>Prancers On Objkt</h3><p>The home for moving Prancer works: Prance Trance (gifted to every Purranchise collector), Prance Or Treat!, The Purrancers Debut and Prancelot.</p><span class="go">Visit the collection</span></div></a>
+  </div>
+  <div class="cards two">
+    <a class="card soon" href="https://aleatory.art/" target="_blank" rel="noopener"><img src="media/09-prancer-3d.jpg" alt="A Prancer 3D cat in The Sphere" loading="lazy">
+      <div class="body"><span class="tag pink">Coming soon · Chapter 07</span><h3>Prancer 3D</h3><p>Mint your own dynamic, interactive 3D Prancer on Aleatory, with built-in emotes and game logic, then walk into the concert as your own cat.</p><span class="go">Coming to Aleatory</span></div></a>
+    <div class="card soon"><img src="media/cinema-frontcat.jpg" alt="The Frontcat close up, from the cinema cut of Decentralize" loading="lazy">
+      <div class="body"><span class="tag pink">Coming soon</span><h3>Decentralize, the cinema cut</h3><p>The music video, recreated in Blender and rendered with real light, haze and fur. A limited edition is coming to objkt, and it will also be an entry pass to the show.</p><span class="go">Rendering now</span></div></div>
   </div>
   <p class="note">Collect what you love, when it feels right. Everything I make is for the music first.</p>
 </div></section>
@@ -244,11 +279,13 @@
   <div class="kicker">Early features</div>
   <h2>In the lab</h2>
   <p>Still growing, and changing often as I build them. Come try them early.</p>
-  <div class="cards two">
+  <div class="cards">
     <a class="card" href="maestro/"><img src="media/maestro-face.png" alt="Maestro, the Buddha Kitty" loading="lazy" style="object-fit:contain;background:#1a0b24">
       <div class="body"><span class="tag">Chat</span><h3>Maestro</h3><p>My Buddha Kitty concierge, still learning. Ask him about any collection, the story so far, or where to go next.</p><span class="go">Say hello</span></div></a>
     <a class="card" href="prancers-site/#yours"><img src="media/desk-prancers.jpg" alt="Desk Prancers, for Prancer holders" loading="lazy">
       <div class="body"><span class="tag gold">Holders</span><h3>Desk Prancers</h3><p>Let your Prancers out of the frame: they walk the page with you, climb it as you scroll, and purr when you pet them.</p><span class="go">Let them out</span></div></a>
+    <div class="card soon"><img src="media/make3d.jpg" alt="A Prancer in 3D, ready to take with you" loading="lazy">
+      <div class="body"><span class="tag gold">Holders · next week</span><h3>Make it 3D</h3><p>Your Prancer as a 3D file (a GLB), rigged and with its moves, for 3D apps, games and AR. The same cat as your mint.</p><span class="go">Coming next week</span></div></div>
   </div>
 </div></section>
 
@@ -268,10 +305,22 @@
   const v = document.getElementById("trailer"), b = document.getElementById("sound");
   b.addEventListener("click", () => { v.muted = !v.muted; if (!v.muted) { v.currentTime = 0; v.play(); } b.textContent = v.muted ? "Sound on" : "Sound off"; b.setAttribute("aria-pressed", String(!v.muted)); });
   const sv = document.getElementById("sheet"), sb = document.getElementById("sheetsound");
-  sb.addEventListener("click", () => { sv.muted = !sv.muted; if (!sv.muted) { v.muted = true; b.textContent = "Sound on"; sv.currentTime = 0; sv.play(); } sb.textContent = sv.muted ? "Sound on" : "Sound off"; sb.setAttribute("aria-pressed", String(!sv.muted)); });
+  sb.addEventListener("click", () => { for (const m of [sv, s3]) if (!m.src) m.src = m.dataset.src; sv.muted = !sv.muted; if (!sv.muted) { v.muted = true; b.textContent = "Sound on"; sv.currentTime = 0; sv.play(); } sb.textContent = sv.muted ? "Sound on" : "Sound off"; sb.setAttribute("aria-pressed", String(!sv.muted)); });
   b.addEventListener("click", () => { if (!v.muted) { sv.muted = true; sb.textContent = "Sound on"; } });   // one sound at a time
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (still) { v.pause(); sv.pause(); }
+  /* the band sheet both ways: the 3D one follows the drawn one's clock (the drawn one carries the sound) */
+  const s3 = document.getElementById("sheet3d"), cmp = document.getElementById("compare"), rv = document.getElementById("reveal");
+  const follow = () => { if (Math.abs(s3.currentTime - sv.currentTime) > 0.08) s3.currentTime = sv.currentTime; if (sv.paused !== s3.paused) (sv.paused ? s3.pause() : s3.play().catch(() => {})); };
+  ["play", "pause", "seeked", "timeupdate"].forEach((e) => sv.addEventListener(e, follow));
+  /* the two sheets load and play once they come into view (about 5 MB between them), and rest when scrolled past */
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) { for (const m of [sv, s3]) if (!m.src) m.src = m.dataset.src; if (!still) sv.play().catch(() => {}); } else if (sv.muted) sv.pause(); }, { rootMargin: "200px" }).observe(cmp);
+  let moved = false; const setX = (x) => cmp.style.setProperty("--x", x + "%");
+  rv.addEventListener("input", () => { moved = true; setX(rv.value); });
+  /* once, when it first comes into view: a slow sweep across, so it is clear there is something to slide */
+  if (!still) new IntersectionObserver((es, o) => { if (!es[0].isIntersecting) return; o.disconnect(); const t0 = performance.now();
+    const step = (now) => { if (moved) return; const k = Math.min(1, (now - t0) / 2600); const x = 50 - 32 * Math.sin(k * Math.PI * 2) * (1 - k * 0.15); setX(x); rv.value = x; if (k < 1) requestAnimationFrame(step); else { setX(50); rv.value = 50; } };
+    setTimeout(() => requestAnimationFrame(step), 600); }, { threshold: 0.6 }).observe(cmp);
+  if (still) { v.pause(); sv.pause(); s3.pause(); }
   /* each member plays only while their card is on screen (the clips load when first seen) */
   const io = new IntersectionObserver((es) => es.forEach(({ target: m, isIntersecting: on }) => {
     if (on && !m.src) m.src = m.dataset.src; if (on && !still) m.play().catch(() => {}); else m.pause(); }), { rootMargin: "120px" });
