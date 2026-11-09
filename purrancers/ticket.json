@@ -4,8 +4,13 @@
    "name": "The Purrancers Debut - Internet Friend",
    "contract": "KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH",
    "tokenId": "3"
+  },
+  {
+   "name": "The Purrancers - Decentralize",
+   "contract": "KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH",
+   "tokenId": "5"
   }
  ],
- "need": "The Purrancers Debut - Internet Friend",
- "get": "https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3"
+ "need": "a Purrancers concert film (Internet Friend or Decentralize)",
+ "get": "https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH"
 }
