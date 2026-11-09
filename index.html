@@ -120,6 +120,8 @@
   .tag { align-self: flex-start; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; margin-bottom: 10px; background: rgba(127, 230, 255, .12); color: var(--cyan); }
   .tag.gold { background: rgba(255, 211, 110, .14); color: var(--gold); }
   .cards.two { grid-template-columns: repeat(2, 1fr); }
+  .cards.two > .card:only-child { grid-column: 1 / -1; flex-direction: row; } .cards.two > .card:only-child img { width: 45%; aspect-ratio: auto; min-height: 240px; }
+  @media (max-width: 760px) { .cards.two > .card:only-child { flex-direction: column; } .cards.two > .card:only-child img { width: 100%; aspect-ratio: 16 / 10; min-height: 0; } }
   @media (max-width: 960px) { .cards { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 620px) { .cards { grid-template-columns: 1fr; } }
 
@@ -219,7 +221,8 @@
     <figure><div class="wide"><video src="media/decentralize-cinema.mp4" poster="media/decentralize-cinema.jpg" controls playsinline preload="none" aria-label="Decentralize, the cinema cut: the opening, and the start of the final shot"></video></div>
       <figcaption><b>Decentralize</b>, the first frames of the cinema cut, rendered in Blender from the same show you can walk.</figcaption></figure>
   </div>
-  <div class="row" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px"><a class="btn ghost" href="https://objkt.com/tokens/KT1HSDxtqEY4UpYWrzxJoUWq1UDLDTMaFU24/25" target="_blank" rel="noopener">Internet Friend on objkt</a>
+  <div class="row" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px"><a class="btn main" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/5" target="_blank" rel="noopener">The Purrancers - Decentralize on objkt</a>
+    <a class="btn ghost" href="https://objkt.com/tokens/KT1HSDxtqEY4UpYWrzxJoUWq1UDLDTMaFU24/25" target="_blank" rel="noopener">Internet Friend on objkt</a>
     <a class="btn ghost" href="https://objkt.com/tokens/KT1HSDxtqEY4UpYWrzxJoUWq1UDLDTMaFU24/17" target="_blank" rel="noopener">"Right Now, Right Here", the interactive album</a></div>
 </div></section>
 
@@ -234,7 +237,6 @@
     <a class="card" href="prancers-site/"><img src="media/01-prancers.jpg" alt="A Prancer walking on the beat" loading="lazy">
       <div class="body"><span class="tag">Play</span><h3>The Prancer Purranchise</h3><p>Every chapter plays right in your browser: tap a Prancer and it reacts and sings, visit the Pads, ride with scuni, deliver the post.</p><span class="go">Visit the Purranchise</span></div></a>
   </div>
-  <p class="also">Or open the show on its own: <a href="purrancers/">yoeshilabs.github.io/purrancers</a>, and pick The 3D show at the doors.</p>
   <div class="hall">
     <a href="https://aleatory.art/generator/KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw" target="_blank" rel="noopener"><img src="media/01-prancers.jpg" alt="" loading="lazy"><span>Prancers</span></a>
     <a href="https://aleatory.art/generator/KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf" target="_blank" rel="noopener"><img src="media/02-pads.jpg" alt="" loading="lazy"><span>Prancer Pads</span></a>
@@ -260,6 +262,13 @@
       <p>Go to TezTowers, tap the Sphere, show your ticket with a free sign-in, pick The 3D show at the doors, and walk in.</p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px"><a class="btn main" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3" target="_blank" rel="noopener">Get the concert film</a><a class="btn ghost" href="https://teztowers.com/" target="_blank" rel="noopener">Go to TezTowers</a></div></div>
   </div>
+  <div class="ticket">
+    <img src="media/cinema-frontcat.jpg" alt="The Frontcat close up, from the cinema cut of Decentralize" loading="lazy">
+    <div class="body"><span class="tag pink">Your ticket · Out now</span><h3>The Purrancers - Decentralize</h3>
+      <p>The second music video: the concert rebuilt in 3D, then rendered in Blender with real light, haze and fur. A limited edition of 25 on objkt, and a second ticket into the show in the Sphere.</p>
+      <p>Holding it or the debut opens the doors: go to TezTowers, tap the Sphere, show your ticket with a free sign-in, and walk in as your own Prancer.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px"><a class="btn main" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/5" target="_blank" rel="noopener">Collect on objkt</a><a class="btn ghost" href="https://teztowers.com/" target="_blank" rel="noopener">Go to TezTowers</a></div></div>
+  </div>
   <div class="cards">
     <a class="card" href="https://aleatory.art/generator/KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY" target="_blank" rel="noopener"><img src="media/03-pfp.jpg" alt="" loading="lazy">
       <div class="body"><span class="tag">Open edition</span><h3>Prancer Portraits</h3><p>The easiest way in: your own Prancer Portrait, ready to wear as your profile picture, and the cat you walk into the 3D show as.</p><span class="go">Mint on Aleatory</span></div></a>
@@ -271,8 +280,6 @@
   <div class="cards two">
     <a class="card soon" href="https://aleatory.art/" target="_blank" rel="noopener"><img src="media/09-prancer-3d.jpg" alt="A Prancer 3D cat in The Sphere" loading="lazy">
       <div class="body"><span class="tag pink">Coming soon · Chapter 07</span><h3>Prancer 3D</h3><p>Mint your own dynamic, interactive 3D Prancer on Aleatory, with built-in emotes and game logic, then walk into the concert as your own cat.</p><span class="go">Coming to Aleatory</span></div></a>
-    <a class="card" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/5" target="_blank" rel="noopener"><img src="media/cinema-frontcat.jpg" alt="The Frontcat close up, from the cinema cut of Decentralize" loading="lazy">
-      <div class="body"><span class="tag pink">Out now · on objkt</span><h3>Decentralize, the cinema cut</h3><p>The music video, recreated in Blender and rendered with real light, haze and fur. A limited edition of 25 on objkt, and a second ticket into the show.</p><span class="go">Collect on objkt</span></div></a>
   </div>
   <p class="note">Collect what you love, when it feels right. Everything I make is for the music first.</p>
 </div></section>
