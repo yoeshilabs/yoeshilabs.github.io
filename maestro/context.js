@@ -22,7 +22,7 @@ keys: where can i go, directory, show me around, tour, give me a tour, branches,
 ask: The Prancer Purranchise | The Purrancers | Who is Yoeshi?
 link: Yoeshi Labs | https://yoeshilabs.github.io/
 link: The Prancer Purranchise | https://yoeshilabs.github.io/prancers-site/
-link: The Purrancers live | https://yoeshilabs.github.io/purrancers/
+link: The Purrancers live | https://teztowers.com/
 link: heART Tarot | https://aleatory.art/generator/KT1Jqm8pRaxs61nyK8TMdURpNNNa2hsd9wnH
 link: Yoeshi on objkt | https://objkt.com/@yoeshilabs
 link: yoeshi.art (coming soon) | https://yoeshi.art/
@@ -620,14 +620,13 @@ The film is also your ticket. Holding it lets you into the live show in the Sphe
 keys: live show, the show, the sphere, sphere, teztowers, tez towers, concert, walk the sphere, walkable show, 3d show, the 3d show, enter the show, get in, doors, the doors, emotes, photo button, how do i get in, walk in as my cat, walk in as my prancer
 ask: The Purrancers Debut | The Purrancers | Prancer Portraits
 link: Enter at TezTowers | https://teztowers.com/
-link: Open the show | https://yoeshilabs.github.io/purrancers/
 The Purrancers play live in the Sphere at TezTowers, and you can walk the floor while they play. There are two ways to see it: the original show, and the new 3D show, with both songs on the setlist.
 
 In the 3D show you walk in as your own Prancer: one of your Prancer Portraits, or a cat of your own. Dance and emote with the crowd, take photos, and stay for both songs.
 
 To get in: go to TezTowers, tap the Sphere, show your ticket with a free sign-in, pick The 3D show at the doors, and walk in.
 +++
-The sign-in only proves you hold the ticket. It is one free message, never a transaction, and it never moves anything in your wallet. You can also open the show on its own at yoeshilabs.github.io/purrancers.
+The sign-in only proves you hold the ticket. It is one free message, never a transaction, and it never moves anything in your wallet.
 
 ## Prancelot
 keys: prancelot, pepper yarnmore, pepper, knight on a pony, sword knight 3d, pony, horse, knight, castle, meadow, first 3d piece, first prancer 3d piece
@@ -1004,7 +1003,7 @@ ask: The Prancer Purranchise | Trancers | Who is Yoeshi?
 - Prancer Portraits | chapter: 03 | editions: an open edition | price: 1 tez | launched: in October 2026, the day before Wild Ride | platform: Aleatory | generator: KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY | play: move your pointer and it watches you, stroke it to purr, tap and it answers back | aliases: prancer pfp, pfp, pfps, portrait, portraits, chapter 3, chapter three, chapter 03
 - Wild Ride | chapter: 04 | editions: 1,024 | price: 6 tez | launched: in October 2026, the day after Prancer Portraits | platform: Aleatory | generator: KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY | play: tap for sound, then watch the cat and its otter ride on the beat | aliases: wild ride, wildride, ride, otter, otters, chapter 4, chapter four, chapter 04
 - Prancer Post | chapter: 05 | editions: 256 | price: 4 tez | launched: on 23 October 2026 | platform: Aleatory | generator: KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En | play: a game: ride Heartstrong's paper route, change lanes with up and down, throw papers with space, ring the bell with B; on phones tap to throw and swipe to change lanes | aliases: prancer post, post, paper route, paperboy, paper delivery, heartstrong paper route, chapter 5, chapter five, chapter 05
-- The Purrancers Debut | chapter: 06 | editions: 250 | price: set on objkt | launched: on 3 November 2026 | platform: objkt (Prancers On Objkt #3) | generator: none, it is a concert film in Prancers On Objkt: KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH token 3 | play: the concert film of The Purrancers playing Internet Friend live in the Sphere, sound on; holding it is the ticket to their walkable live show at https://yoeshilabs.github.io/purrancers/ | aliases: the purrancers debut, purrancers debut, the debut, internet friend concert film, the concert film, the ticket, chapter 6, chapter six, chapter 06
+- The Purrancers Debut | chapter: 06 | editions: 250 | price: set on objkt | launched: on 3 November 2026 | platform: objkt (Prancers On Objkt #3) | generator: none, it is a concert film in Prancers On Objkt: KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH token 3 | play: the concert film of The Purrancers playing Internet Friend live in the Sphere, sound on; holding it is the ticket to their walkable live show in the Sphere at TezTowers (teztowers.com) | aliases: the purrancers debut, purrancers debut, the debut, internet friend concert film, the concert film, the ticket, chapter 6, chapter six, chapter 06
 - Prancers On Objkt | chapter: none, it is the objkt branch of the Purranchise | editions: set piece by piece (Prance Trance: 100) | price: set piece by piece on objkt | launched: on 21 October 2026 | platform: objkt | generator: none, it is an objkt collection: KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH | play: the moving Prancer works live here, sound on; the first is Prance Trance, the fractal visualizer | aliases: prancers on objkt, objkt collection, objkt branch, prance trance, the objkt prancers
 - heART Tarot | chapter: none, it sits beside the chapters | editions: 1,999 | price: 3 tez | launched: on 3 October 2026 | platform: Aleatory | generator: KT1Jqm8pRaxs61nyK8TMdURpNNNa2hsd9wnH | play: tap to turn the cards, one at a time | aliases: heart tarot, its all heart, tarot
 - Maestro | chapter: none, I am a one of one | editions: one of one | price: set on objkt by whoever lists me | launched: on 14 October 2026 | platform: objkt | generator: none, I am a single interactive token | play: move, stroke, tap, or press Ask Maestro | aliases: maestro, buddha kitty, the buddha kitty
