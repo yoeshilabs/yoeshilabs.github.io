@@ -179,8 +179,10 @@ $("ar").onclick = async () => {
   b.disabled = false;
 };
 
-/* the preview before anyone looks: a cat from the generator, not anyone's (no download) */
-show(portraitCat("make3d"), "A Prancer, for a preview", false);
+/* the preview before anyone looks: a fresh roll of the Prancer 3D generator on every visit, from a random seed shaped like a
+   mint's (Yoeshi, 2026-11-10: a random roll, not the same lion every time); not anyone's cat, so no download */
+const B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+show(prancer3dCat("oo" + Array.from(crypto.getRandomValues(new Uint8Array(49)), (v) => B58[v % 58]).join("")), "A Prancer, for a preview", false);
 if (LOCAL && QS.get("holder")) { $("addr").value = QS.get("holder"); look(QS.get("holder")); }
 else if (LOCAL && QS.get("seed3d")) { mine = await prancer3dOf(""); drawCats(); $("cats").querySelector("button")?.click(); }
 if (LOCAL) window.__make3d = { get cur() { return cur; }, look, renderer };   // for the checks on this Mac
