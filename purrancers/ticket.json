@@ -9,8 +9,13 @@
    "name": "The Purrancers - Decentralize",
    "contract": "KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH",
    "tokenId": "5"
+  },
+  {
+   "name": "Prancer 3D, any mint",
+   "contract": "KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn",
+   "tokenId": ""
   }
  ],
- "need": "a Purrancers concert film (Internet Friend or Decentralize)",
+ "need": "a Purrancers concert film (Internet Friend or Decentralize) or any Prancer 3D",
  "get": "https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH"
 }

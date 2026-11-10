@@ -102,7 +102,7 @@ export function buildVenue({ scene, STAGE, fanTex, fanMeta, pinFaces }) {
   const HALL = [["01-prancers", "Prancers", "Chapter 01 · Aleatory"], ["02-pads", "Prancer Pads", "Chapter 02 · Aleatory"], ["03-pfp", "Prancer Portraits", "Chapter 03 · Aleatory"],
     ["04-wild-ride", "Wild Ride", "Chapter 04 · with scuni"], ["05-prance-trance", "Prance Trance", "Prancers On Objkt"], ["06-post", "Prancer Post", "Chapter 05 · Aleatory"],
     ["07-prance-or-treat", "Prance Or Treat!", "Prancers On Objkt"], ["08-purrancers-debut", "The Purrancers Debut", "Chapter 06 · Prancers On Objkt"],
-    ["09-prancer-3d", "Prancer 3D", "Chapter 07 · coming soon"]];   // the Purranchise only (heART Tarot stays out, Yoeshi 2026-11-01); 06 and 07 added 2026-11-07 (Yoeshi)
+    ["09-prancer-3d", "Prancer 3D", "Chapter 07 · Aleatory"]];   // the Purranchise only (heART Tarot stays out, Yoeshi 2026-11-01); 06 and 07 added 2026-11-07 (Yoeshi)
   const loader = new THREE.TextureLoader(), A0 = -1.38, A1 = A0 + 0.05 * HALL.length;   // a frame every 0.05 rad (1.33 m), the hall growing toward the food stand
   const hs = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.62), new THREE.MeshBasicMaterial({ map: sign("Prancer Art Hall", ["#c38bff", "#7fe6ff"]), transparent: true, toneMapped: false, fog: false }));
   hs.position.copy(P(R_OUT - 0.05, (A0 + A1) / 2, DECK + 3.15)); hs.rotation.y = -(A0 + A1) / 2; group.add(hs);
