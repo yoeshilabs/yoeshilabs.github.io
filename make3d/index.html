@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Make it 3D · Yoeshi Labs</title>
+<meta name="description" content="Your Prancer as a 3D file: rigged, animated, and ready for 3D apps, games and AR. For Prancer holders.">
+<style>
+  :root { --night: #120a1c; --deep: #1c1028; --card: #241431; --line: rgba(255, 247, 239, .12); --ink: #fff7ef; --dim: rgba(255, 247, 239, .72); --faint: rgba(255, 247, 239, .5);
+    --pink: #ff5fa8; --gold: #ffd36e; --cyan: #7fe6ff; --grad: linear-gradient(90deg, var(--pink), var(--gold)); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--night); color: var(--ink); font: 17px/1.6 ui-rounded, "Arial Rounded MT Bold", "Nunito", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  .wrap { width: min(1120px, 100% - 32px); margin: 0 auto; }
+  h1 { font-size: clamp(36px, 5.6vw, 60px); line-height: 1.08; margin: 0 0 14px; letter-spacing: -0.01em; }
+  p { margin: 0 0 14px; color: var(--dim); }
+  .kicker { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+  .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  nav { position: sticky; top: 0; z-index: 10; background: rgba(18, 10, 28, .82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 58px; }
+  nav a { text-decoration: none; } nav .name { font-weight: bold; font-size: 20px; } nav .back { color: var(--dim); font-size: 15px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 22px; border-radius: 999px; font: inherit; font-weight: bold; font-size: 16px; border: 0; cursor: pointer; text-decoration: none; transition: transform .15s, opacity .15s; }
+  .btn:hover { transform: translateY(-2px); } .btn:disabled { opacity: .45; cursor: default; transform: none; }
+  .btn.main { background: var(--grad); color: #2a0f3c; box-shadow: 0 8px 28px rgba(255, 95, 168, .3); }
+  .btn.ghost { background: transparent; border: 1.5px solid var(--line); color: var(--ink); }
+  main { padding: 48px 0 80px; }
+  .grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 40px; align-items: start; }
+  @media (max-width: 880px) { .grid { grid-template-columns: 1fr; gap: 28px; } }
+  .stage { position: relative; aspect-ratio: 1; border-radius: 24px; overflow: hidden; background: radial-gradient(ellipse at 50% 38%, #3a1c4e 0%, #1c1028 58%, #120a1c 100%); box-shadow: 0 30px 80px rgba(0, 0, 0, .55), 0 0 0 1px var(--line); touch-action: none; }
+  .stage canvas { display: block; width: 100%; height: 100%; cursor: grab; } .stage canvas:active { cursor: grabbing; }
+  .stage .hint { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; font-size: 13px; color: var(--faint); pointer-events: none; padding: 0 12px; }
+  .stage .moves { position: absolute; left: 0; right: 0; bottom: 38px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 0 12px; }
+  .stage .moves button { padding: 6px 11px; border-radius: 999px; border: 1px solid var(--line); background: rgba(18, 10, 28, .66); color: var(--ink); font: inherit; font-size: 13px; cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .stage .moves button:hover { border-color: var(--gold); }
+  .stage:focus { outline: none; } .stage:focus-visible { box-shadow: 0 30px 80px rgba(0, 0, 0, .55), 0 0 0 2px var(--gold); }
+  .stage .who { position: absolute; left: 18px; top: 16px; font-size: 14px; color: var(--ink); background: rgba(18, 10, 28, .66); padding: 7px 12px; border-radius: 999px; backdrop-filter: blur(6px); }
+  .steps { display: grid; gap: 14px; margin: 22px 0; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; }
+  .step h3 { margin: 0 0 8px; font-size: 18px; } .step .n { color: var(--gold); margin-right: 6px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .paste { display: flex; gap: 8px; margin-top: 10px; } .paste input { flex: 1; min-width: 0; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: #1a0f26; color: var(--ink); font: inherit; font-size: 15px; }
+  .msg { font-size: 15px; color: var(--dim); margin-top: 10px; min-height: 1.4em; } .msg.bad { color: #ff9cc6; }
+  .cats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .cats button { padding: 9px 13px; border-radius: 999px; border: 1px solid var(--line); background: #1a0f26; color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
+  .cats button.on { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(255, 211, 110, .25); }
+  .cats .kind { width: 100%; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); margin-top: 6px; }
+  .fine { font-size: 14px; color: var(--faint); }
+  .fine b { color: var(--dim); font-weight: normal; }
+</style>
+<!-- three.js, as Prancer 3D draws with it (the build points this at its own copy) -->
+<script type="importmap">{ "imports": { "three": "./p3d/lib/three.module.min.js" } }</script>
+</head>
+<body>
+<nav><div class="wrap"><a class="name" href="../">Yoeshi</a><a class="back" href="../#lab">Back to the lab</a></div></nav>
+<main><div class="wrap grid">
+  <div class="stage" id="stage"><span class="who" id="who">A Prancer, for a preview</span><span class="hint">Drag to turn it</span></div>
+  <div>
+    <div class="kicker">Lab · Holders</div>
+    <h1>Make it <span class="grad">3D</span></h1>
+    <p>Your Prancer as a 3D file: rigged, with its coat, eyes, hat and moves, ready for 3D apps, games and AR. The same cat as your mint, grown from the same seed.</p>
+    <div class="steps">
+      <div class="step"><h3><span class="n">1</span>Show my Prancers</h3>
+        <p class="fine">Your wallet is only asked for your address. Nothing is signed or sent.</p>
+        <div class="row"><button class="btn main" id="connect" type="button">Connect to read my address</button></div>
+        <form class="paste" id="paste"><input id="addr" placeholder="Or paste a Tezos address (tz1...)" autocomplete="off" spellcheck="false"><button class="btn ghost" type="submit">Look</button></form>
+        <div class="msg" id="msg"></div>
+      </div>
+      <div class="step"><h3><span class="n">2</span>Pick your cat</h3>
+        <div class="cats" id="cats"><span class="fine">Your Prancer Portraits and Prancer 3D cats will show here.</span></div>
+      </div>
+      <div class="step"><h3><span class="n">3</span>Take it with you</h3>
+        <div class="row"><button class="btn main" id="glb" type="button" disabled>Download the 3D file (.glb)</button> <button class="btn" id="ar" type="button" disabled>See it in your room (AR)</button></div>
+        <p class="fine" id="arnote" hidden style="margin-top:10px"></p>
+        <p class="fine" id="glbnote" style="margin-top:10px">A .glb opens in Blender, Unity, Godot, three.js and most 3D viewers, with its moves: idle, walk, run, wave, the Posey Paw, paws up, dance, knead and spin.</p>
+      </div>
+    </div>
+  </div>
+</div></main>
+<script type="module" src="make3d.js"></script>
+</body>
+</html>
