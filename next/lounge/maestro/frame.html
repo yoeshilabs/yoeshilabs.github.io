@@ -1,0 +1,13 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Maestro</title></head><body>
+<script>window.MAESTRO_SITE = true;</script>
+<script src="./context.js"></script><script src="./heart.js"></script><script src="./brain.js"></script>
+<script>
+
+  const strip = (t) => String(t || "").replace(/\*\*(.+?)\*\*/g, "$1").replace(/(^|\s)_(.+?)_(?=\s|$|[.,!?])/g, "$1$2").replace(/^- /gm, "• ");
+  const tell = (r, id) => parent.postMessage({ maestro: 1, id, text: strip(r && r.text), links: (r && r.links || []).filter((l) => l && typeof l.href === "string" && /^https:\/\//.test(l.href)).map((l) => ({ href: l.href, label: String(l.label || l.text || l.href).slice(0, 80) })).slice(0, 6), chips: (r && r.chips || []).map((c) => String(c).slice(0, 60)).slice(0, 5), crisis: !!(r && r.crisis) }, location.origin);
+  addEventListener("message", (e) => { if (e.source !== parent || e.origin !== location.origin || !e.data || e.data.maestro !== 1) return; let r; try { r = window.MAESTRO_BRAIN.respond(String(e.data.q || "").slice(0, 400)); } catch (err) { r = { text: "I lost my thread, friend. Ask me again?" }; } tell(r, e.data.id); });
+  parent.postMessage({ maestro: 1, ready: true }, location.origin);
+</script></body></html>
