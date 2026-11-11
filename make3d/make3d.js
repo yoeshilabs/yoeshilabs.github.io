@@ -26,7 +26,7 @@ const $ = (id) => document.getElementById(id), say = (t, bad) => { $("msg").text
 
 /* ---------------------------------------------------------------- the holdings: TzKT, read only */
 async function prancer3dOf(address) {
-  const out = ADDR.test(address || "") ? (await mintsOf3d(address)).map((x) => ({ kind: "p3d", no: x.no, name: "", seed: x.seed })) : [];
+  const out = ADDR.test(address || "") ? (await mintsOf3d(address)).map((x) => ({ kind: "p3d", no: x.no, name: (() => { try { return String(rollSeed(x.seed).NAME || ""); } catch (e) { return ""; } })(), seed: x.seed }))   /* its name, rolled from its seed as the generator rolls it (TzKT may not have the mint's metadata yet) */ : [];
   if (LOCAL && QS.get("seed3d")) out.push({ kind: "p3d", no: "test", name: "", seed: QS.get("seed3d").slice(0, 64) });   // testing on this Mac, before the generator is minted
   return out;
 }
