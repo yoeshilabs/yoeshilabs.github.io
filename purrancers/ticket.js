@@ -16,15 +16,20 @@ const PASS = "purrancers-pass";
 export const testDoor = () => /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).get("ticket") !== "check";
 /* Inside another site's frame (TezTowers' Sphere, for now the only public way in), browser wallets such as Temple cannot
    connect: since Temple 2.0.34 (2026-11-02) its extension answers only the site open in the tab itself, and the show is
-   another site inside it (a visitor at the door, 2026-11-08). Phones and other wallets still connect through the
-   wallet window. frameNote(after) puts a short line under the door's ticket link saying so, with the show in its own tab
-   (where Temple works) as the other way in. Nothing happens outside a frame or with the doors open to everyone. */
-export function frameNote(after, cfg) {
-  let framed = false; try { framed = window.top !== window.self && !window.top.location.href; } catch (e) { framed = true; }   // (another site's frame: reading where the top page is throws)
-  if (!framed || !cfg || !cfg.contract || !after || document.getElementById("framenote")) return;
+   another site inside it (visitors at the door, 2026-11-08 and 2026-11-11: Temple's "Install Temple Wallet" screen).
+   Phones and other wallets still connect through the wallet window. frameNote(after, cfg, door) puts a short line under
+   the door's ticket link saying so, with a button that signs in through a small window of the show's own (signin.html),
+   where Temple works: that window signs the same free message and hands it back here, where it is checked as if it had
+   been signed in the frame (windowSignIn, below). door: { ui, done(address) }, done going on through the doors.
+   Nothing happens outside a frame or with the doors open to everyone. */
+export const framed = () => { try { return window.top !== window.self && !window.top.location.href; } catch (e) { return true; } };   // (another site's frame: reading where the top page is throws)
+export function frameNote(after, cfg, door) {
+  if (!framed() || !cfg || !cfg.contract || !after || document.getElementById("framenote")) return;
   const p = document.createElement("p"); p.id = "framenote"; p.style.cssText = "margin:10px 0 0;font-size:13px;opacity:.85";
-  const a = document.createElement("a"); a.href = location.href.split("#")[0]; a.target = "_blank"; a.rel = "noopener"; a.textContent = "open the show in its own tab"; a.style.color = "var(--gold)";
-  p.append("Using Temple? It cannot connect inside TezTowers (a Temple safety rule since 2 November). Choose your phone in the wallet window, or ", a, ".");
+  const b = document.createElement("button"); b.type = "button"; b.textContent = "Sign in with Temple in a new window";
+  b.style.cssText = "display:block;margin:8px auto;font-size:14px;padding:7px 16px;background:transparent;color:var(--gold);border:1px solid var(--gold);box-shadow:none";   // quieter than the doors' own button
+  b.onclick = () => windowSignIn(door.ui, "Sign in to show your ticket.", door.done);
+  p.append("Using Temple? It cannot connect inside TezTowers (a Temple safety rule since 2 November).", b, "Or choose your phone in the wallet window.");
   after.after(p); }
 const session = { get() { try { return JSON.parse(sessionStorage.getItem(PASS)); } catch (e) { return null; } }, set(v) { try { sessionStorage.setItem(PASS, JSON.stringify(v)); } catch (e) {} } };
 
@@ -62,12 +67,14 @@ async function guardLocks() {
   try { Object.defineProperty(navigator, "locks", { value: undefined, configurable: true }); } catch (e) {}
   try { if (navigator.locks) Object.defineProperty(Object.getPrototypeOf(navigator), "locks", { get: () => undefined, configurable: true }); } catch (e) {}
 }
-export async function signIn(ui, why = "Sign in to show your ticket.") {
-  const known = who.get(); if (known) return known.address;
-  ui.status("Opening your wallet…");
+const nonce = () => Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => b.toString(16).padStart(2, "0")).join("");
+/* connect, then one signed message (in this page). One wallet client at a time: it is destroyed when it is done, so a
+   second try starts clean (a client left running beside a new one was what Beacon warned about on "Try again",
+   2026-11-11). Returns { address, publicKey, payload, signature }, or throws. Also used by the sign-in window. */
+export async function walletSign(ui, why, code) {
   await guardLocks();
   const W = await import("./lib/ticket-wallet.js");
-  const client = new W.DAppClient({ name: "The Purrancers, live in the Sphere", iconUrl: new URL("assets/purrancers-title.png", location.href).href, appUrl: location.origin + location.pathname, network: { type: W.NetworkType.MAINNET } });
+  const client = new W.DAppClient({ name: "The Purrancers, live in the Sphere", iconUrl: new URL("assets/purrancers-title.png", import.meta.url).href, appUrl: location.origin + location.pathname, network: { type: W.NetworkType.MAINNET } });
   for (const m of OFF) client[m] = () => Promise.reject(new Error("The show only asks for a sign-in message."));
   try {
     await client.clearActiveAccount();
@@ -76,16 +83,58 @@ export async function signIn(ui, why = "Sign in to show your ticket.") {
     if (!ADDR.test(address || "")) throw new Error("No address came back from the wallet.");
     if (!publicKey) { const r = await fetch(`https://api.tzkt.io/v1/accounts/${address}?select=publicKey`); publicKey = r.ok ? await r.json() : null; }
     ui.status("Sign the message in your wallet. It is free and moves nothing.");
-    const code = Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => b.toString(16).padStart(2, "0")).join("");
     const text = `Tezos Signed Message: ${location.origin} ${new Date().toISOString()} The Purrancers, live in the Sphere. ${why} This is free and does not move anything. Address: ${address} Code: ${code}`;   // the site and the time first, the way Tezos sign-in messages name where they come from
     const payload = micheline(text, W.stringToBytes);
     const { signature } = await client.requestSignPayload({ signingType: W.SigningType.MICHELINE, payload, sourceAddress: address });
-    if (!publicKey || W.getPkhfromPk(publicKey) !== address || !W.verifySignature(payload, publicKey, signature)) throw new Error("That signature did not match the wallet. Try again.");
-    who.set({ address, at: Date.now() }); return address;
-  } catch (e) { ui.status(/abort|reject|declin|cancel/i.test(e?.message || e?.errorType || "") ? "No problem. Connect again whenever you are ready." : (e?.message || "Something went wrong. Try again."), true); return null; }
-  finally { try { await client.clearActiveAccount(); await client.disconnect?.(); } catch (e) {} } }
+    return { address, publicKey, payload, signature };
+  } finally { try { await client.clearActiveAccount(); } catch (e) {} try { await client.destroy(); } catch (e) {} } }
 
-/* ui: { status(text, stop) } — returns true when the visitor may enter */
+/* the check, the same wherever the message was signed: the text is this site's sign-in with this visit's code and the
+   address in it, the key belongs to the address, and the signature is the key's */
+async function proven(r, code) {
+  if (!r || !ADDR.test(r.address || "") || typeof r.payload !== "string" || typeof r.signature !== "string" || !/^0501[0-9a-f]{8}([0-9a-f]{2})+$/.test(r.payload)) return false;
+  const bytes = new Uint8Array(r.payload.slice(12).match(/../g).map((h) => parseInt(h, 16)));
+  if (parseInt(r.payload.slice(4, 12), 16) !== bytes.length) return false;
+  const text = new TextDecoder().decode(bytes);
+  if (!text.startsWith(`Tezos Signed Message: ${location.origin} `) || !text.endsWith(` Address: ${r.address} Code: ${code}`)) return false;
+  const W = await import("./lib/ticket-wallet.js");
+  try { return !!r.publicKey && W.getPkhfromPk(r.publicKey) === r.address && W.verifySignature(r.payload, r.publicKey, r.signature); } catch (e) { return false; } }
+
+export const quiet = (e) => /abort|reject|declin|cancel/i.test(e?.message || e?.errorType || "");
+export async function signIn(ui, why = "Sign in to show your ticket.") {
+  const known = who.get(); if (known) return known.address;
+  ui.status("Opening your wallet…");
+  const code = nonce();
+  try {
+    const r = await walletSign(ui, why, code);
+    if (!(await proven(r, code))) throw new Error("That signature did not match the wallet. Try again.");
+    who.set({ address: r.address, at: Date.now() }); return r.address;
+  } catch (e) { ui.status(quiet(e) ? "No problem. Connect again whenever you are ready." : (e?.message || "Something went wrong. Try again."), true); return null; } }
+
+/* the sign-in window (for the frame): signin.html, a page of the show's own, opened on the visitor's click, signs at the
+   top of its own tab where Temple works, and posts the result back to this page only (its own site). It is checked here
+   with this visit's code, as above; then done(address). The window's address carries only that random code. */
+let signWin = null;
+export function windowSignIn(ui, why, done) {
+  if (signWin && !signWin.closed) { signWin.focus(); return; }
+  const known = who.get(); if (known) { done(known.address); return; }
+  const code = nonce(), url = new URL("signin.html", import.meta.url);
+  url.hash = new URLSearchParams({ c: code, w: /Prancer/.test(why) ? "p" : "t" }).toString();
+  const w = signWin = window.open(url.href, "purrancers-signin", "popup,width=460,height=680");
+  if (!w) { ui.status("Your browser blocked the sign-in window. Allow pop-ups for this page, then try again.", true); return; }
+  ui.status("Sign in in the new window. This page waits for you.");
+  let got = false;
+  const on = async (e) => {
+    if (e.source !== w || e.origin !== location.origin || !e.data || e.data.type !== "purrancers-signin") return;
+    got = true; removeEventListener("message", on);
+    if (e.data.error) { ui.status(e.data.quiet ? "No problem. Connect again whenever you are ready." : e.data.error, true); return; }
+    if (!(await proven(e.data, code))) { ui.status("That signature did not match the wallet. Try again.", true); return; }
+    who.set({ address: e.data.address, at: Date.now() }); ui.status("Signed in. Opening the doors…"); done(e.data.address); };
+  addEventListener("message", on);
+  const watch = setInterval(() => { if (!w.closed) return; clearInterval(watch);
+    setTimeout(() => { if (got) return; removeEventListener("message", on); ui.status("The sign-in window closed. Try again whenever you are ready.", true); }, 1500); }, 700); }
+
+/* ui: { status(text, stop) }; returns true when the visitor may enter */
 export async function checkTicket(cfg, ui) {
   if (!cfg.contract) return true;                                                               // no ticket set yet: doors open
   if (testDoor()) return true;   // testing on this Mac

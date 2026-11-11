@@ -215,7 +215,7 @@ const ticket = await loadTicket();   // ticket.js: a signed sign-in message, the
 const tmsg = $("ticketmsg"), tget = $("ticketget");
 const ticketUi = { status(text, stop) { tmsg.textContent = text; tmsg.hidden = false; if (stop) { enter.disabled = false; enter.textContent = ticket.contract ? "Try again" : "Enter the show"; tget.hidden = !ticket.get; } } };
 if (ticket.get) tget.href = ticket.get;
-frameNote(tget, ticket);   // inside TezTowers: Temple cannot connect there; the phone or the show in its own tab (ticket.js)
+frameNote(tget, ticket, { ui: { status: (s, stop) => ticketUi.status(s, stop && !enter.disabled) }, done: () => { if (!enter.disabled) enter.click(); else tmsg.textContent = "Signed in. Show your ticket when the doors open."; } });   // inside TezTowers: Temple cannot connect there; a sign-in window of the show's own, or the phone (ticket.js)
 const enter = $("enter");
 band.addEventListener("loadeddata", () => { band.addEventListener("seeked", () => { makePinFaces(band, pinCanvases); venue.pins.forEach((p) => (p.sprite.material.map.needsUpdate = true));
     band.currentTime = START; enter.disabled = false; enter.textContent = ticket.contract ? "Show your ticket" : "Enter the show"; }, { once: true }); band.currentTime = 70; }, { once: true }); band.load();
