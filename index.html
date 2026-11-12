@@ -4,338 +4,239 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Yoeshi</title>
-<meta name="description" content="Yoeshi is a singer songwriter who builds worlds for his songs with code: the Prancer Purranchise, Maestro, and The Purrancers, live in the Sphere in 3D with Internet Friend and Decentralize.">
+<meta name="description" content="Yoeshi is a singer songwriter who builds worlds for his songs with code.">
 <meta property="og:title" content="Yoeshi">
-<meta property="og:description" content="All code. Music at the core from day one, and still the whole goal.">
-<meta property="og:image" content="https://yoeshilabs.github.io/media/og-cinema.jpg">
-<meta property="og:url" content="https://yoeshilabs.github.io/">
+<meta property="og:description" content="Yoeshi is a singer songwriter who builds worlds for his songs with code.">
+<meta property="og:image" content="https://yoeshi.art/media/og-cinema.jpg">
+<meta property="og:url" content="https://yoeshi.art/">
 <meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="media/favicon.svg">
 <meta name="theme-color" content="#120a1c">
-<style>
-  :root { --night: #120a1c; --deep: #1c1028; --card: #241431; --line: rgba(255, 247, 239, .12); --ink: #fff7ef; --dim: rgba(255, 247, 239, .72); --faint: rgba(255, 247, 239, .5);
-    --pink: #ff5fa8; --gold: #ffd36e; --cyan: #7fe6ff; --grad: linear-gradient(90deg, var(--pink), var(--gold)); }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body { margin: 0; background: var(--night); color: var(--ink); font: 17px/1.6 ui-rounded, "Arial Rounded MT Bold", "Nunito", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-  a { color: inherit; }
-  img, video { display: block; max-width: 100%; }
-  .wrap { width: min(1120px, 100% - 32px); margin: 0 auto; }
-  h1, h2, h3 { line-height: 1.12; margin: 0; letter-spacing: -0.01em; }
-  h2 { font-size: clamp(28px, 4.4vw, 44px); margin-bottom: 14px; }
-  h3 { font-size: 21px; margin-bottom: 6px; }
-  p { margin: 0 0 14px; color: var(--dim); }
-  .kicker { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
-  .grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 22px; border-radius: 999px; font-weight: bold; text-decoration: none; font-size: 16px; transition: transform .15s; }
-  .btn:hover { transform: translateY(-2px); }
-  .btn.main { background: var(--grad); color: #2a0f3c; box-shadow: 0 8px 28px rgba(255, 95, 168, .3); }
-  .btn.ghost { border: 1.5px solid var(--line); color: var(--ink); }
-  section { padding: 84px 0; }
-  nav { position: sticky; top: 0; z-index: 10; background: rgba(18, 10, 28, .82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
-  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 58px; gap: 16px; }
-  nav .name { font-weight: bold; font-size: 20px; text-decoration: none; }
-  nav .links { display: flex; gap: 20px; font-size: 15px; }
-  nav .links a { text-decoration: none; color: var(--dim); } nav .links a:hover { color: var(--ink); }
-  @media (max-width: 640px) { nav .links a:not(.keep) { display: none; } }
-
-  /* the opening: the trailer, the line, the debut */
-  .hero { padding: 56px 0 72px; }
-  .hero .wrap { display: grid; grid-template-columns: 1.05fr .95fr; gap: 48px; align-items: center; }
-  .hero h1 { font-size: clamp(40px, 6.4vw, 72px); margin-bottom: 18px; }
-  .hero .lead { font-size: clamp(18px, 2.2vw, 22px); color: var(--ink); }
-  .hero .row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
-  .debut { display: inline-flex; gap: 10px; align-items: center; margin-top: 26px; padding: 10px 16px; border-radius: 14px; background: var(--card); border: 1px solid rgba(255, 211, 110, .35); font-size: 15px; color: var(--ink); }
-  .debut b { color: var(--gold); }
-  .live { width: 9px; height: 9px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 0 0 rgba(255, 95, 168, .7); animation: pulse 2s infinite; flex: none; }
-  @keyframes pulse { 70% { box-shadow: 0 0 0 10px rgba(255, 95, 168, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 95, 168, 0); } }
-  .screen { position: relative; border-radius: 24px; overflow: hidden; aspect-ratio: 1; background: #000; box-shadow: 0 30px 80px rgba(0, 0, 0, .55), 0 0 0 1px var(--line); }
-  .screen video { width: 100%; height: 100%; object-fit: cover; }
-  .sound { position: absolute; right: 14px; bottom: 14px; border: 0; border-radius: 999px; padding: 9px 14px; font: inherit; font-size: 14px; color: var(--ink); background: rgba(18, 10, 28, .7); cursor: pointer; backdrop-filter: blur(6px); }
-  @media (max-width: 860px) { .hero .wrap { grid-template-columns: 1fr; gap: 32px; } .screen { max-width: 520px; } }
-
-  /* the story */
-  .story { background: var(--deep); }
-  .story .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
-  .timeline { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--line); }
-  .timeline li { position: relative; padding: 0 0 22px 22px; }
-  .timeline li::before { content: ""; position: absolute; left: -7px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--night); border: 2px solid var(--gold); }
-  .timeline li.now::before { background: var(--pink); border-color: var(--pink); }
-  .timeline .when { font-size: 13px; color: var(--gold); letter-spacing: .08em; text-transform: uppercase; }
-  .timeline .what { color: var(--ink); }
-  .stats { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 22px; }
-  .stats div { flex: 1 1 120px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
-  .stats b { display: block; font-size: 26px; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .stats span { font-size: 14px; color: var(--dim); }
-  @media (max-width: 860px) { .story .wrap { grid-template-columns: 1fr; gap: 36px; } }
-
-  /* listen */
-  .listen .wrap { display: grid; grid-template-columns: 1.2fr .8fr; gap: 40px; align-items: center; }
-  .setlist { display: grid; grid-template-columns: .82fr 1.18fr; gap: 18px; margin-top: 28px; align-items: start; }
-  .setlist figure { margin: 0; } .setlist figcaption { font-size: 14.5px; color: var(--dim); margin-top: 10px; } .setlist figcaption b { color: var(--ink); }
-  @media (max-width: 860px) { .setlist { grid-template-columns: 1fr; } }
-  .wide { border-radius: 20px; overflow: hidden; aspect-ratio: 16 / 9; background: #000; box-shadow: 0 0 0 1px var(--line); }
-  .wide video { width: 100%; height: 100%; object-fit: cover; }
-  .wide.square { aspect-ratio: 1; }
-  .listen .wrap:has(.square) { grid-template-columns: .9fr 1.1fr; }
-  @media (max-width: 860px) { .listen .wrap, .listen .wrap:has(.square) { grid-template-columns: 1fr; } .wide.square { max-width: 520px; } }
-
-  /* the band */
-  .band { background: var(--deep); }
-  .band .lead2 { max-width: 760px; }
-  .sheet { position: relative; margin-top: 30px; border-radius: 22px; overflow: hidden; aspect-ratio: 16 / 9; background: #000; box-shadow: 0 30px 80px rgba(0, 0, 0, .45), 0 0 0 1px var(--line); }
-  .sheet video { width: 100%; height: 100%; object-fit: cover; }
-  /* the band sheet both ways: drawn over 3D, cut away at the handle (drag anywhere, or the arrow keys) */
-  .compare { --x: 50%; }
-  .compare video { position: absolute; inset: 0; }
-  .compare .before { clip-path: inset(0 calc(100% - var(--x)) 0 0); }
-  .compare .divider { position: absolute; top: 0; bottom: 0; left: var(--x); width: 2px; margin-left: -1px; background: rgba(255, 247, 239, .92); box-shadow: 0 0 14px rgba(0, 0, 0, .55); pointer-events: none; }
-  .compare .knob { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 46px; height: 46px; border-radius: 50%; background: var(--grad); color: #2a0f3c; display: grid; place-items: center; font-weight: bold; font-size: 18px; box-shadow: 0 6px 22px rgba(0, 0, 0, .5); }
-  .compare .reveal { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; touch-action: pan-y; }
-  .compare .reveal:focus-visible ~ .divider .knob { outline: 3px solid var(--cyan); outline-offset: 3px; }
-  .compare .label { position: absolute; top: 14px; padding: 5px 12px; border-radius: 999px; font-size: 13px; letter-spacing: .04em; background: rgba(18, 10, 28, .74); color: var(--ink); pointer-events: none; }
-  .compare .label.l { left: 14px; } .compare .label.r { right: 14px; }
-  .compare .sound { z-index: 2; }
-  .members { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 26px; }
-  .member { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
-  .member video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #1a0b24; }
-  .member .body { padding: 14px 16px 16px; }
-  .member .chair { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--pink); }
-  .member h3 { font-size: 19px; margin: 4px 0 8px; }
-  .member dl { margin: 0; font-size: 14px; display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; }
-  .member dt { color: var(--gold); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding-top: 2px; }
-  .member dd { margin: 0; color: var(--dim); }
-  .styles { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; }
-  .styles li { font-size: 14px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); color: var(--dim); }
-  @media (max-width: 960px) { .members { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 520px) { .members { grid-template-columns: 1fr; } }
-
-  /* cards */
-  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; text-decoration: none; transition: transform .2s, border-color .2s; }
-  a.card:hover { transform: translateY(-4px); border-color: rgba(255, 211, 110, .45); }
-  .card img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
-  .card .body { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
-  .card .body p { font-size: 15.5px; flex: 1; }
-  .card .go { font-weight: bold; font-size: 15px; color: var(--gold); }
-  .tag { align-self: flex-start; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; margin-bottom: 10px; background: rgba(127, 230, 255, .12); color: var(--cyan); }
-  .tag.gold { background: rgba(255, 211, 110, .14); color: var(--gold); }
-  .cards.two { grid-template-columns: repeat(2, 1fr); }
-  .cards.two > .card:only-child { grid-column: 1 / -1; flex-direction: row; } .cards.two > .card:only-child img { width: 45%; aspect-ratio: auto; min-height: 240px; }
-  @media (max-width: 760px) { .cards.two > .card:only-child { flex-direction: column; } .cards.two > .card:only-child img { width: 100%; aspect-ratio: 16 / 10; min-height: 0; } }
-  @media (max-width: 960px) { .cards { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 620px) { .cards { grid-template-columns: 1fr; } }
-
-  /* the art hall strip */
-  .hall { display: grid; grid-template-columns: repeat(9, 1fr); gap: 12px; margin-top: 30px; }
-  .hall a { display: block; text-decoration: none; }
-  .hall img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 14px; border: 3px solid #d9b45a; box-shadow: 0 8px 24px rgba(0, 0, 0, .4); transition: transform .2s; }
-  .hall a:hover img { transform: translateY(-4px) rotate(-1deg); }
-  .hall span { display: block; font-size: 13px; margin-top: 8px; text-align: center; color: var(--dim); }
-  .hall .soon img { filter: saturate(.85); } .hall .soon span { color: var(--gold); }
-  @media (max-width: 960px) { .hall { grid-template-columns: repeat(5, 1fr); } }
-  @media (max-width: 520px) { .hall { grid-template-columns: repeat(3, 1fr); } }
-  .card.soon { border-style: dashed; border-color: rgba(255, 211, 110, .35); }
-  .tag.pink { background: rgba(255, 95, 168, .14); color: var(--pink); }
-  .also { margin-top: 18px; font-size: 15px; color: var(--dim); } .also a { color: var(--gold); }
-
-  /* collect */
-  .collect { background: var(--deep); }
-  .ticket { margin-top: 26px; display: grid; grid-template-columns: .9fr 1.1fr; gap: 0; border-radius: 22px; overflow: hidden; background: linear-gradient(135deg, #3a1446, #241431); border: 1px solid rgba(255, 211, 110, .35); }
-  .ticket img { width: 100%; height: 100%; object-fit: cover; min-height: 240px; }
-  .ticket .body { padding: 28px 30px; }
-  .ticket h3 { font-size: 26px; }
-  @media (max-width: 760px) { .ticket { grid-template-columns: 1fr; } }
-  .note { margin-top: 26px; font-size: 15px; color: var(--faint); }
-
-  footer { padding: 46px 0 60px; border-top: 1px solid var(--line); }
-  footer .wrap { display: flex; flex-wrap: wrap; gap: 14px 26px; justify-content: space-between; align-items: center; }
-  footer .links { display: flex; flex-wrap: wrap; gap: 10px 22px; font-size: 15px; }
-  footer .links a { color: var(--dim); text-decoration: none; } footer .links a:hover { color: var(--ink); }
-  footer small { color: var(--faint); }
-  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
-</style>
+<script type="importmap">{ "imports": { "three": "./p3d/lib/three.module.min.js" } }</script>
+<style>@font-face{font-family:"League Gothic";src:url(media/league-gothic.woff2) format("woff2");font-display:swap}:root{--night: #120a1c;--night2: #1c1029;--ink: #fff7ef;--dim: rgba(255, 247, 239, .74);--paper: #f5eee2;--paper2: #ece2d1;--pen: #1d1326;--pen2: rgba(29, 19, 38, .7);--rule: rgba(29, 19, 38, .16);--pink: #ff5fa8;--gold: #ffd36e;--ruby: #c0143f;--display: "League Gothic", "Oswald", "Arial Narrow", sans-serif;--voice: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;--ui: ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif;--mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;--gut: clamp(20px, 5vw, 72px)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--night);color:var(--ink);font:17px/1.55 var(--ui);-webkit-font-smoothing:antialiased}a{color:inherit}img{display:block;max-width:100%}.wrap{max-width:1280px;margin:0 auto;padding:0 var(--gut)}.kicker{font:600 12px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase}h1,h2,h3{font-family:var(--display);font-weight:400;text-transform:uppercase;margin:0;letter-spacing:.005em}nav{position:fixed;inset:0 0 auto 0;z-index:10;padding:16px 0;transition:background .3s,padding .3s}nav.solid{background:rgba(18,10,28,.88);backdrop-filter:blur(10px);padding:9px 0}nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}nav .name{font:400 34px/1 var(--display);letter-spacing:.04em;text-decoration:none;text-transform:uppercase}nav .links{display:flex;gap:clamp(14px,2.4vw,34px);font-size:14px}nav .links a{text-decoration:none;color:var(--dim)}nav .links a:hover{color:var(--ink)}.stage{position:relative;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;isolation:isolate}.stage .bg{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:50% 40%}.stage::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(11,6,17,.9) 0%,rgba(11,6,17,.62) 34%,rgba(11,6,17,.08) 68%),linear-gradient(0deg,var(--night) 0%,rgba(18,10,28,.0) 34%),linear-gradient(180deg,rgba(11,6,17,.7) 0%,rgba(11,6,17,0) 16%)}.stage .wrap{width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:40px;align-items:end;padding-top:120px;padding-bottom:clamp(28px,6vh,64px)}.stage .kicker{color:var(--gold);margin-bottom:18px}.stage h1{font-size:clamp(76px,12.2vw,208px);line-height:.84;margin-left:-.02em;text-wrap:balance}.grad{background:linear-gradient(100deg,var(--pink),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}.stage .lead{font-size:clamp(18px,1.6vw,22px);max-width:30em;margin:22px 0 0;color:var(--ink)}.row{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}.btn{display:inline-block;font:600 16px/1 var(--ui);text-decoration:none;padding:15px 26px;border-radius:999px}.btn.main{color:#2a0f3c;background:linear-gradient(100deg,var(--pink),var(--gold));box-shadow:0 8px 28px rgba(255,95,168,.32)}.btn.ghost{color:var(--ink);border:1px solid rgba(255,247,239,.4)}.now{background:rgba(18,10,28,.62);backdrop-filter:blur(12px);border:1px solid rgba(255,247,239,.14);border-radius:18px;padding:16px 16px 8px}.now .kicker{display:flex;align-items:center;gap:9px;color:var(--ink);margin-bottom:8px}.now .kicker i{width:8px;height:8px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 0 rgba(255,95,168,.7);animation:pulse 2.4s infinite}.now .kicker small{margin-left:auto;font:inherit;color:var(--dim);letter-spacing:.08em}@keyframes pulse{70%{box-shadow:0 0 0 9px rgba(255,95,168,0)}100%{box-shadow:0 0 0 0 rgba(255,95,168,0)}}.now a{display:grid;grid-template-columns:52px 44px 1fr;gap:12px;align-items:center;text-decoration:none;padding:9px 0;border-top:1px solid rgba(255,247,239,.1)}.now time{font:12px/1.2 var(--mono);color:var(--gold)}.now img{width:44px;height:44px;object-fit:cover;border-radius:8px}.now b{font:400 22px/1 var(--display);letter-spacing:.02em;text-transform:uppercase}.now .live{display:block;font-size:13.5px;line-height:1.4;color:var(--dim);padding:10px 0 8px;border-top:1px solid rgba(255,247,239,.1)}.now .live b{font:600 13.5px var(--ui);text-transform:none;letter-spacing:0;color:var(--ink)}.paper{background:var(--paper);color:var(--pen)}.artist{padding:clamp(72px,11vw,150px) 0 clamp(56px,8vw,110px)}.artist .top{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(28px,6vw,96px);align-items:end}.artist .kicker{color:var(--ruby);margin-bottom:22px}.artist h2{font-size:clamp(60px,8.6vw,144px);line-height:.86;text-wrap:balance}.artist h2 em{font-style:normal;color:var(--ruby)}.voice{font:20px/1.6 var(--voice);color:var(--pen);margin:0 0 1em;max-width:34em}.voice.small{font-size:17px;color:var(--pen2)}.branches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,3.2vw,48px);margin-top:clamp(48px,7vw,96px);border-top:1px solid var(--rule);padding-top:clamp(28px,4vw,48px)}.branch img{width:100%;aspect-ratio:1 / 1.02;object-fit:contain;object-position:50% 100%}.branch .n{font:12px/1 var(--mono);letter-spacing:.16em;color:var(--ruby);margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--rule)}.branch h3{font-size:clamp(40px,4.4vw,64px);line-height:.9}.branch p{font:17px/1.6 var(--voice);margin:12px 0 0}.branch details{margin-top:10px}.branch summary{cursor:pointer;font:600 14px var(--ui);color:var(--ruby);list-style:none}.branch summary::-webkit-details-marker{display:none}.branch details p{color:var(--pen2)}.story{background:var(--paper2);color:var(--pen);padding:clamp(64px,9vw,128px) 0}.story .wrap{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,2fr);gap:clamp(28px,6vw,96px);align-items:start}.story .side{position:sticky;top:96px}.story .kicker{color:var(--ruby);margin-bottom:20px}.story h2{font-size:clamp(56px,7vw,112px);line-height:.86}.story .side p{font:17px/1.6 var(--voice);color:var(--pen2);margin:18px 0 0;max-width:22em}.year{font:400 clamp(64px,8vw,120px)/.8 var(--display);color:transparent;-webkit-text-stroke:1.5px var(--pen);margin:0 0 14px}.year+.entry{border-top:1px solid var(--pen)}.entry{position:relative;display:grid;grid-template-columns:104px 76px minmax(0,1fr);gap:20px;align-items:center;padding:14px 0;border-top:1px solid var(--rule);text-decoration:none;color:inherit;transition:padding .2s,background .2s}a.entry:hover{background:rgba(255,255,255,.5);padding-left:10px}.entry time{font:13px/1.2 var(--mono);color:var(--pen2)}.entry img,.entry .noimg{width:76px;height:76px;object-fit:cover;border-radius:6px;box-shadow:0 1px 0 rgba(29,19,38,.25),0 10px 22px -12px rgba(29,19,38,.5)}.entry .noimg{display:grid;place-items:center;background:var(--paper);color:var(--ruby);font-size:26px;box-shadow:inset 0 0 0 1px var(--rule)}.entry .what b{display:block;font:400 clamp(28px,2.6vw,38px)/1 var(--display);letter-spacing:.01em;text-transform:uppercase}.entry .what span{display:block;font:16px/1.45 var(--voice);color:var(--pen2);margin-top:4px}.entry .pin{position:absolute;right:0;top:14px;font:600 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;font-style:normal;color:#fff;background:var(--ruby);padding:5px 8px;border-radius:999px}.more{margin-top:6px;border-top:1px solid var(--rule)}.more>summary{cursor:pointer;list-style:none;padding:18px 0;font:600 15px var(--ui);color:var(--ruby)}.more>summary::-webkit-details-marker{display:none}.more[open]>summary{display:none}.gap{font:italic 16px/1.5 var(--voice);color:var(--pen2);padding:26px 0 30px 124px;border-top:1px solid var(--rule)}.world{padding:clamp(72px,10vw,140px) 0 clamp(56px,8vw,110px);background:radial-gradient(120% 60% at 50% 0%,#2a1240 0%,var(--night) 60%)}.world .kicker{color:var(--gold);margin-bottom:18px}.world h2{font-size:clamp(60px,9.4vw,156px);line-height:.86}.world .lead{font-size:19px;color:var(--dim);max-width:34em;margin:18px 0 0}.places{display:grid;grid-template-columns:1.55fr 1fr;grid-template-rows:1fr 1fr;gap:16px;margin-top:clamp(32px,5vw,60px)}.place{position:relative;display:flex;align-items:flex-end;min-height:250px;border-radius:22px;overflow:hidden;text-decoration:none;isolation:isolate}.place:first-child{grid-row:span 2;min-height:540px}.place img{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.7,.2,1)}.place:hover img{transform:scale(1.04)}.place::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(11,6,17,.94) 0%,rgba(11,6,17,.3) 55%,rgba(11,6,17,0) 75%)}.place:not(:first-child)::after{background:linear-gradient(90deg,rgba(11,6,17,.95) 0%,rgba(11,6,17,.78) 46%,rgba(11,6,17,.1) 100%)}.place:not(:first-child) .body{max-width:62%}.place:not(:first-child) img{object-position:100% 50%;width:70%;left:auto;right:0}.place .body{padding:22px 24px}.place .kicker{color:var(--gold);margin-bottom:10px;font-size:11px}.place h3{font-size:clamp(38px,4.2vw,68px);line-height:.88}.place p{margin:8px 0 0;font-size:15.5px;line-height:1.45;color:var(--dim);max-width:30em}.place .go{display:inline-block;margin-top:12px;font:600 14.5px var(--ui);color:var(--gold)}.chapters{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:10px;margin-top:16px}.chapters a{text-decoration:none;font:11px/1.25 var(--mono);color:var(--dim);text-align:center}.chapters img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;margin-bottom:7px}.next{margin-top:clamp(40px,6vw,72px);border-top:1px solid rgba(255,247,239,.14);padding-top:22px;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;color:var(--dim);font-size:15px}.next .kicker{color:var(--pink)}footer{padding:34px 0 44px;color:var(--dim);font-size:14px;border-top:1px solid rgba(255,247,239,.1)}footer .wrap{display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-between}footer a{text-decoration:none}footer .mono{font:12px var(--mono);letter-spacing:.08em}@media (max-width: 860px){nav .name{font-size:28px}nav .links a.wide,br.wide{display:none}.stage .wrap{grid-template-columns:1fr;gap:26px}.stage::before{background:linear-gradient(0deg,var(--night) 0%,rgba(11,6,17,.86) 46%,rgba(11,6,17,.2) 82%),linear-gradient(180deg,rgba(11,6,17,.7) 0%,rgba(11,6,17,0) 14%)}.stage .bg{object-position:50% 0;height:62%}.artist .top,.story .wrap{grid-template-columns:1fr}.story .side{position:static}.branches{grid-template-columns:1fr;gap:44px}.branch img{max-width:360px;margin:0 auto}.entry{grid-template-columns:62px minmax(0,1fr);gap:14px}.entry time{grid-column:1 / -1}.entry img,.entry .noimg{width:62px;height:62px}.entry .pin{top:12px}.gap{padding-left:0}.places{grid-template-columns:1fr;grid-template-rows:none}.place:first-child{min-height:420px}.chapters{grid-template-columns:repeat(5,minmax(0,1fr))}.chapters a{font-size:10px}}@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.now .kicker i{animation:none}.place img{transition:none}}:root{--u: clamp(58px, 6.8vw, 104px);--neon: #b46bff;--wall: calc(var(--u) * .7);--deep: 5.6;--wallzoom: 1}body{background-color:#0d0716;background-image:radial-gradient(1.2px 1.2px at 12% 18%,rgba(255,255,255,.7) 50%,transparent 52%),radial-gradient(1px 1px at 68% 42%,rgba(255,255,255,.5) 50%,transparent 52%),radial-gradient(1.4px 1.4px at 86% 76%,rgba(255,255,255,.6) 50%,transparent 52%),radial-gradient(1px 1px at 34% 88%,rgba(255,255,255,.45) 50%,transparent 52%);background-size:340px 340px}.skip{position:fixed;left:12px;top:-60px;z-index:40;padding:10px 16px;border-radius:999px;background:var(--gold);color:#2a0f3c;font:600 14px var(--ui);text-decoration:none;transition:top .15s}.skip:focus{top:10px}#pad{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}nav{z-index:20}nav .links{align-items:center}.stage{min-height:calc(100svh + var(--u) * 3.2)}.stage .wrap{padding-bottom:calc(var(--u) * 5)}.tower{max-width:1440px;margin:0 auto;border-inline:var(--wall) solid #2a1838;box-shadow:-2px 0 0 0 var(--neon),2px 0 0 0 var(--neon),0 0 46px rgba(180,107,255,.32)}.live3d .tower{box-shadow:none}.roofwrap{max-width:1440px;margin:calc(var(--u) * -4.6) auto 0;padding-inline:var(--wall);box-sizing:border-box}.floor{position:relative;scroll-margin-top:50px}.slab{position:relative;z-index:2;display:flex;align-items:center;gap:16px;height:calc(var(--u) * .62);padding:0 clamp(14px,3vw,34px);color:var(--ink);background:linear-gradient(#38224f,#1e1230);border-top:2px solid var(--neon);border-bottom:2px solid rgba(180,107,255,.6);box-shadow:0 0 24px rgba(180,107,255,.5),inset 0 0 16px rgba(180,107,255,.22)}.live3d .slab{background:none;border-color:transparent;box-shadow:none;text-shadow:0 1px 4px #000}.slab b{font:400 30px/1 var(--display);letter-spacing:.04em;color:var(--gold);border:1.5px solid var(--gold);border-radius:8px;padding:4px 9px 2px;background:#170d25}.slab span{font:400 26px/1 var(--display);letter-spacing:.07em;text-transform:uppercase}.slab i{margin-left:auto;font:600 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;font-style:normal;color:var(--dim)}.room{background:#f3ebde}.paper2 .room{background:#ece2d1}.night .room{background:#231338}.lobby .room{background:#2a1a3c}.room.roof{background:none;height:calc(var(--u) * 4.6)}.paper,.paper2{color:var(--pen)}.night,.lobby{color:var(--ink)}.wallart{position:relative;z-index:1}.live3d .wallart{perspective:1700px}.live3d .hang{transform:translateZ(calc(var(--u) * (var(--deep) - .08) * -1));transform-style:preserve-3d}.live3d .content{zoom:var(--wallzoom);transform-style:preserve-3d}.content{padding:calc(var(--u) * .95) calc(var(--u) * .5) calc(var(--u) * 3.75)}html:not(.live3d) .content{max-width:1080px;margin:0 auto;padding-bottom:calc(var(--u) * 4.4)}.wallrow{display:grid;gap:calc(var(--u) * .34);align-items:start;transform-style:preserve-3d}.wallrow+.wallrow,.sign+.wallrow,.wallrow+.gallery{margin-top:calc(var(--u) * .34)}.wallrow.two{grid-template-columns:1.3fr 1fr;align-items:center}.wallrow.three{grid-template-columns:repeat(3,minmax(0,1fr))}.wallrow.doors{grid-template-columns:1.5fr 1fr 1fr;align-items:stretch}.spot{transform-style:preserve-3d;min-width:0}.frame{--fr: #6b4a2e;--mount: #fbf8f1;position:relative;display:block;height:100%;box-sizing:border-box;background:var(--mount);color:var(--pen);padding:clamp(16px,calc(var(--u) * .26),30px);border:calc(var(--u) * .11) solid var(--fr);border-radius:2px;text-decoration:none;outline:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.45),inset 0 0 0 7px #efe8db,inset 0 0 0 8px rgba(0,0,0,.1),inset 0 6px 24px rgba(60,40,20,.12),0 1px 0 rgba(255,255,255,.28),0 26px 30px -16px rgba(20,10,30,.6),0 4px 8px rgba(20,10,30,.3);transition:transform .55s cubic-bezier(.2,.8,.2,1),box-shadow .55s}.frame::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.3) 0%,rgba(255,255,255,0) 20%,rgba(255,255,255,0) 62%,rgba(255,255,255,.14) 100%);background-size:240% 240%;background-position:calc(var(--mx, .5) * 100%) calc(var(--my, .5) * 100%)}.frame.gold{--fr: #c39a3e;border-image:linear-gradient(135deg,#f3dc98,#b88a2e 38%,#f0d68a 58%,#a67a22) 1}.frame.black{--fr: #26222e}.frame.wood{--fr: #7a5433}.night .frame,.lobby .frame{--mount: #1c1030;color:var(--ink);box-shadow:inset 0 0 0 1px rgba(0,0,0,.6),inset 0 0 0 7px #24143a,inset 0 6px 24px rgba(0,0,0,.3),0 26px 30px -16px rgba(0,0,0,.7),0 4px 8px rgba(0,0,0,.4)}@media (hover: hover){.live3d .spot.rises:hover>.frame{transform:translateZ(calc(var(--u) * var(--deep) * .97 / var(--wallzoom)));box-shadow:inset 0 0 0 1px rgba(0,0,0,.45),inset 0 0 0 7px #efe8db,0 70px 80px -30px rgba(10,5,20,.65),0 10px 22px rgba(10,5,20,.35);cursor:default}}.live3d .spot.rises>.frame.near,.live3d .spot.rises>.frame:focus-visible{transform:translateZ(calc(var(--u) * var(--deep) * .97 / var(--wallzoom)))}.spot.rises>.frame{cursor:zoom-in}.frame .kicker{color:var(--ruby);margin-bottom:calc(var(--u) * .16)}.night .frame .kicker,.lobby .frame .kicker{color:var(--gold)}.frame h2{font-size:calc(var(--u) * .98);line-height:.86;text-wrap:balance}.frame h2 em{font-style:normal;color:var(--ruby)}.frame h2+p{margin-top:calc(var(--u) * .16)}.frame{container-type:inline-size}.frame h3{font-size:min(calc(var(--u) * .46),15.5cqi);line-height:.9;overflow-wrap:anywhere}.frame .n{font:12px/1 var(--mono);letter-spacing:.16em;color:var(--ruby);margin-bottom:8px}.frame p{font:16.5px/1.55 var(--voice);margin:10px 0 0}.frame .voice{font-size:18.5px;margin:0 0 .8em;max-width:none}.frame .voice.small{font-size:16px;color:var(--pen2);margin-bottom:0}.frame details{margin-top:8px}.frame summary{cursor:pointer;font:600 14px var(--ui);color:var(--ruby);list-style:none}.frame summary::-webkit-details-marker{display:none}.frame details p{color:var(--pen2)}.frame.sheet{padding-top:clamp(12px,calc(var(--u) * .18),22px)}.frame.sheet .year{font-size:calc(var(--u) * .78);margin-bottom:8px}.frame.sheet .entry .what b{font-size:calc(var(--u) * .3)}.frame.sheet .gap{padding-left:0}.sign .kicker{color:var(--gold);margin-bottom:calc(var(--u) * .12)}.sign .lead{font-size:18px;color:var(--dim);margin:calc(var(--u) * .14) 0 0}.neon{font-size:calc(var(--u) * 1.18);line-height:.9;color:#fff4fa;text-shadow:0 0 5px #ff5fa8,0 0 16px #ff5fa8,0 0 38px rgba(255,95,168,.85),0 0 70px rgba(255,95,168,.4)}.frame.pic{padding:0;display:flex;flex-direction:column;cursor:pointer}.frame.pic img{width:100%;aspect-ratio:16 / 10;object-fit:cover;flex:0 0 auto}.frame.pic .cap{display:block;padding:calc(var(--u) * .16) calc(var(--u) * .18) calc(var(--u) * .2)}.frame.pic .kicker{display:block;font-size:10.5px;margin-bottom:8px}.frame.pic b{display:block;font:400 min(calc(var(--u) * .5),calc(19.5cqi - var(--u) * .08))/.9 var(--display);letter-spacing:.01em;text-transform:uppercase;overflow-wrap:anywhere}.frame.pic .cap>span:not(.kicker){display:block;margin-top:7px;font-size:14.5px;line-height:1.45;color:var(--dim)}.frame.pic i{display:block;margin-top:9px;font:600 14px var(--ui);font-style:normal;color:var(--gold)}.wallrow.ledger{grid-template-columns:minmax(0,1fr) minmax(0,2.1fr);grid-auto-rows:calc(var(--u) * 5.9);align-items:stretch}.wallrow.ledger .poster h2{font-size:calc(var(--u) * .7)}.wallrow.ledger .poster{overflow:hidden}.stack{display:grid;grid-template-rows:minmax(0,1fr) auto;gap:calc(var(--u) * .22);min-height:0;transform-style:preserve-3d}.frame.note p{margin:0;font:14.5px/1.45 var(--ui);color:var(--dim)}.frame.note .kicker{margin-bottom:8px}.night .frame.sheet{--mount: #fbf8f1;color:var(--pen);display:flex;flex-direction:column;padding:clamp(10px,calc(var(--u) * .14),16px);box-shadow:inset 0 0 0 1px rgba(0,0,0,.45),inset 0 0 0 7px #efe8db,inset 0 6px 24px rgba(60,40,20,.12),0 26px 30px -16px rgba(0,0,0,.7),0 4px 8px rgba(0,0,0,.4)}.rows{flex:1 1 0;min-height:0;overflow-y:auto;padding:0 calc(var(--u) * .14);scrollbar-width:thin;scrollbar-color:var(--ruby) transparent;outline:0}.rows::-webkit-scrollbar{width:8px}.rows::-webkit-scrollbar-thumb{background:var(--ruby);border-radius:8px}.frame.sheet .cap{margin:2px calc(var(--u) * .14) 8px;padding-bottom:8px;border-bottom:1px solid var(--pen);font:italic 14px/1.4 var(--voice);color:var(--pen2)}.rows .entry:first-child{border-top:0}.rows .entry img{transition:transform .3s cubic-bezier(.2,.8,.2,1);transform-origin:0 50%;position:relative}.rows .entry:hover img{transform:scale(2.3);z-index:3}.wallrow.bandrow{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:stretch}.wallrow.bandrow .pic img{aspect-ratio:16 / 9}.frame.pic:not(a){cursor:default}.roster ul{list-style:none;margin:0;padding:0}.roster li{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid rgba(255,247,239,.14)}.roster li:first-child{border-top:0}.roster li span{font:11px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}.roster li b{font:400 calc(var(--u) * .3)/1 var(--display);letter-spacing:.03em;text-transform:uppercase;text-align:right}.frame.roster p{font:14px/1.45 var(--ui);color:var(--dim);margin-top:12px}.frame a:not(.btn){color:var(--ruby)}.night .frame a:not(.btn),.lobby .frame a:not(.btn){color:var(--gold)}.wallrow.jukerow{grid-template-columns:minmax(0,1fr) minmax(0,1.75fr);grid-auto-rows:max(calc(var(--u) * 7.6),680px);align-items:stretch}.wallrow.jukerow .poster h2{font-size:calc(var(--u) * .78)}.wallrow.jukerow .poster{overflow:hidden}.frame.loungedoor{height:100%}.frame.loungedoor img{flex:1 1 0;min-height:calc(var(--u) * 1.6);aspect-ratio:auto;object-position:50% 35%}.frame.loungedoor b{font-size:min(calc(var(--u) * .5),calc(19.5cqi - var(--u) * .08))}.frame.jukeframe{display:flex;flex-direction:column;padding:clamp(12px,calc(var(--u) * .16),18px)}.frame.jukeframe::after{content:none}.jukehead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:2px 4px 10px;margin-bottom:10px;border-bottom:1px solid rgba(255,211,110,.28)}.jukehead b{font:400 calc(var(--u) * .46)/.9 var(--display);letter-spacing:.03em;text-transform:uppercase;background:linear-gradient(var(--gold),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}.jukehead span{color:var(--dim);font-size:14px}#juke{flex:1 1 0;min-height:0}.wallrow.pair{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}.wallrow.four{grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch}.wallrow.closing{grid-template-columns:minmax(0,46ch);justify-content:center}.paper2 .frame.pic .cap>span:not(.kicker){color:var(--pen2)}.paper2 .frame.pic i{color:var(--ruby)}.frame.pic .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.frame.pic .acts .btn{padding:12px 18px;font-size:14.5px}.btn.line{color:inherit;border:1px solid currentColor;opacity:.85}.frame.way b{font-size:calc(var(--u) * .31)}.frame.way .cap>span:not(.kicker){font-size:14px}.frame.pic img.cut{object-fit:contain;object-position:50% 100%;background:radial-gradient(circle at 50% 70%,#3a2550,#1c1030 70%);padding-top:10px;box-sizing:border-box}.frame.note .voice{font-size:17px;margin:0}.paper .frame.note p,.paper2 .frame.note p{color:var(--pen)}.tech .room{background:#10202b}.neon.cool{text-shadow:0 0 5px #4fd8ff,0 0 16px #4fd8ff,0 0 38px rgba(79,216,255,.85),0 0 70px rgba(79,216,255,.4);color:#f2fdff}.tech .frame{--mount: #122a36}.still{position:absolute;z-index:1;left:0;right:0;bottom:0;height:calc(var(--u) * 3.9);display:flex;justify-content:space-evenly;align-items:flex-end;pointer-events:none}.still img{height:100%;width:auto;max-width:32%;object-fit:contain;object-position:50% 100%}.live3d .still{display:none}.works{position:relative;z-index:2;height:76px;display:grid;place-items:center;background:repeating-linear-gradient(-45deg,#ffd36e 0 22px,#1d1129 22px 44px);border-top:2px solid var(--neon)}.works span{font:600 12px/1.3 var(--mono);letter-spacing:.16em;text-transform:uppercase;text-align:center;color:var(--gold);background:#1d1129;border:1px solid rgba(255,211,110,.5);border-radius:8px;padding:9px 16px;margin:0 12px}.wallrow.lobbyrow{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:start}.frame.brass{--fr: #b8872a;border-image:linear-gradient(135deg,#f0d68a,#a67a22 45%,#e8c874 60%,#8f6a1e) 1}.frame.brass p{color:var(--dim);font:16.5px/1.5 var(--ui);margin:10px 0 16px}.boxes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.boxes a{position:relative;display:block;text-decoration:none;padding:16px 16px 14px;border-radius:10px;background:linear-gradient(#4a315f,#35224a);border:1px solid rgba(255,211,110,.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 14px -6px rgba(0,0,0,.6)}.boxes a::before{content:"";display:block;height:5px;border-radius:3px;background:#170d25;box-shadow:inset 0 1px 2px #000;margin-bottom:12px}.boxes b{display:block;font:400 24px/1 var(--display);letter-spacing:.04em;text-transform:uppercase}.boxes small{font:12px/1 var(--mono);color:var(--gold)}.street{position:relative;z-index:2;height:110px;background:linear-gradient(#1b1126,#0d0716);border-top:3px solid #2a1a3c;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 var(--gut);color:var(--dim);font-size:13px}.street .mono{font:12px var(--mono);letter-spacing:.08em}.lift{position:fixed;z-index:20;right:max(10px,calc((100vw - 1440px) / 2 - 64px));top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding:8px;border-radius:14px;background:rgba(23,13,37,.86);border:1px solid rgba(180,107,255,.55);backdrop-filter:blur(8px)}.lift a{display:flex;align-items:center;justify-content:flex-end;gap:10px;min-width:38px;height:34px;padding:0 9px;box-sizing:border-box;border-radius:8px;text-decoration:none;color:var(--dim)}.lift a b{font:400 20px/1 var(--display);letter-spacing:.04em}.lift a span{display:none;font:600 13px/1 var(--ui);white-space:nowrap}.lift:hover a span,.lift.open a span{display:inline}.lift a:hover{color:var(--ink)}.lift a.on{color:#2a0f3c;background:linear-gradient(100deg,var(--pink),var(--gold))}nav .links a.door,.lift a.door{color:var(--gold)}nav .links a.door:hover,.lift a.door:hover{color:#fff3c4}.lift a.door{margin-top:4px;border-top:1px solid rgba(255,215,106,.28);border-radius:0 0 8px 8px}@media (max-width: 1099px){.lift{top:auto;bottom:14px;right:12px;transform:none}.lift a:not(.on){display:none}.lift.open a{display:flex}.lift a.on::after{content:"▴";font-size:11px;margin-left:-4px}.lift.open a.on::after{content:none}}@media (max-width: 860px){:root{--wall: calc(var(--u) * .4);--deep: 3.8}nav .links a{display:none}.slab{gap:10px}.slab b{font-size:22px;padding:3px 7px 1px}.slab span{font-size:21px}.slab i{display:none}.content{padding-inline:calc(var(--u) * .22)}.wallrow.two,.wallrow.three,.wallrow.ledger,.wallrow.doors,.wallrow.lobbyrow,.wallrow.bandrow,.wallrow.jukerow,.wallrow.pair{grid-template-columns:minmax(0,1fr)}.wallrow.four{grid-template-columns:minmax(0,1fr)}.wallrow.four .frame.way{flex-direction:row;align-items:stretch}.wallrow.four .frame.way img{width:34%;aspect-ratio:auto;align-self:stretch;object-fit:cover}.wallrow.jukerow{grid-auto-rows:auto}.wallrow.jukerow>.spot{height:720px}.roster li b{font-size:21px}.frame.way b{font-size:21px}.frame.pic .acts .btn{padding:11px 14px;font-size:14px}.frame{padding:14px;border-width:7px}.frame h2{font-size:calc(var(--u) * .86)}.frame h3{font-size:calc(var(--u) * .56)}.frame p,.frame .voice{font-size:15.5px}.frame .voice.small{font-size:14.5px}.frame.sheet .entry{grid-template-columns:54px minmax(0,1fr);gap:10px}.frame.sheet .entry img,.frame.sheet .entry .noimg{width:54px;height:54px}.frame.sheet .entry .what b{font-size:23px}.frame.sheet .entry .what span{font-size:14px}.neon{font-size:calc(var(--u) * .98)}.wallrow.ledger{grid-auto-rows:auto}.wallrow.ledger>.spot{height:calc(var(--u) * 7.6)}.rows{padding:0 2px}.boxes b{font-size:20px}.boxes a{padding:12px 10px}.still img{max-width:34%}}@media (prefers-reduced-motion: reduce){.frame{transition:none}}</style>
 </head>
 <body>
-<nav><div class="wrap">
+<a class="skip" href="#artist">Skip to the floors</a>
+<nav id="nav"><div class="wrap">
   <a class="name" href="#top">Yoeshi</a>
-  <div class="links"><a class="keep" href="#band">The band</a><a href="#listen">Listen</a><a href="#explore">Explore</a><a class="keep" href="#collect">Collect</a><a href="#lab">Lab</a></div>
+  <div class="links"><a href="#artist">The artist</a><a href="#music">The music</a><a href="#world">The world</a><a href="#collect">Collect</a><a class="wide" href="#lab">The lab</a><a class="wide" href="#lobby">The lobby</a><a class="door" href="lounge/">The Lounge</a><span id="syncbox"></span></div>
 </div></nav>
 
-<header class="hero" id="top"><div class="wrap">
-  <div>
-    <div class="kicker">Singer songwriter · Yoeshi Labs</div>
-    <h1>My songs performed by <span class="grad">cats</span>.</h1>
-    <p class="lead">All code. Music at the core from day one, and still the whole goal.</p>
-    <p>Once "just a singer songwriter". Now I build worlds where fictional bands play my songs, made independently, with code and AI.</p>
-    <a class="debut" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3" target="_blank" rel="noopener" style="text-decoration:none"><span class="live"></span><span><b>The Purrancers</b> are live in the Sphere at TezTowers, now in full 3D with Decentralize on the setlist. The concert film is your ticket.</span></a>
-    <div class="row"><a class="btn main" href="#explore">Step into the world</a><a class="btn ghost" href="#listen">Listen</a></div>
+<header class="stage" id="top">
+  <img class="bg" src="media/hero-stage.jpg" alt="The Purrancers on stage in the Sphere, lasers over the crowd, from the cinema cut of Decentralize">
+  <div class="wrap">
+    <div>
+      <div class="kicker">Singer songwriter · Yoeshi Labs</div>
+      <h1>My songs performed by <span class="grad">cats.</span></h1>
+      <p class="lead">All code. Music at the core from day one, and still the whole goal.</p>
+      <div class="row"><a class="btn main" href="#world">Step into the world</a><a class="btn ghost" href="#artist">Meet the artist</a></div>
+    </div>
+    <aside class="now" aria-label="What is new">
+      <div class="kicker"><i></i>Now<small>updated 10 Nov 2026</small></div>
+      <a href="#story"><time datetime="2026-11-10">10 Nov</time><img src="media/09-prancer-3d.jpg" alt=""><span><b>Prancer 3D</b></span></a>
+      <a href="#story"><time datetime="2026-11-09">9 Nov</time><img src="media/10-decentralize.jpg" alt=""><span><b>The Purrancers · Decentralize</b></span></a>
+      <a href="#story"><time datetime="2026-11-04">4 Nov</time><img src="media/prancelot.jpg" alt=""><span><b>Prancelot</b></span></a>
+      <span class="live"><b>The Purrancers</b> are live in the Sphere at TezTowers, in full 3D, with Decentralize on the setlist.</span>
+    </aside>
   </div>
-  <div class="screen">
-    <video id="trailer" src="media/hero-cinema.mp4" poster="media/hero-cinema.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The Purrancers in the Sphere, from the cinema cut of Decentralize"></video>
-    <button class="sound" id="sound" aria-pressed="false">Sound on</button>
-  </div>
-</div></header>
+</header>
 
-<section class="band" id="band"><div class="wrap">
-  <div class="kicker">The house band</div>
-  <h2>Meet The Purrancers</h2>
-  <p class="lead2">Eight cats, one house band. They play any style and any part a song asks for, and every one of them sings. Some songs I sing myself; on others the band carries them. The songs are always mine.</p>
-  <p class="lead2">Now in 3D as well: the same eight cats, built in code, playing every note of the song on stage in the Sphere. Drag across the sheet to see them both ways.</p>
-  <ul class="styles" aria-label="Styles they play"><li>Bossa and neo soul</li><li>Rock</li><li>Reggae</li><li>Gospel</li><li>Country</li><li>Hip-hop and lo-fi</li><li>Orchestral</li><li>Electronic</li><li>A cappella</li></ul>
-  <div class="sheet compare" id="compare">
-    <video id="sheet3d" class="after" data-src="media/band-sheet-3d.mp4" poster="media/band-sheet-3d.jpg" muted loop playsinline preload="none" aria-label="The Purrancers in 3D, all eight in matching black suits, playing together"></video>
-    <video id="sheet" class="before" data-src="media/band-sheet.mp4" poster="media/band-sheet.jpg" muted loop playsinline preload="none" aria-label="The Purrancers as drawn, all eight in matching black suits, playing together"></video>
-    <input class="reveal" id="reveal" type="range" min="0" max="100" step="0.5" value="50" aria-label="Slide between the band as drawn and the band in 3D">
-    <div class="divider" aria-hidden="true"><span class="knob">&#8596;</span></div>
-    <span class="label l">Drawn</span><span class="label r">In 3D</span>
-    <button class="sound" id="sheetsound" aria-pressed="false">Sound on</button>
-  </div>
-  <div class="members">
-    <article class="member"><video data-src="media/band-frontcat.mp4" poster="media/band-frontcat.jpg" muted loop playsinline preload="none" aria-label="the frontcat, singing with a ruby red guitar"></video>
-      <div class="body"><div class="chair">Lead vocals</div><h3>The Frontcat</h3><dl><dt>Plays</dt><dd>Ruby cutaway acoustic, electric guitar, piano, ukulele, percussion</dd><dt>Signature</dt><dd>Yin-yang pendant, ruby shoes</dd><dt>Habit</dt><dd>Thanks the crowd between songs, and means it</dd></dl></div></article>
-    <article class="member"><video data-src="media/band-ozzy.mp4" poster="media/band-ozzy.jpg" muted loop playsinline preload="none" aria-label="Ozzy Pawton playing a nylon string guitar"></video>
-      <div class="body"><div class="chair">Guitars</div><h3>Ozzy Pawton</h3><dl><dt>Plays</dt><dd>Nylon, electric lead, twelve-string, banjo, mandolin</dd><dt>Signature</dt><dd>The Tez stud</dd><dt>Habit</dt><dd>Plays every solo like it is the last one</dd></dl></div></article>
-    <article class="member"><video data-src="media/band-captain.mp4" poster="media/band-captain.jpg" muted loop playsinline preload="none" aria-label="Captain Bagel von Meow, bat wings out, on upright bass"></video>
-      <div class="body"><div class="chair">Bass</div><h3>Captain Bagel von Meow</h3><dl><dt>Plays</dt><dd>Upright, electric and synth bass, cello, tuba</dd><dt>Signature</dt><dd>The 3D glasses</dd><dt>Habit</dt><dd>Claims to have played bass on every planet</dd></dl></div></article>
-    <article class="member"><video data-src="media/band-moxie-beret.mp4" poster="media/band-moxie-beret.jpg" muted loop playsinline preload="none" aria-label="Moxie on congas"></video>
-      <div class="body"><div class="chair">Hand percussion</div><h3>Moxie</h3><dl><dt>Plays</dt><dd>Congas, bongos, cajón, timbales, steel pan, kit</dd><dt>Signature</dt><dd>The cat-eye glasses</dd><dt>Habit</dt><dd>Will not say where they learned to play</dd></dl></div></article>
-    <article class="member"><video data-src="media/band-moxie-lion.mp4" poster="media/band-moxie-lion.jpg" muted loop playsinline preload="none" aria-label="Leo Hornsby, a lion in heart glasses, on sax"></video>
-      <div class="body"><div class="chair">Horns</div><h3>Leo Hornsby</h3><dl><dt>Plays</dt><dd>Alto and tenor sax, trumpet, trombone, clarinet, harmonica</dd><dt>Signature</dt><dd>The heart glasses</dd><dt>Habit</dt><dd>Fierce on stage, the softest cat off it</dd></dl></div></article>
-    <article class="member"><video data-src="media/band-toast.mp4" poster="media/band-toast.jpg" muted loop playsinline preload="none" aria-label="Toast on violin"></video>
-      <div class="body"><div class="chair">Strings</div><h3>Toast</h3><dl><dt>Plays</dt><dd>Violin, fiddle, viola, cello, mandolin</dd><dt>Signature</dt><dd>The aviators</dd><dt>Habit</dt><dd>Learns one new instrument every tour</dd></dl></div></article>
-    <article class="member"><video data-src="media/band-billie.mp4" poster="media/band-billie.jpg" muted loop playsinline preload="none" aria-label="Billie Whiskerstein at the turntables"></video>
-      <div class="body"><div class="chair">Beats</div><h3>Billie Whiskerstein</h3><dl><dt>Plays</dt><dd>Turntables, sampler, drum machine, synths, kit</dd><dt>Signature</dt><dd>The pearl earring</dd><dt>Habit</dt><dd>Hides a sample of the crowd in every beat</dd></dl></div></article>
-    <article class="member"><video data-src="media/band-zoomie.mp4" poster="media/band-zoomie.jpg" muted loop playsinline preload="none" aria-label="Zoomie McSnoozes at the keys"></video>
-      <div class="body"><div class="chair">Keys</div><h3>Zoomie McSnoozes</h3><dl><dt>Plays</dt><dd>Rhodes, organ, grand piano, synth, accordion</dd><dt>Signature</dt><dd>The gold hoop</dd><dt>Habit</dt><dd>Naps on the bench; wakes on the count-in</dd></dl></div></article>
-  </div>
-  <p class="also">Follow the band: <a href="https://www.youtube.com/@Purrancers" target="_blank" rel="noopener">YouTube @Purrancers</a> and <a href="https://www.tiktok.com/@purrancers" target="_blank" rel="noopener">TikTok @purrancers</a>.</p>
-</div></section>
+<div class="roofwrap"><div class="room roof" data-room="roof" data-lift="R" data-name="The roof" id="roof" aria-hidden="true"></div></div>
+<main class="tower" id="tower">
 
-<section class="listen" id="listen"><div class="wrap" style="display:block">
-  <div class="kicker">Listen</div>
-  <h2>The setlist: Internet Friend and Decentralize</h2>
-  <p>The Purrancers play two of my songs in the Sphere. Internet Friend opened their debut; Decentralize, my new song, follows it. Every light, every confetti cannon and every move of the band follows the music.</p>
-  <div class="setlist">
-    <figure><div class="wide square"><video src="media/concert-drop.mp4" poster="media/concert-drop.jpg" controls playsinline preload="none" aria-label="Internet Friend, live in the Sphere: the held note into the big drop"></video></div>
-      <figcaption><b>Internet Friend</b>, from the concert film: the held note into the big drop.</figcaption></figure>
-    <figure><div class="wide"><video src="media/decentralize-cinema.mp4" poster="media/decentralize-cinema.jpg" controls playsinline preload="none" aria-label="Decentralize, the cinema cut: the opening, and the start of the final shot"></video></div>
-      <figcaption><b>Decentralize</b>, the first frames of the cinema cut, rendered in Blender from the same show you can walk.</figcaption></figure>
-  </div>
-  <div class="row" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px"><a class="btn main" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/5" target="_blank" rel="noopener">The Purrancers - Decentralize on objkt</a>
-    <a class="btn ghost" href="https://objkt.com/tokens/KT1HSDxtqEY4UpYWrzxJoUWq1UDLDTMaFU24/25" target="_blank" rel="noopener">Internet Friend on objkt</a>
-    <a class="btn ghost" href="https://objkt.com/tokens/KT1HSDxtqEY4UpYWrzxJoUWq1UDLDTMaFU24/17" target="_blank" rel="noopener">"Right Now, Right Here", the interactive album</a></div>
-</div></section>
+<section class="floor paper" id="artist" data-lift="05" data-name="The artist">
+  <div class="slab"><b>05</b><span>The artist</span><i>In the studio</i></div>
+  <div class="room" data-room="studio"><div class="wallart"><div class="hang"><div class="content">
+    <div class="wallrow two">
+      <div class="spot"><div class="frame gold poster"><div class="kicker">The artist</div><h2>A He<em>ART</em> strong life is all I wish to live</h2></div></div>
+      <div class="spot rises"><div class="frame wood" tabindex="0"><p class="voice">Yoeshi is a multidisciplinary artist working across music, writing, and visual compositions. His work explores how people connect, create meaning, and navigate change, especially at the intersection of human emotion and emerging technology.</p>
+        <p class="voice small">Yoeshi’s art is meant to be experienced, not consumed. It invites listeners and viewers to slow down, engage, and find personal meaning within the work.</p></div></div>
+    </div>
+    <div class="wallrow three">
+      <div class="spot rises"><div class="frame black" tabindex="0"><div class="n">01</div><h3>Music</h3><p>The core motivator for everything I do is my longing to write songs about the most important things to all of us and sing them for those who want to listen.</p><details><summary>Read on</summary><p>For as long as I can remember, I have believed that music has a greater power over humans than any other artform, and this is why I feel a responsibility to contribute intentional, heartstrong, and (hopefully) timeless songs to the story of humanity by any means necessary while I am here in this lifetime.</p></details></div></div>
+      <div class="spot rises"><div class="frame black" tabindex="0"><div class="n">02</div><h3>Digital art</h3><p>The core motivator for my visual art is storytelling. My visual practice began as a way to create imagery that could coexist with my music and convey the same emotion and narrative.</p><details><summary>Read on</summary><p>Each release is documented through smart contracts and NFTs, forming interconnected story worlds built through art, technology, and community.</p></details></div></div>
+      <div class="spot rises"><div class="frame black" tabindex="0"><div class="n">03</div><h3>Communication</h3><p>Communication has always been central to how I move through the world. Composing words became a way to understand people, emotion, and meaning.</p><details><summary>Read on</summary><p>Alongside writing, I host a weekly X Space with Tezos Commons, where artists on Tezos are interviewed, and their art is spotlighted.</p></details></div></div>
+    </div></div></div></div></div>
+  <div class="still" aria-hidden="true"><img src="media/cat-music.webp" alt="" loading="lazy" decoding="async"><img src="media/cat-art.webp" alt="" loading="lazy" decoding="async"><img src="media/cat-words.webp" alt="" loading="lazy" decoding="async"></div>
+</section>
 
-<section id="explore"><div class="wrap">
-  <div class="kicker">Free to explore</div>
-  <h2>Come in, look around</h2>
-  <p>Most of this world is free to visit. Wander, play, and listen.</p>
-  <div class="cards two">
-    <a class="card" href="https://teztowers.com/" target="_blank" rel="noopener"><img src="media/show3d.jpg" alt="Your own Prancer on the walkway in the 3D show, the band on stage and confetti in the air" loading="lazy">
-      <div class="body"><span class="tag gold">Ticket holders</span><h3>Walk the Sphere</h3>
-        <p>Now in full 3D: walk in as your own Prancer, one of your Prancer Portraits or a cat of your own, dance and emote with the crowd, take photos, and stay for both songs. The original show is still there too.</p><span class="go">Enter at TezTowers</span></div></a>
-    <a class="card" href="prancers-site/"><img src="media/01-prancers.jpg" alt="A Prancer walking on the beat" loading="lazy">
-      <div class="body"><span class="tag">Play</span><h3>The Prancer Purranchise</h3><p>Every chapter plays right in your browser: tap a Prancer and it reacts and sings, visit the Pads, ride with scuni, deliver the post.</p><span class="go">Visit the Purranchise</span></div></a>
-  </div>
-  <div class="hall">
-    <a href="https://aleatory.art/generator/KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw" target="_blank" rel="noopener"><img src="media/01-prancers.jpg" alt="" loading="lazy"><span>Prancers</span></a>
-    <a href="https://aleatory.art/generator/KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf" target="_blank" rel="noopener"><img src="media/02-pads.jpg" alt="" loading="lazy"><span>Prancer Pads</span></a>
-    <a href="https://aleatory.art/generator/KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY" target="_blank" rel="noopener"><img src="media/03-pfp.jpg" alt="" loading="lazy"><span>Prancer Portraits</span></a>
-    <a href="https://aleatory.art/generator/KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY" target="_blank" rel="noopener"><img src="media/04-wild-ride.jpg" alt="" loading="lazy"><span>Wild Ride</span></a>
-    <a href="https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH" target="_blank" rel="noopener"><img src="media/05-prance-trance.jpg" alt="" loading="lazy"><span>Prance Trance</span></a>
-    <a href="https://aleatory.art/generator/KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En" target="_blank" rel="noopener"><img src="media/06-post.jpg" alt="" loading="lazy"><span>Prancer Post</span></a>
-    <a href="https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH" target="_blank" rel="noopener"><img src="media/07-prance-or-treat.jpg" alt="" loading="lazy"><span>Prance Or Treat!</span></a>
-    <a href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3" target="_blank" rel="noopener"><img src="media/08-purrancers-debut.jpg" alt="" loading="lazy"><span>The Purrancers Debut</span></a>
-    <a href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/5" target="_blank" rel="noopener"><img src="media/10-decentralize.jpg" alt="" loading="lazy"><span>Decentralize</span></a>
-    <a href="https://aleatory.art/generator/KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn" target="_blank" rel="noopener"><img src="media/09-prancer-3d.jpg" alt="" loading="lazy"><span>Prancer 3D</span></a>
-  </div>
-</div></section>
+<section class="floor night" id="music" data-lift="04" data-name="The music">
+  <div class="slab"><b>04</b><span>The music</span><i>The house band, and the Jukebox</i></div>
+  <div class="room" data-room="music"><div class="wallart"><div class="hang"><div class="content">
+    <div class="sign"><div class="kicker">The house band</div><h2 class="neon">Meet The Purrancers</h2><p class="lead">Eight cats, one house band. They play any style and any part a song asks for, and every one of them sings. Some songs I sing myself; on others the band carries them. The songs are always mine.</p></div>
+    <div class="wallrow bandrow">
+      <div class="spot"><div class="frame gold pic"><img src="media/band-sheet-3d.jpg" alt="The eight Purrancers in 3D, side by side" loading="lazy">
+        <span class="cap"><span class="kicker">Now in 3D as well</span><span>The same eight cats, built in code, playing every note of the song on stage in the Sphere.</span></span></div></div>
+      <div class="spot"><div class="frame black roster"><div class="kicker">The band</div><ul><li><span>Lead vocals</span><b>The Frontcat</b></li><li><span>Guitars</span><b>Ozzy Pawton</b></li><li><span>Bass</span><b>Captain Bagel von Meow</b></li><li><span>Hand percussion</span><b>Moxie</b></li><li><span>Horns</span><b>Leo Hornsby</b></li><li><span>Strings</span><b>Toast</b></li><li><span>Beats</span><b>Billie Whiskerstein</b></li><li><span>Keys</span><b>Zoomie McSnoozes</b></li></ul>
+        <p>Follow the band: <a href="https://www.youtube.com/@Purrancers" target="_blank" rel="noopener">YouTube @Purrancers</a> and <a href="https://www.tiktok.com/@purrancers" target="_blank" rel="noopener">TikTok @purrancers</a>.</p></div></div>
+    </div>
+    <div class="wallrow jukerow">
+      <div class="stack">
+        <div class="spot"><a class="frame gold pic loungedoor" href="lounge/"><img src="media/lounge.jpg" alt="The Lounge: a round room with arches, columns of water, a dance floor and a jukebox, a Prancer standing in the middle" loading="lazy">
+          <span class="cap"><span class="kicker">A room to walk into</span><b>The Lounge</b><span>Open to all: a song from Maestro, a seat at his bar, a dance. Holders, sync a wallet to hang your own art.</span><i>Walk in</i></span></a></div>
+        <div class="spot rises"><div class="frame black note" tabindex="0"><div class="kicker">The setlist</div><p>The Purrancers play two of my songs in the Sphere. Internet Friend opened their debut; Decentralize, my new song, follows it. Every light, every confetti cannon and every move of the band follows the music.</p><p><a href="https://teztowers.com/" target="_blank" rel="noopener">Enter at TezTowers</a></p></div></div>
+      </div>
+      <div class="spot"><div class="frame gold jukeframe"><div class="jukehead"><b>The Jukebox</b><span>My songs, played from the chain.</span></div><div id="juke"></div></div></div>
+    </div></div></div></div></div>
+  <div class="still" aria-hidden="true"><img src="media/cat-sax.webp" alt="" loading="lazy" decoding="async"><img src="media/cat-phones.webp" alt="" loading="lazy" decoding="async"><img src="media/cat-uke.webp" alt="" loading="lazy" decoding="async"></div>
+</section>
 
-<section class="collect" id="collect"><div class="wrap">
-  <div class="kicker">Collect and support</div>
-  <h2>Help the music go further</h2>
-  <p>Exploring stays free. Collecting is how you support the songs and the world around them, and it opens doors to experiences made for collectors.</p>
-  <div class="ticket">
-    <img src="media/rockstars.jpg" alt="The Purrancers on stage, seen from the front of the crowd" loading="lazy">
-    <div class="body"><span class="tag gold">Your ticket · Chapter 06</span><h3>The Purrancers Debut</h3>
-      <p>The concert film is also the ticket. Holding it lets you into the live show in the Sphere, the original and the new 3D one, to walk the floor while the band plays.</p>
-      <p>Go to TezTowers, tap the Sphere, show your ticket with a free sign-in, pick The 3D show at the doors, and walk in.</p>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px"><a class="btn main" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3" target="_blank" rel="noopener">Get the concert film</a><a class="btn ghost" href="https://teztowers.com/" target="_blank" rel="noopener">Go to TezTowers</a></div></div>
-  </div>
-  <div class="ticket">
-    <img src="media/cinema-frontcat.jpg" alt="The Frontcat close up, from the cinema cut of Decentralize" loading="lazy">
-    <div class="body"><span class="tag pink">Your ticket · Out now</span><h3>The Purrancers - Decentralize</h3>
-      <p>The second music video: the concert rebuilt in 3D, then rendered in Blender with real light, haze and fur. A limited edition of 25 on objkt, and a second ticket into the show in the Sphere.</p>
-      <p>Holding it or the debut opens the doors: go to TezTowers, tap the Sphere, show your ticket with a free sign-in, and walk in as your own Prancer.</p>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px"><a class="btn main" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/5" target="_blank" rel="noopener">Collect on objkt</a><a class="btn ghost" href="https://teztowers.com/" target="_blank" rel="noopener">Go to TezTowers</a></div></div>
-  </div>
-  <div class="cards">
-    <a class="card" href="https://aleatory.art/generator/KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY" target="_blank" rel="noopener"><img src="media/03-pfp.jpg" alt="" loading="lazy">
-      <div class="body"><span class="tag">Open edition</span><h3>Prancer Portraits</h3><p>The easiest way in: your own Prancer Portrait, ready to wear as your profile picture, and the cat you walk into the 3D show as.</p><span class="go">Mint on Aleatory</span></div></a>
-    <a class="card" href="prancers-site/"><img src="media/02-pads.jpg" alt="" loading="lazy">
-      <div class="body"><span class="tag">The chapters</span><h3>Prancers, Pads, Wild Ride and Post</h3><p>Chapters 01 to 05. Each is a generator on Aleatory. Every mint is one of a kind, and collectors get holder extras on the Purranchise site, like Desk Prancers.</p><span class="go">See every chapter</span></div></a>
-    <a class="card" href="https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH" target="_blank" rel="noopener"><img src="media/05-prance-trance.jpg" alt="" loading="lazy">
-      <div class="body"><span class="tag">On objkt</span><h3>Prancers On Objkt</h3><p>The home for moving Prancer works: Prance Trance (gifted to every Purranchise collector), Prance Or Treat!, The Purrancers Debut, Prancelot and Decentralize.</p><span class="go">Visit the collection</span></div></a>
-  </div>
-  <div class="cards two">
-    <a class="card" href="https://aleatory.art/generator/KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn" target="_blank" rel="noopener"><img src="media/09-prancer-3d.jpg" alt="A Prancer 3D cat in The Sphere" loading="lazy">
-      <div class="body"><span class="tag pink">Chapter 07 · Aleatory</span><h3>Prancer 3D</h3><p>Mint your own dynamic, interactive 3D Prancer on Aleatory, with built-in emotes and game logic, then walk into the concert as your own cat.</p><span class="go">Mint on Aleatory</span></div></a>
-  </div>
-  <p class="note">Collect what you love, when it feels right. Everything I make is for the music first.</p>
-</div></section>
+<section class="floor night" id="world" data-lift="03" data-name="The world">
+  <div class="slab"><b>03</b><span>The world</span><i>Come in, look around</i></div>
+  <div class="room" data-room="world"><div class="wallart"><div class="hang"><div class="content">
+    <div class="sign"><div class="kicker">The world so far</div><h2 class="neon">Come in, look around</h2><p class="lead">Most of this world is free to visit. Wander, play, and listen.</p></div>
+    <div class="wallrow doors">
+      <div class="spot"><a class="frame gold pic" href="https://teztowers.com/" target="_blank" rel="noopener"><img src="media/show3d.jpg" alt="Your own Prancer on the walkway in the 3D show, the band on stage and confetti in the air" loading="lazy">
+        <span class="cap"><span class="kicker">A place to walk · ticket holders</span><b>The Sphere</b><span>The Purrancers play my songs live, in full 3D. Walk in as your own Prancer, dance with the crowd and stay for both songs.</span><i>Enter at TezTowers</i></span></a></div>
+      <div class="spot"><a class="frame gold pic" href="prancers-site/"><img src="media/01-prancers.jpg" alt="A Prancer walking on the beat" loading="lazy">
+        <span class="cap"><span class="kicker">Seven chapters to play</span><b>The Purranchise</b><span>Every chapter plays right in your browser.</span><i>Visit the Purranchise</i></span></a></div>
+      <div class="spot"><a class="frame gold pic" href="#lab"><img src="media/make3d.jpg" alt="An astronaut Prancer in 3D" loading="lazy">
+        <span class="cap"><span class="kicker">Tools to try</span><b>The Lab</b><span>Make it 3D, Desk Prancers, and Maestro, my concierge.</span><i>Down to the lab</i></span></a></div>
+    </div>
+    <div class="wallrow ledger">
+      <div class="stack">
+        <div class="spot"><div class="frame gold poster"><div class="kicker">The story so far</div><h2>One world, still growing</h2></div></div>
+        <div class="spot rises"><div class="frame black note" tabindex="0"><div class="kicker">Before the Purranchise</div><p>2021 to 2025: the first mints, the butterflies, the songs. A wing of its own, being built.</p></div></div>
+      </div>
+      <div class="spot"><div class="frame wood sheet"><p class="cap">Every drop, show and experiment, newest first. The list writes itself: each new piece adds its own line the day it launches.</p><div class="rows" tabindex="0" aria-label="The story so far, newest first">
+        <a class="entry newest" href="https://aleatory.art/generator/KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn" target="_blank" rel="noopener" data-year="2026">
+      <time datetime="2026-11-10">10 Nov 2026</time>
+      <img src="media/09-prancer-3d.jpg" alt="" loading="lazy">
+      <span class="what"><b>Prancer 3D</b><span>Chapter 07. The Portraits step out of the frame: playable 3D cats, each in a world of its own.</span></span><i class="pin">Newest</i>
+    </a>
+        <a class="entry" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/5" target="_blank" rel="noopener" data-year="2026">
+      <time datetime="2026-11-09">9 Nov 2026</time>
+      <img src="media/10-decentralize.jpg" alt="" loading="lazy">
+      <span class="what"><b>The Purrancers · Decentralize</b><span>The second music video: the concert rebuilt in 3D, then rendered in Blender.</span></span>
+    </a>
+        <a class="entry" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/4" target="_blank" rel="noopener" data-year="2026">
+      <time datetime="2026-11-04">4 Nov 2026</time>
+      <img src="media/prancelot.jpg" alt="" loading="lazy">
+      <span class="what"><b>Prancelot</b><span>Pepper Yarnmore, a small Sword Knight on a pony. The first Prancer 3D piece.</span></span>
+    </a>
+        <a class="entry" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3" target="_blank" rel="noopener" data-year="2026">
+      <time datetime="2026-11-03">3 Nov 2026</time>
+      <img src="media/08-purrancers-debut.jpg" alt="" loading="lazy">
+      <span class="what"><b>The Purrancers debut</b><span>Chapter 06. The concert film is minted and the walkable show opens in the Sphere at TezTowers.</span></span>
+    </a>
+        <a class="entry" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/2" target="_blank" rel="noopener" data-year="2026">
+      <time datetime="2026-10-27">27 Oct 2026</time>
+      <img src="media/07-prance-or-treat.jpg" alt="" loading="lazy">
+      <span class="what"><b>Prance Or Treat!</b><span>Portraits trick or treating down a street of haunted Pads, for Midnight Mass 2026 by 617 Gallery.</span></span>
+    </a>
+        <a class="entry" href="https://aleatory.art/generator/KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En" target="_blank" rel="noopener" data-year="2026">
+      <time datetime="2026-10-23">23 Oct 2026</time>
+      <img src="media/06-post.jpg" alt="" loading="lazy">
+      <span class="what"><b>Prancer Post</b><span>Chapter 05. Heartstrong's paper route: a playable street in every mint.</span></span>
+    </a>
+        <a class="entry" href="https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH" target="_blank" rel="noopener" data-year="2026">
+      <time datetime="2026-10-21">21 Oct 2026</time>
+      <img src="media/05-prance-trance.jpg" alt="" loading="lazy">
+      <span class="what"><b>Prancers On Objkt</b><span>The home for moving Prancer works opens with Prance Trance, a gift to every collector.</span></span>
+    </a>
+        <a class="entry" href="maestro/" data-year="2026">
+      <time datetime="2026-10-14">14 Oct 2026</time>
+      <img src="media/maestro-face.png" alt="" loading="lazy">
+      <span class="what"><b>Maestro</b><span>A one of one, and the concierge to everything Yoeshi Labs.</span></span>
+    </a>
+        <a class="entry" href="https://aleatory.art/generator/KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY" target="_blank" rel="noopener" data-year="2026">
+      <time datetime="2026-10-13">13 Oct 2026</time>
+      <img src="media/04-wild-ride.jpg" alt="" loading="lazy">
+      <span class="what"><b>Wild Ride</b><span>Chapter 04, with scuni. Then a Prancer met an otter.</span></span>
+    </a>
+        <a class="entry" href="https://aleatory.art/generator/KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY" target="_blank" rel="noopener" data-year="2026">
+      <time datetime="2026-10-11">11 Oct 2026</time>
+      <img src="media/03-pfp.jpg" alt="" loading="lazy">
+      <span class="what"><b>Prancer Portraits</b><span>Chapter 03. Picture day, and the Prancers came dressed to impress.</span></span>
+    </a>
+        <a class="entry" href="https://aleatory.art/generator/KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf" target="_blank" rel="noopener" data-year="2026">
+      <time datetime="2026-10-07">7 Oct 2026</time>
+      <img src="media/02-pads.jpg" alt="" loading="lazy">
+      <span class="what"><b>Prancer Pads</b><span>Chapter 02. Then they got homes of their own.</span></span>
+    </a>
+        <a class="entry" href="https://aleatory.art/generator/KT1Jqm8pRaxs61nyK8TMdURpNNNa2hsd9wnH" target="_blank" rel="noopener" data-year="2026">
+      <time datetime="2026-10-03">3 Oct 2026</time>
+      <span class="noimg" aria-hidden="true">&#9829;</span>
+      <span class="what"><b>heART Tarot</b><span>A generative tarot on Aleatory, dealt from my own mints.</span></span>
+    </a>
+        <a class="entry" href="https://aleatory.art/generator/KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw" target="_blank" rel="noopener" data-year="2026">
+      <time datetime="2026-10-01">1 Oct 2026</time>
+      <img src="media/01-prancers.jpg" alt="" loading="lazy">
+      <span class="what"><b>Prancers</b><span>Chapter 01. It started with a cat that walked on the beat.</span></span>
+    </a>
+      </div></div></div>
+    </div></div></div></div></div>
+  <div class="still" aria-hidden="true"><img src="media/cat-paper.webp" alt="" loading="lazy" decoding="async"><img src="media/cat-astro.webp" alt="" loading="lazy" decoding="async"></div>
+</section>
 
-<section id="lab"><div class="wrap">
-  <div class="kicker">Early features</div>
-  <h2>In the lab</h2>
-  <p>Still growing, and changing often as I build them. Come try them early.</p>
-  <div class="cards">
-    <a class="card" href="maestro/"><img src="media/maestro-face.png" alt="Maestro, the Buddha Kitty" loading="lazy" style="object-fit:contain;background:#1a0b24">
-      <div class="body"><span class="tag">Chat</span><h3>Maestro</h3><p>My Buddha Kitty concierge, still learning. Ask him about any collection, the story so far, or where to go next.</p><span class="go">Say hello</span></div></a>
-    <a class="card" href="prancers-site/#yours"><img src="media/desk-prancers.jpg" alt="Desk Prancers, for Prancer holders" loading="lazy">
-      <div class="body"><span class="tag gold">Holders</span><h3>Desk Prancers</h3><p>Let your Prancers out of the frame: they walk the page with you, climb it as you scroll, and purr when you pet them.</p><span class="go">Let them out</span></div></a>
-    <a class="card" href="make3d/"><img src="media/make3d.jpg" alt="A Prancer in 3D, ready to take with you" loading="lazy">
-      <div class="body"><span class="tag gold">Holders</span><h3>Make it 3D</h3><p>Your Prancer as a 3D file (a GLB), rigged and with its moves, for 3D apps, games and AR. The same cat as your mint.</p><span class="go">Make yours</span></div></a>
-  </div>
-</div></section>
+<section class="floor paper2" id="collect" data-lift="02" data-name="Collect">
+  <div class="slab"><b>02</b><span>Collect</span><i>Support the songs</i></div>
+  <div class="room" data-room="collect"><div class="wallart"><div class="hang"><div class="content">
+    <div class="wallrow two">
+      <div class="spot"><div class="frame gold poster"><div class="kicker">Collect and support</div><h2>Help the music go further</h2></div></div>
+      <div class="spot rises"><div class="frame wood" tabindex="0"><p class="voice">Exploring stays free. Collecting is how you support the songs and the world around them, and it opens doors to experiences made for collectors.</p></div></div>
+    </div>
+    <div class="wallrow pair">
+      <div class="spot"><div class="frame gold pic ticket"><img src="media/08-purrancers-debut.jpg" alt="The Purrancers on stage in the Sphere, from the concert film" loading="lazy">
+        <span class="cap"><span class="kicker">Your ticket · Chapter 06</span><b>The Purrancers Debut</b><span>The concert film is also the ticket. Holding it lets you into the live show in the Sphere, the original and the new 3D one, to walk the floor while the band plays.</span>
+        <span class="acts"><a class="btn main" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/3" target="_blank" rel="noopener">Get the concert film</a><a class="btn line" href="https://teztowers.com/" target="_blank" rel="noopener">Go to TezTowers</a></span></span></div></div>
+      <div class="spot"><div class="frame gold pic ticket"><img src="media/10-decentralize.jpg" alt="The Frontcat singing in the cinema cut of Decentralize" loading="lazy">
+        <span class="cap"><span class="kicker">Your ticket · Out now</span><b>The Purrancers - Decentralize</b><span>The second music video: the concert rebuilt in 3D, then rendered in Blender with real light, haze and fur. A limited edition of 25 on objkt, and a second ticket into the show in the Sphere.</span>
+        <span class="acts"><a class="btn main" href="https://objkt.com/tokens/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH/5" target="_blank" rel="noopener">Collect on objkt</a><a class="btn line" href="https://teztowers.com/" target="_blank" rel="noopener">Go to TezTowers</a></span></span></div></div>
+    </div>
+    <div class="wallrow four">
+      <div class="spot"><a class="frame gold pic way" href="https://aleatory.art/generator/KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY" target="_blank" rel="noopener"><img src="media/03-pfp.jpg" alt="A Prancer Portrait" loading="lazy">
+        <span class="cap"><span class="kicker">Open edition</span><b>Prancer Portraits</b><span>The easiest way in: your own Prancer Portrait, ready to wear as your profile picture, and the cat you walk into the 3D show as.</span><i>Mint on Aleatory</i></span></a></div>
+      <div class="spot"><a class="frame gold pic way" href="prancers-site/"><img src="media/01-prancers.jpg" alt="A Prancer walking on the beat" loading="lazy">
+        <span class="cap"><span class="kicker">The chapters</span><b>Prancers, Pads, Wild Ride and Post</b><span>Chapters 01 to 05. Each is a generator on Aleatory. Every mint is one of a kind, and collectors get holder extras on the Purranchise site, like Desk Prancers.</span><i>See every chapter</i></span></a></div>
+      <div class="spot"><a class="frame gold pic way" href="https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH" target="_blank" rel="noopener"><img src="media/05-prance-trance.jpg" alt="Prance Trance" loading="lazy">
+        <span class="cap"><span class="kicker">On objkt</span><b>Prancers On Objkt</b><span>The home for moving Prancer works: Prance Trance (gifted to every Purranchise collector), Prance Or Treat!, The Purrancers Debut, Prancelot and Decentralize.</span><i>Visit the collection</i></span></a></div>
+      <div class="spot"><a class="frame gold pic way" href="https://aleatory.art/generator/KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn" target="_blank" rel="noopener"><img src="media/09-prancer-3d.jpg" alt="A Prancer 3D cat" loading="lazy">
+        <span class="cap"><span class="kicker">Chapter 07 · Aleatory</span><b>Prancer 3D</b><span>Mint your own dynamic, interactive 3D Prancer on Aleatory, with built-in emotes and game logic, then walk into the concert as your own cat.</span><i>Mint on Aleatory</i></span></a></div>
+    </div>
+    <div class="wallrow closing"><div class="spot rises"><div class="frame black note" tabindex="0"><p class="voice">Collect what you love, when it feels right. Everything I make is for the music first.</p></div></div></div></div></div></div></div>
+  <div class="still" aria-hidden="true"><img src="media/cat-suit.webp" alt="" loading="lazy" decoding="async"><img src="media/cat-tee.webp" alt="" loading="lazy" decoding="async"></div>
+</section>
 
-<footer><div class="wrap">
-  <div class="links">
-    <a href="https://x.com/YinYangYoeshi" target="_blank" rel="noopener">X @YinYangYoeshi</a>
-    <a href="https://objkt.com/@yoeshilabs" target="_blank" rel="noopener">objkt @yoeshilabs</a>
-    <a href="https://www.youtube.com/@Purrancers" target="_blank" rel="noopener">YouTube @Purrancers</a>
-    <a href="https://www.tiktok.com/@purrancers" target="_blank" rel="noopener">TikTok @purrancers</a>
-    <a href="https://linktr.ee/Yoeshi" target="_blank" rel="noopener">Linktree</a>
-    <a href="maestro/">Maestro</a>
-    <a href="prancers-site/">The Purranchise</a>
-  </div>
-  <small>Yoeshi Labs · yoeshilabs.tez</small>
-</div></footer>
+<section class="floor night tech" id="lab" data-lift="01" data-name="The lab">
+  <div class="slab"><b>01</b><span>The lab</span><i>Early features</i></div>
+  <div class="room" data-room="lab"><div class="wallart"><div class="hang"><div class="content">
+    <div class="sign"><div class="kicker">Early features</div><h2 class="neon cool">In the lab</h2><p class="lead">Still growing, and changing often as I build them. Come try them early.</p></div>
+    <div class="wallrow three">
+      <div class="spot"><a class="frame gold pic way" href="make3d/"><img src="media/make3d.jpg" alt="An astronaut Prancer in 3D" loading="lazy">
+        <span class="cap"><span class="kicker">Holders</span><b>Make it 3D</b><span>Your Prancer as a 3D file (a GLB), rigged and with its moves, for 3D apps, games and AR. The same cat as your mint.</span><i>Make yours</i></span></a></div>
+      <div class="spot"><a class="frame gold pic way" href="prancers-site/#yours"><img src="media/desk-prancers.jpg" alt="Prancers walking along the edge of a web page" loading="lazy">
+        <span class="cap"><span class="kicker">Holders</span><b>Desk Prancers</b><span>Let your Prancers out of the frame: they walk the page with you, climb it as you scroll, and purr when you pet them.</span><i>Let them out</i></span></a></div>
+      <div class="spot"><a class="frame gold pic way" href="maestro/"><img class="cut" src="media/cat-maestro-cream.webp" alt="Maestro, a grey-brown tabby in round glasses and a cream sweater" loading="lazy">
+        <span class="cap"><span class="kicker">Chat</span><b>Maestro</b><span>My concierge, still learning. Ask him about any collection, the story so far, or where to go next.</span><i>Say hello</i></span></a></div>
+    </div></div></div></div></div>
+  <div class="still" aria-hidden="true"><img src="media/cat-prop.webp" alt="" loading="lazy" decoding="async"><img src="media/cat-wiz.webp" alt="" loading="lazy" decoding="async"></div>
+</section>
 
-<script>
-  /* the trailer plays muted; one tap brings the sound up */
-  const v = document.getElementById("trailer"), b = document.getElementById("sound");
-  b.addEventListener("click", () => { v.muted = !v.muted; if (!v.muted) { v.currentTime = 0; v.play(); } b.textContent = v.muted ? "Sound on" : "Sound off"; b.setAttribute("aria-pressed", String(!v.muted)); });
-  const sv = document.getElementById("sheet"), sb = document.getElementById("sheetsound");
-  sb.addEventListener("click", () => { for (const m of [sv, s3]) if (!m.src) m.src = m.dataset.src; sv.muted = !sv.muted; if (!sv.muted) { v.muted = true; b.textContent = "Sound on"; sv.currentTime = 0; sv.play(); } sb.textContent = sv.muted ? "Sound on" : "Sound off"; sb.setAttribute("aria-pressed", String(!sv.muted)); });
-  b.addEventListener("click", () => { if (!v.muted) { sv.muted = true; sb.textContent = "Sound on"; } });   // one sound at a time
-  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  /* the band sheet both ways: the 3D one follows the drawn one's clock (the drawn one carries the sound) */
-  const s3 = document.getElementById("sheet3d"), cmp = document.getElementById("compare"), rv = document.getElementById("reveal");
-  const follow = () => { if (Math.abs(s3.currentTime - sv.currentTime) > 0.08) s3.currentTime = sv.currentTime; if (sv.paused !== s3.paused) (sv.paused ? s3.pause() : s3.play().catch(() => {})); };
-  ["play", "pause", "seeked", "timeupdate"].forEach((e) => sv.addEventListener(e, follow));
-  /* the two sheets load and play once they come into view (about 5 MB between them), and rest when scrolled past */
-  new IntersectionObserver(([e]) => { if (e.isIntersecting) { for (const m of [sv, s3]) if (!m.src) m.src = m.dataset.src; if (!still) sv.play().catch(() => {}); } else if (sv.muted) sv.pause(); }, { rootMargin: "200px" }).observe(cmp);
-  let moved = false; const setX = (x) => cmp.style.setProperty("--x", x + "%");
-  rv.addEventListener("input", () => { moved = true; setX(rv.value); });
-  /* once, when it first comes into view: a slow sweep across, so it is clear there is something to slide */
-  if (!still) new IntersectionObserver((es, o) => { if (!es[0].isIntersecting) return; o.disconnect(); const t0 = performance.now();
-    const step = (now) => { if (moved) return; const k = Math.min(1, (now - t0) / 2600); const x = 50 - 32 * Math.sin(k * Math.PI * 2) * (1 - k * 0.15); setX(x); rv.value = x; if (k < 1) requestAnimationFrame(step); else { setX(50); rv.value = 50; } };
-    setTimeout(() => requestAnimationFrame(step), 600); }, { threshold: 0.6 }).observe(cmp);
-  if (still) { v.pause(); sv.pause(); s3.pause(); }
-  /* each member plays only while their card is on screen (the clips load when first seen) */
-  const io = new IntersectionObserver((es) => es.forEach(({ target: m, isIntersecting: on }) => {
-    if (on && !m.src) m.src = m.dataset.src; if (on && !still) m.play().catch(() => {}); else m.pause(); }), { rootMargin: "120px" });
-  document.querySelectorAll(".member video").forEach((m) => io.observe(m));
-</script>
+  <section class="floor lobby" id="lobby" data-lift="G" data-name="The lobby">
+    <div class="slab"><b>G</b><span>The lobby</span><i>Ask at the desk</i></div>
+    <div class="room" data-room="lobby"><div class="wallart"><div class="hang"><div class="content"><div class="wallrow lobbyrow">
+      <div class="spot"><div class="frame brass"><div class="kicker">The concierge</div><h2>Ask Maestro</h2><p>My concierge, still learning. Ask him about any collection, the story so far, or where to go next.</p><a class="btn main" href="maestro/">Say hello</a></div></div>
+      <div class="boxes">
+        <a href="https://x.com/YinYangYoeshi" target="_blank" rel="noopener"><b>X</b><small>@YinYangYoeshi</small></a>
+        <a href="https://objkt.com/@yoeshilabs" target="_blank" rel="noopener"><b>objkt</b><small>@yoeshilabs</small></a>
+        <a href="https://www.youtube.com/@Purrancers" target="_blank" rel="noopener"><b>YouTube</b><small>@Purrancers</small></a>
+        <a href="https://www.tiktok.com/@purrancers" target="_blank" rel="noopener"><b>TikTok</b><small>@purrancers</small></a>
+        <a href="https://linktr.ee/Yoeshi" target="_blank" rel="noopener"><b>Linktree</b><small>linktr.ee/Yoeshi</small></a>
+        <a href="prancers-site/"><b>The Purranchise</b><small>every chapter</small></a>
+      </div>
+    </div></div></div></div></div>
+    <div class="still" aria-hidden="true"><img src="media/cat-maestro-cream.webp" alt="" loading="lazy" decoding="async"></div>
+  </section>
+</main>
+<div class="street"><span class="mono">YOESHI LABS · YOESHILABS.TEZ</span><span>Updated 10 Nov 2026.</span></div>
+
+<aside class="lift" id="lift" aria-label="Floors"></aside>
+<canvas id="pad" aria-hidden="true"></canvas>
+<script>const nav=document.getElementById("nav"),onScroll=()=>nav.classList.toggle("solid",scrollY>40);addEventListener("scroll",onScroll,{passive:true});onScroll();const lift=document.getElementById("lift"),stops=[...document.querySelectorAll("[data-lift]")];for(const s of stops){const a=document.createElement("a"),b=document.createElement("b"),n=document.createElement("span");b.textContent=s.dataset.lift;n.textContent=s.dataset.name;a.append(n,b);a.href="#"+(s.id||"top");lift.appendChild(a);s._a=a}{const a=document.createElement("a"),b=document.createElement("b"),n=document.createElement("span");b.textContent="↗";n.textContent="The Lounge";a.append(n,b);a.href="lounge/";a.className="door";a.title="The Lounge, the room next door";lift.appendChild(a)}stops[0]._a.classList.add("on");lift.addEventListener("click",e=>{if(matchMedia("(min-width: 1100px)").matches)return;if(!lift.classList.contains("open")){e.preventDefault();lift.classList.add("open")}else lift.classList.remove("open")});addEventListener("pointerdown",e=>{if(!lift.contains(e.target))lift.classList.remove("open")});stops.forEach((s,i,all)=>new IntersectionObserver(es=>{for(const e of es)if(e.isIntersecting)for(const o of all)o._a.classList.toggle("on",o===s)},{rootMargin:"-48% 0px -48% 0px"}).observe(s));try{history.scrollRestoration="manual"}catch(e){}const spotNow=()=>{const mid=scrollY+innerHeight/2;for(const s of stops){const r=s.getBoundingClientRect(),top=r.top+scrollY;if(s.id&&mid>=top&&mid<top+r.height)return{id:s.id,r:(mid-top)/r.height,y:scrollY}}return{id:"",r:0,y:scrollY}};let spotT=0;addEventListener("scroll",()=>{clearTimeout(spotT);spotT=setTimeout(()=>{try{history.replaceState({...history.state||{},spot:spotNow()},"")}catch(e){}},400)},{passive:true});{const nav2=performance.getEntriesByType("navigation")[0],sp=history.state&&history.state.spot;let mine=true;const hands=()=>{mine=false};if(sp&&nav2&&(nav2.type==="back_forward"||nav2.type==="reload")){for(const ev of["wheel","touchstart","keydown","pointerdown"])addEventListener(ev,hands,{once:true,passive:true});const put=()=>{if(!mine)return;const el=sp.id&&document.getElementById(sp.id),r=el&&el.getBoundingClientRect();scrollTo({top:Math.max(0,el?r.top+scrollY+sp.r*r.height-innerHeight/2:sp.y||0),behavior:"instant"})};put();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(put);addEventListener("load",put);setTimeout(put,700);setTimeout(()=>{put();mine=false},1600)}}addEventListener("click",e=>{const f=e.target.closest(".frame");if(e.target.closest("a, summary, button"))return;for(const x of document.querySelectorAll(".frame.near"))if(x!==f)x.classList.remove("near");if(f&&matchMedia("(hover: none)").matches)f.classList.toggle("near")});</script>
+<script type="module">import{mountSync}from"./sync/sync-ui.js";mountSync(document.getElementById("syncbox"));</script>
+<script type="module">const juke=document.getElementById("juke"),bring=()=>import("./songs/juke-ui.js").then(m=>{window.yoeshiJuke=m.mountJukebox(juke,{mute:new URLSearchParams(location.search).get("mute")==="1"})});if("IntersectionObserver"in window){const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){io.disconnect();bring()}},{rootMargin:"150% 0px"});io.observe(juke)}else bring();</script>
+<script type="module" src="condo/condo.js"></script>
 </body>
 </html>
