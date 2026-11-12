@@ -188,7 +188,7 @@ const SITE = !!window.MAESTRO_SITE, SAFE_HOSTS = ["yoeshilabs.github.io", "aleat
 const COMPANION = SITE && Q.get("companion") === "1" && window.parent !== window;
 const WINGS = { prancers: ["the Prancer Purranchise", ["Tell me about Prancers", "How do I mint?", "Where can I go?"]] };
 const WING = WINGS[Q.get("from")] || ["this wing of Yoeshi Labs", ["Where can I go?", "Who is Yoeshi?"]];
-const SITE_HOME = "yoeshilabs.github.io";
+const SITE_HOME = "yoeshi.art";
 const safeLink = (h) => { try { const u = new URL(h); return u.protocol === "https:" && SAFE_HOSTS.includes(u.hostname) && !u.username && !u.password ? u.href : null; } catch (e) { return null; } };
 const short = (a) => a.length > 14 ? a.slice(0, 6) + "\u2026" + a.slice(-4) : a;
 const MEM = { name: "", last: null, turns: 0, heavy: 0 };

@@ -19,26 +19,56 @@ window.MAESTRO_CONTEXT = `
 
 ## Where can I go
 keys: where can i go, directory, show me around, tour, give me a tour, branches, sections, what is here, guide me, menu, places, navigate, what can i see, explore, lobby, front desk, map
-ask: The Prancer Purranchise | The Purrancers | Who is Yoeshi?
-link: Yoeshi Labs | https://yoeshilabs.github.io/
-link: The Prancer Purranchise | https://yoeshilabs.github.io/prancers-site/
+ask: The Lounge | The Prancer Purranchise | The Purrancers
+link: yoeshi.art | https://yoeshi.art/
+link: The Lounge | https://yoeshi.art/lounge/
+link: The Prancer Purranchise | https://yoeshi.art/prancers-site/
 link: The Purrancers live | https://teztowers.com/
 link: heART Tarot | https://aleatory.art/generator/KT1Jqm8pRaxs61nyK8TMdURpNNNa2hsd9wnH
 link: Yoeshi on objkt | https://objkt.com/@yoeshilabs
-link: yoeshi.art (coming soon) | https://yoeshi.art/
 Welcome to the lobby. Here is what is open right now:
+- **yoeshi.art**: Yoeshi's own home on the web, built like a tall Prancer Pad, with a floor each for the artist, the music, the world, collecting and the lab.
+- **The Lounge**: a room to walk into, with the Jukebox, a dance floor and my bar. It is open to everyone.
 - **The Prancer Purranchise**: six chapters of living cats on Tezos, with the Lab and Desk Prancers.
 - **The Purrancers**: the house band, live in the Sphere at TezTowers, in the original show and in 3D.
 - **heART Tarot**: a generative reading dealt from 583 of Yoeshi's real mints.
 - **Yoeshi's art and music on objkt**: five years of collections, from the first Hic et Nunc mints to HeArt Strong.
 
-Coming soon: **yoeshi.art**, Yoeshi's own home on the web, joins the studio, along with dedicated rooms for his music, writing and art. I will show you to each one as it opens. Until then, ask me about any of them and I will tell you what I know.
+Ask me about any of them and I will tell you what I know.
 
 ## yoeshi.art
-keys: yoeshi.art, yoeshi art, yoeshiart, yoeshis website, yoeshis site, his website, personal website, other website, art website
-ask: Where can I go? | Yoeshi's collections | Beta
+keys: yoeshi.art, yoeshi art, yoeshiart, yoeshis website, yoeshis site, his website, personal website, other website, art website, front door, the front door, home page
+ask: Where can I go? | The Lounge | Yoeshi's collections
 link: yoeshi.art | https://yoeshi.art/
-yoeshi.art is Yoeshi's own home on the web, built on its own domain. It is coming into the studio soon, and once it does I will be able to walk you through it room by room. For now you can visit it directly, and I can tell you about the art and music it will hold.
+yoeshi.art is Yoeshi's own home on the web, on its own domain, and the front door of Yoeshi Labs.
+
+It is built like a tall Prancer Pad. You come in over the roof and ride down a floor at a time: the artist, the music, the world, collecting, the lab, and the lobby, where my desk is. The Lounge is the room next door.
+
+## The Lounge
+keys: lounge, the lounge, jukebox lounge, your bar, the bar, bartender, dance floor, the jukebox, a room to walk into, walk into the lounge, is the lounge open, who can enter the lounge, can anyone enter the lounge
+ask: The holders list | Yoeshi Labs music | Where can I go?
+link: Walk into the Lounge | https://yoeshi.art/lounge/
+The Lounge is a room you can walk into at yoeshi.art. There is a Jukebox with Yoeshi's songs, a dance floor under a dome, booths, and a bar, where I pour and take requests.
+
+It is open to everyone. No wallet, no ticket.
++++
+Holders get a little more: their own art in the frames, my curations of it, and the screens on the walls to tune. Ask me about the holders list and I will tell you what counts.
+
+## The holders list
+keys: holders list, the holders list, holder list, join the holders list, what can i collect to join the holders list, what can i collect to join, what can i collect, what do i collect, holders perk, holders perks, holder perks, perks, what counts, become a holder, how do i become a holder, who is a holder, am i a holder
+ask: The Lounge | Prancer 3D | The Purrancers Debut
+link: Prancer 3D on Aleatory | https://aleatory.art/generator/KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn
+link: It's All HeArt on objkt | https://objkt.com/collections/KT19MGDuDruBtauTbudfKtJE8roN9R99VEwE
+link: Music Is HeART on objkt | https://objkt.com/collections/KT1KcChbdsHwxabWi43dgKze8EsZfAZrov3H
+To join the holders list, collect any one of these:
+- a **Prancer 3D**
+- a **Purrancers concert film**: Internet Friend or Decentralize
+- a **Chapter 01 Prancer**
+- anything in **It's All HeArt**
+
+Holding one of each of the eleven songs in **Music Is HeART** counts too.
++++
+Then sync your wallet at the top right of yoeshi.art. It is one free sign-in message, never a transaction, and it never moves anything in your wallet. In the Lounge, holders hang their own art, have me curate it, and tune the screens.
 
 ## Beta
 keys: beta, is this accurate, are you accurate, is that right, is that true, are you sure, you are wrong, thats wrong, that is wrong, wrong answer, mistake, incorrect, error, bug, report a bug, feedback, are you finished, is this finished, work in progress, still building
@@ -468,7 +498,7 @@ The result is a lot of art from one artist, made fast, with the care still in it
 ## The Prancer Purranchise
 keys: purranchise, prancer purranchise, franchise, the collections, all projects, your projects, family, universe, prancer family, what projects, overview, chapters
 ask: Tell me about Prancers | The Purrancers | Prancers On Objkt
-link: Visit the Purranchise | https://yoeshilabs.github.io/prancers-site/
+link: Visit the Purranchise | https://yoeshi.art/prancers-site/
 The Purranchise is Yoeshi Labs' family of living cats on Tezos, told as a story in chapters:
 - **Chapter 01, Prancers**: it started with a cat that walked on the beat.
 - **Chapter 02, Prancer Pads**: then they got homes of their own.
@@ -483,7 +513,7 @@ Around them sit **Prancers On Objkt**, the home for the moving Prancer works, **
 ## Prancers
 keys: prancers, chapter 1, chapter one, chapter 01, original prancers, first collection, walking cats, cat that walks, on the beat
 ask: Prancers traits and genetics | Laser eyes | How do I mint?
-link: Meet the Prancers | https://yoeshilabs.github.io/prancers-site/#prancers
+link: Meet the Prancers | https://yoeshi.art/prancers-site/#prancers
 link: Mint on Aleatory | https://aleatory.art/generator/KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw
 Prancers is where it all began: 256 living, generative cats that walk on the beat, launched on Aleatory on 1 October 2026 at 10 tez each.
 
@@ -508,7 +538,7 @@ In Prancer Portraits, laser eyes come in four colours (blue, red, green and gold
 ## Prancer Pads
 keys: prancer pads, pads, chapter 2, chapter two, chapter 02, homes, houses, house, cat house, mansion, trailer, residents
 ask: How do I mint? | Prancer Portraits | The Lab
-link: See the Pads | https://yoeshilabs.github.io/prancers-site/#pads
+link: See the Pads | https://yoeshi.art/prancers-site/#pads
 link: Mint on Aleatory | https://aleatory.art/generator/KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf
 Prancer Pads is Chapter 02: the Prancers got homes of their own. 256 open cutaway homes, from a humble trailer to a mansion, with a rare Cat House drawn from one of Yoeshi's paintings, each with one to seven resident cats living their lives inside.
 
@@ -519,7 +549,7 @@ The generator is KT1GcZLhxb5TbaQ2onhA5hb4VYp4xBc8o3Vf on Aleatory. Like every ch
 ## Prancer Portraits
 keys: prancer pfp, pfp, chapter 3, chapter three, chapter 03, portraits, profile picture, avatar, picture day, prancer portrait
 ask: Mythics | Laser eyes | Rarity
-link: See the portraits | https://yoeshilabs.github.io/prancers-site/#pfp
+link: See the portraits | https://yoeshi.art/prancers-site/#pfp
 link: Mint on Aleatory | https://aleatory.art/generator/KT1KD3b5LZQ8qaoXcN4ZM7w6sk1miapkZodY
 Prancer Portraits is Chapter 03: picture day, and the Prancers came dressed to impress. An open edition at 1 tez on Aleatory, each portrait a dynamic, object-aware PFP drawn live from its mint.
 
@@ -550,7 +580,7 @@ For the original Prancers, the website has a rarity lookup. As for me, my rarity
 ## Wild Ride
 keys: wild ride, chapter 4, chapter four, chapter 04, otter, otters, rider, wild cat, wild cats, big cats, savanna, wild ride collab
 ask: Who is scuni? | How do I mint? | The Lab
-link: Ride along | https://yoeshilabs.github.io/prancers-site/#ride
+link: Ride along | https://yoeshi.art/prancers-site/#ride
 link: Mint on Aleatory | https://aleatory.art/generator/KT1UofDX7Vr1Xy38qHxJo5GSMuxpVcEk8xKY
 Wild Ride is Chapter 04, a collaboration with scuni: a Prancer met an otter. scuni's otters hopped on, the Prancers touched grass, and off they went through savannas, rainforests, snowy peaks, Neon City, the Desert Trail and the Moonlit Hills, with the band playing the whole way. Every ride starts and ends on Tezos.
 
@@ -563,7 +593,7 @@ The otters come in every shade of brown the river has ever been, and once in a l
 ## Prancer Post
 keys: prancer post, paper route, paperboy, paper boy, paper delivery, the game, prancer game, heartstrong, heartstrong game, newspaper game, taco butler, front page, high score, best score, chapter 5, chapter five, chapter 05, play a game
 ask: Prices and editions | Prancer Pads | How do I mint?
-link: Ride the route | https://yoeshilabs.github.io/prancers-site/#post
+link: Ride the route | https://yoeshi.art/prancers-site/#post
 link: Prancer Post on Aleatory | https://aleatory.art/generator/KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En
 Prancer Post is Chapter 05 of the Purranchise, and you can play it. Heartstrong has taken a paper route through the Prancer neighbourhood. Each mint seeds its own street: the Prancer Pads houses, the time and weather, the sky, the cats, the rules of the ride and a theme song of its own. It is the same street every time you ride it, so your best score counts.
 
@@ -593,7 +623,7 @@ I stayed home that night and handed out catnip. Nobody wanted catnip.
 ## The Purrancers
 keys: purrancers, the purrancers, the band, house band, prancer band, cat band, frontcat, the frontcat, ozzy pawton, captain bagel von meow, moxie, leo hornsby, toast, billie whiskerstein, zoomie mcsnoozes, band members, who is in the band, singer, internet friend, decentralize, setlist, songs they play
 ask: The live show | The Purrancers Debut | Yoeshi Labs music
-link: Meet The Purrancers | https://yoeshilabs.github.io/#band
+link: Meet The Purrancers | https://yoeshi.art/#music
 The Purrancers are the Yoeshi Labs house band: eight cats who play Yoeshi's songs. They can play any style and any part a song asks for, and every one of them sings. The songs are always his.
 - **The Frontcat**: lead vocals and guitar.
 - **Ozzy Pawton**: guitars.
@@ -642,7 +672,7 @@ Tap anywhere and the pony rears up. Double-tap to prance, and again to stop. Pre
 keys: prancer 3d, prancer3d, 3d prancer, 3d prancers, chapter 7, chapter seven, chapter 07, 3d cat, 3d cats, mint a 3d cat, prancer 3d controls, play with my 3d cat, prancer 3d legendary, prancer 3d mythic, legendaries, night guardian, astronaut, adventurer, sphinx, star monk, gladiator, cib agent, prancer 3d settings, prancer 3d names
 ask: The live show | How do I mint? | Mythics
 link: Mint on Aleatory | https://aleatory.art/generator/KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn
-link: See Chapter 07 | https://yoeshilabs.github.io/prancers-site/#p3d
+link: See Chapter 07 | https://yoeshi.art/prancers-site/#p3d
 Prancer 3D is Chapter 07 of the Purranchise: the Prancers grown into living 3D cats, on Aleatory. Every cat is rolled from its own seed, with a name of its own, a coat and fur, eyes, ears and build, an outfit and headwear, sometimes an instrument or a treasure to hold, and a home from the Purranchise: the Portrait Studio, Pad Corner, Paper Route, the Sphere, Deep Space and more.
 
 Play with it: tap your cat for its signature move, hold to pet it (it purrs and kneads), double tap to prance, and if it has laser eyes, tap where you want them to fire. Drag to look round it, and use the slider along the bottom to come closer.
@@ -661,7 +691,7 @@ scuni is the artist behind the otters, and Yoeshi's partner on Wild Ride. Two ar
 ## Desk Prancers
 keys: desk prancers, desktop, desk cats, desktop pet, pets, holders, roam, let them out, unchained, un-chain, your cats on the page
 ask: Is connecting my wallet safe? | The website | The Lab
-link: Open Desk Prancers | https://yoeshilabs.github.io/prancers-site/#yours
+link: Open Desk Prancers | https://yoeshi.art/prancers-site/#yours
 Desk Prancers lets holders take their cats out of the frame. Connect your wallet once (read-only) and your own Prancers come out to play on the website: they roam the page, climb on buttons, nap on cards and come running when you call.
 
 Stroke a cat to pet it, click for its reaction, and double-click in the room to drop a treat. A desktop app is on the roadmap, so one day they may roam your whole screen.
@@ -669,7 +699,7 @@ Stroke a cat to pet it, click for its reaction, and double-click in the room to 
 ## The Lab
 keys: the lab, lab, gif, gif maker, make a gif, animated gif, share, share to x, post, download gif
 ask: Desk Prancers | The website
-link: Open the Lab | https://yoeshilabs.github.io/prancers-site/#lab
+link: Open the Lab | https://yoeshi.art/prancers-site/#lab
 The Lab makes a GIF of any cat in the Purranchise. Pick a collection, choose one of your own cats (connect to see them) or roll the dice, and watch it come to life as a GIF, drawn frame by frame right in your browser. Nothing gets uploaded.
 
 Turn on "show someone playing with it" and a cursor pets and taps the cat in the GIF. When it is ready you can download it, share it, or post it straight to X.
@@ -677,8 +707,8 @@ Turn on "show someone playing with it" and a cursor pets and taps the cat in the
 ## The website
 keys: website, site, web site, url, link, where can i see, homepage, landing page, prancers site, tez page
 ask: Desk Prancers | The Lab | Is connecting my wallet safe?
-link: Visit the Purranchise | https://yoeshilabs.github.io/prancers-site/
-The Purranchise has one home on the web: yoeshilabs.github.io/prancers-site (yoeshilabs.tez.page takes you there too).
+link: Visit the Purranchise | https://yoeshi.art/prancers-site/
+The Purranchise has one home on the web: yoeshi.art/prancers-site (yoeshilabs.tez.page takes you there too).
 
 It tells the story chapter by chapter, with each collection live on the page, a dice to roll new cats, live edition counters, the Lab for GIFs, Desk Prancers for holders, and a read-only wallet sync at the top right that shows all your cats across every project.
 
@@ -813,7 +843,7 @@ link: linktr.ee/Yoeshi | https://linktr.ee/Yoeshi
 - **X**: @YinYangYoeshi
 - **objkt**: Yoeshi (@yoeshilabs)
 - **Links**: linktr.ee/Yoeshi
-- **Website**: yoeshilabs.github.io, with yoeshi.art joining soon
+- **Website**: yoeshi.art
 
 Collectors sharing their cats and their GIFs is the heart of the community. Tag Yoeshi when you post.
 
