@@ -17,19 +17,20 @@ const SCROLL = (() => {
     const line = raw.replace(/\s+$/, "");
     let m;
     if ((m = /^# (.+)$/.exec(line))) { close(); group = m[1].trim(); groups[group] = groups[group] || []; continue; }
-    if (group === "Knowledge") {
+    if (group === "Knowledge" || group === "Codex") {   /* # Codex: entries written from the Codex's facts by codex/tools/sync.mjs, never by hand */
       if ((m = /^## (.+)$/.exec(line))) { close(); cur = { title: m[1].trim(), keys: [], ask: [], lines: [], moreLines: [], inMore: false }; continue; }
       if (!cur) continue;
       if ((m = /^keys:\s*(.+)$/i.exec(line))) { cur.keys = m[1].split(",").map((k) => k.trim()).filter(Boolean); continue; }
       if ((m = /^ask:\s*(.+)$/i.exec(line))) { cur.ask = m[1].split("|").map((k) => k.trim()).filter(Boolean); continue; }
       if (/^only:\s*site\s*$/i.test(line)) { cur.siteOnly = true; continue; }
+      if (/^only:\s*piece\s*$/i.test(line)) { cur.pieceOnly = true; continue; }   /* the piece built for objkt alone (never minted: Yoeshi, 2026-11-12): on the website he has another look, and says so */
       if ((m = /^link:\s*(.+?)\s*\|\s*(\S+)\s*$/i.exec(line))) { (cur.links = cur.links || []).push({ label: m[1], href: m[2] }); continue; }
       if (line.trim() === "+++") { cur.inMore = true; continue; }
       (cur.inMore ? cur.moreLines : cur.lines).push(line);
     } else if (group && (m = /^- (.+)$/.exec(line))) groups[group].push(m[1].trim());
   }
   close();
-  return { groups, kb: kb.filter((e) => !e.siteOnly || window.MAESTRO_SITE) };
+  return { groups, kb: kb.filter((e) => (!e.siteOnly || window.MAESTRO_SITE) && (!e.pieceOnly || !window.MAESTRO_SITE)) };
 })();
 
 /* ================================================================ words */
@@ -127,13 +128,13 @@ const ATTR = [["price", /\b(price|prices|cost|costs|how much|pay)\b/], ["edition
   ["chapter", /\b(which chapter|what chapter|chapter number)\b/]];
 const ME = (c) => c.name === "Maestro";
 const SAY = {
-  price: (c) => ME(c) ? "My price is set on objkt by whoever lists me." : `${c.name} mints at ${c.price} each on ${c.platform}.`,
-  editions: (c) => ME(c) ? "I am one of one." : /^\d/.test(c.editions) ? `${c.name} has ${c.editions} editions.` : `${c.name} is ${c.editions}.`,
+  price: (c) => ME(c) ? "I have no price: I have not been minted." : `${c.name} mints at ${c.price} each on ${c.platform}.`,
+  editions: (c) => ME(c) ? "There is one of me, and I have not been minted." : /^\d/.test(c.editions) ? `${c.name} has ${c.editions} editions.` : `${c.name} is ${c.editions}.`,
   launched: (c) => ME(c) ? `I was made ${c.launched}.` : `${c.name} launched ${c.launched}.`,
-  generator: (c) => ME(c) ? "I have no generator: I am a single interactive token." : `The ${c.name} generator lives on chain at ${c.generator}.`,
+  generator: (c) => ME(c) ? "I have no generator and no contract: I have not been minted." : `The ${c.name} generator lives on chain at ${c.generator}.`,
   play: (c) => ME(c) ? `With me: ${c.play}.` : `To play with ${c.name}: ${c.play}.`,
-  platform: (c) => ME(c) ? "I live on objkt." : /^Aleatory$/.test(c.platform) ? `${c.name} mints on Aleatory, through the Mint on Aleatory buttons on the website.` : `${c.name} lives on ${c.platform}.`,
-  chapter: (c) => ME(c) ? "I sit outside the chapters, a one of one." : `${c.name} is Chapter ${c.chapter} of the Prancer Purranchise.` };
+  platform: (c) => ME(c) ? "I live at the front desk of yoeshi.art. I have not been minted." : /^Aleatory$/.test(c.platform) ? `${c.name} mints on Aleatory, through the Mint on Aleatory buttons on the website.` : `${c.name} lives on ${c.platform}.`,
+  chapter: (c) => ME(c) ? "I sit outside the chapters: one of a kind, and the concierge." : `${c.name} is Chapter ${c.chapter} of the Prancer Purranchise.` };
 function attrAnswer(n) {
   const bare = COLLS.reduce((q, x) => q.split(norm(x.name)).join(" "), n);   /* a word in a name ("The Purrancers Debut") is not a question about it */
   const at = ATTR.filter(([, re]) => has(bare, re)).map(([k]) => k); if (!at.length || SCROLL.kb.some((e) => norm(e.title) === n)) return null;   /* an entry named outright wins */
@@ -198,7 +199,7 @@ const tag = (t, p = 0.35) => MEM.name && rnd() < p ? t.replace(/([.!?])$/, `, ${
 const hourWord = () => { const h = new Date().getHours(); return h < 5 ? "Late night" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
 
 const DEFAULT_CHIPS = ["Who are you?", "Who is Yoeshi?", "Tell me about the Prancer Purranchise", "Help me breathe"];
-const SITE_CHIPS = ["Where can I go?", "The Prancer Purranchise", "Who is Yoeshi?", "Yoeshi Labs music"];
+const SITE_CHIPS = (SCROLL.groups.Prompts || []).length ? SCROLL.groups.Prompts.slice(0, 6) : ["Where can I go?", "The Prancer Purranchise", "Who is Yoeshi?", "Yoeshi Labs music"];   /* # Prompts: written from the Codex, so what he offers first is what is new */
 const greeting = () => {
   const who = MEM.name ? `Welcome back, ${MEM.name}.` : VIEWER ? `Welcome, friend from ${short(VIEWER)}.` : "Welcome, friend.";   /* everyone is greeted as a newcomer */
   if (COMPANION) return `${MEM.name ? `Hello again, ${MEM.name}.` : "Hello again."} I followed you to ${WING[0]}. Ask me anything about it, or anything else in Yoeshi Labs.`;

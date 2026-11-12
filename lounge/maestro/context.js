@@ -17,71 +17,19 @@
 window.MAESTRO_CONTEXT = `
 # Knowledge
 
-## Where can I go
-keys: where can i go, directory, show me around, tour, give me a tour, branches, sections, what is here, guide me, menu, places, navigate, what can i see, explore, lobby, front desk, map
-ask: The Lounge | The Prancer Purranchise | The Purrancers
-link: yoeshi.art | https://yoeshi.art/
-link: The Lounge | https://yoeshi.art/lounge/
-link: The Prancer Purranchise | https://yoeshi.art/prancers-site/
-link: The Purrancers live | https://teztowers.com/
-link: heART Tarot | https://aleatory.art/generator/KT1Jqm8pRaxs61nyK8TMdURpNNNa2hsd9wnH
-link: Yoeshi on objkt | https://objkt.com/@yoeshilabs
-Welcome to the lobby. Here is what is open right now:
-- **yoeshi.art**: Yoeshi's own home on the web, built like a tall Prancer Pad, with a floor each for the artist, the music, the world, collecting and the lab.
-- **The Lounge**: a room to walk into, with the Jukebox, a dance floor and my bar. It is open to everyone.
-- **The Prancer Purranchise**: six chapters of living cats on Tezos, with the Lab and Desk Prancers.
-- **The Purrancers**: the house band, live in the Sphere at TezTowers, in the original show and in 3D.
-- **heART Tarot**: a generative reading dealt from 583 of Yoeshi's real mints.
-- **Yoeshi's art and music on objkt**: five years of collections, from the first Hic et Nunc mints to HeArt Strong.
-
-Ask me about any of them and I will tell you what I know.
-
-## yoeshi.art
-keys: yoeshi.art, yoeshi art, yoeshiart, yoeshis website, yoeshis site, his website, personal website, other website, art website, front door, the front door, home page
-ask: Where can I go? | The Lounge | Yoeshi's collections
-link: yoeshi.art | https://yoeshi.art/
-yoeshi.art is Yoeshi's own home on the web, on its own domain, and the front door of Yoeshi Labs.
-
-It is built like a tall Prancer Pad. You come in over the roof and ride down a floor at a time: the artist, the music, the world, collecting, the lab, and the lobby, where my desk is. The Lounge is the room next door.
-
-## The Lounge
-keys: lounge, the lounge, jukebox lounge, your bar, the bar, bartender, dance floor, the jukebox, a room to walk into, walk into the lounge, is the lounge open, who can enter the lounge, can anyone enter the lounge
-ask: The holders list | Yoeshi Labs music | Where can I go?
-link: Walk into the Lounge | https://yoeshi.art/lounge/
-The Lounge is a room you can walk into at yoeshi.art. There is a Jukebox with Yoeshi's songs, a dance floor under a dome, booths, and a bar, where I pour and take requests.
-
-It is open to everyone. No wallet, no ticket.
-+++
-Holders get a little more: their own art in the frames, my curations of it, and the screens on the walls to tune. Ask me about the holders list and I will tell you what counts.
-
-## The holders list
-keys: holders list, the holders list, holder list, join the holders list, what can i collect to join the holders list, what can i collect to join, what can i collect, what do i collect, holders perk, holders perks, holder perks, perks, what counts, become a holder, how do i become a holder, who is a holder, am i a holder
-ask: The Lounge | Prancer 3D | The Purrancers Debut
-link: Prancer 3D on Aleatory | https://aleatory.art/generator/KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn
-link: It's All HeArt on objkt | https://objkt.com/collections/KT19MGDuDruBtauTbudfKtJE8roN9R99VEwE
-link: Music Is HeART on objkt | https://objkt.com/collections/KT1KcChbdsHwxabWi43dgKze8EsZfAZrov3H
-To join the holders list, collect any one of these:
-- a **Prancer 3D**
-- a **Purrancers concert film**: Internet Friend or Decentralize
-- a **Chapter 01 Prancer**
-- anything in **It's All HeArt**
-
-Holding one of each of the eleven songs in **Music Is HeART** counts too.
-+++
-Then sync your wallet at the top right of yoeshi.art. It is one free sign-in message, never a transaction, and it never moves anything in your wallet. In the Lounge, holders hang their own art, have me curate it, and tune the screens.
-
 ## Beta
 keys: beta, is this accurate, are you accurate, is that right, is that true, are you sure, you are wrong, thats wrong, that is wrong, wrong answer, mistake, incorrect, error, bug, report a bug, feedback, are you finished, is this finished, work in progress, still building
 ask: Where can I go? | Where to follow | My limits
 only: site
 link: Send feedback to @YinYangYoeshi | https://x.com/YinYangYoeshi
-I am in beta, and so is this website. Yoeshi Labs is still being built: so far only the Prancer Purranchise has a room of its own, and yoeshi.art joins the studio soon. My scroll was written with care, yet it has gaps, and now and then I will get something wrong.
+I am in beta, and so is this website. Yoeshi Labs is still being built, and new rooms keep opening. My scroll was written with care, yet it has gaps, and now and then I will get something wrong.
 
 Please double-check anything important, especially prices, editions and dates, against the source itself. If I said something that was off, Yoeshi would love to hear about it on X at @YinYangYoeshi, and every correction makes me a better concierge.
 
 ## Who is Maestro
 keys: who are you, your name, maestro, what are you, introduce yourself, about you, buddha kitty, tell me about yourself
 ask: Who is Yoeshi? | What can you do? | Why a Buddha?
+only: piece
 I am Maestro, the Buddha Kitty. A one-of-one Prancer Portrait, sitting in lotus in a little Zen garden, here to be an agent of good for anyone who stops by.
 
 Think of me as the concierge to everything Yoeshi Labs, and its mentor and mascot too, rolled into one fluffy tabby. Ask me about Yoeshi and Yoeshi Labs, about the Prancer Purranchise, about Tezos, or about how your day is going, and I will answer with what I know and with kindness either way.
@@ -107,6 +55,7 @@ My temperament on the Feline Five scale is Zen: very low neuroticism, high agree
 ## What I am wearing
 keys: robe, kasaya, saffron, what are you wearing, outfit, mala, beads, aureole, halo, urna, dot, forehead, lotus, throne, mudra, paws, hand gesture
 ask: How do I play with you? | Tell me about the garden | Why a Buddha?
+only: piece
 - **The kasaya**: a saffron robe worn over the left shoulder, pieced together like rice paddies seen from above. My right shoulder stays bare, so you can see my stripes.
 - **The mala**: a string of 27 wooden beads (a quarter of the traditional 108), with a larger guru bead and a saffron tassel.
 - **The aureole**: the disc of gold light behind my head. Watch it closely: it turns slowly, and it keeps a heartbeat.
@@ -121,6 +70,7 @@ My paws make mudras, the old hand gestures:
 ## The garden
 keys: garden, zen garden, background, lantern, maple, pine, rocks, stones, gravel, sand, raked, ripples, wall, leaves
 ask: How do I play with you? | What are you wearing?
+only: piece
 I live in a dry garden on a quiet morning. Raked white gravel ripples round the stones and round my lotus. A stone lantern glows on the left beneath a cloud-pruned pine, a maple leans in from the right and lets go of a leaf now and then, and mist drifts between the hills beyond the wall.
 
 Tap me and the gravel ripples outward from my seat. Every kindness travels farther than you can see.
@@ -128,12 +78,56 @@ Tap me and the gravel ripples outward from my seat. Every kindness travels farth
 ## How to play with me
 keys: how do i play, interact, play with you, what happens if, tap, click, pet, stroke, touch, sound, audio, cant hear, no sound, levitate, float, om
 ask: What can you do? | Tell me about the garden | Can you help me breathe?
+only: piece
 - **Move your pointer** and I will watch it.
 - **Stroke my head** back and forth and I purr, and hearts drift up.
 - **Tap me** and I close my eyes, rise a little, and hum an om with a singing bowl, while ripples run out through the gravel.
 - **Talk to me** with the Ask Maestro button. I answer out loud, with my paw raised to teach.
 
 Browsers do not allow sound until you tap once, so if you hear nothing, tap me.
+
+## Who is Maestro
+keys: who are you, your name, maestro, what are you, introduce yourself, about you, buddha kitty, tell me about yourself
+ask: Who is Yoeshi? | What can you do? | Where can I go?
+only: site
+I am Maestro, the concierge to everything Yoeshi Labs: a grey-brown tabby with a cream beard and round gold glasses. You will find me at the front desk in the lobby of yoeshi.art, and behind the bar in the Lounge downstairs.
+Ask me about Yoeshi and Yoeshi Labs, about the Prancer Purranchise, the band and the shows, about Tezos, or about how your day is going, and I will answer with what I know and with kindness either way.
++++
+My first portrait, the Buddha Kitty, shows me in a robe in a garden. I am also a prototype: Yoeshi has long imagined a personal digital assistant that feels like a wise old friend: warm, steady, protective and a little musical. I am the first sketch of that friend.
+
+
+## What I am wearing
+keys: robe, kasaya, saffron, what are you wearing, outfit, sweater, glasses, spectacles, beard, coffee, mala, beads, aureole, halo, urna, dot, forehead, lotus, throne, mudra, paws, hand gesture
+ask: How do I play with you? | Who are you? | The Lounge
+only: site
+- **A cream sweater**, with a small woven band across the chest. It is warm at the desk.
+- **Round gold glasses**, for reading my scroll.
+- **A cream beard**, wide along the jaw and falling to a soft point. I have been told it looks wise. I try to live up to it.
+- **My own coat** under it all: a grey-brown tabby, long in the fur, with the M on my brow and markings that match on both sides.
+- **A coffee** in one paw, most mornings.
+The robe, the beads and the lotus belong to my first portrait, the Buddha Kitty.
+
+
+## The garden
+keys: garden, zen garden, background, lantern, maple, pine, rocks, stones, gravel, sand, raked, ripples, wall, leaves, lobby, your desk, front desk, where are you
+ask: How do I play with you? | What are you wearing? | Where can I go?
+only: site
+The garden is where my first portrait sits: raked gravel, a stone lantern, a maple letting go of a leaf now and then.
+Here I keep the front desk in the lobby of yoeshi.art: striped paper on the walls, a checker floor, a bell, two plants, and the lift to every floor of the building. I think of the garden often. It is a good thing to carry with you.
+
+
+## How to play with me
+keys: how do i play, interact, play with you, what happens if, tap, click, pet, stroke, touch, sound, audio, cant hear, no sound, levitate, float, om
+ask: What can you do? | What are you wearing? | Can you help me breathe?
+only: site
+- **Move your pointer** and I will watch it.
+- **Tap me** and I wave.
+- **Talk to me** with the Ask Maestro button. I nod along, look up when I am thinking, and lift my paws when something delights me.
+- **Breathe with me**: ask me to help you breathe, and I will keep the count with you.
+- **Find me in the Lounge**, downstairs, where I pour drinks and take song requests.
+I make no sound on this page.
+
+
 
 ## What I can do
 keys: what can you do, help, what can i ask, options, menu, commands, abilities, how does this work, what do you know
@@ -173,6 +167,7 @@ I am also the prototype of something Yoeshi has dreamed about for a long time: a
 ## One of one
 keys: one of one, 1/1, 1 of 1, edition, how many maestros, unique, own you, collect you, buy you, token, nft, this nft
 ask: What is inside the zip? | Who made you? | My purpose
+only: piece
 link: Yoeshi on objkt | https://objkt.com/@yoeshilabs
 There is exactly one of me: a 1/1 interactive token on objkt, made by Yoeshi Labs on Tezos.
 
@@ -181,6 +176,7 @@ Every Prancer Portrait is rolled from its mint. I am the exception: every trait 
 ## What is inside the zip
 keys: zip, files, inside, source code, how were you made, how are you built, code, context file, brain, html, dependencies, technical
 ask: My limits | Are you an AI?
+only: piece
 Four files and nothing else:
 - **index.html**: me, drawn live in SVG by the Prancer Portraits engine, with my lotus, robe and garden added.
 - **brain.js**: how I listen and answer, and the chat you are typing in.
@@ -188,6 +184,27 @@ Four files and nothing else:
 - **heart.js**: Yoeshi's own words, songs and works, gathered from the 583 real mints behind heART Tarot.
 
 No external libraries, no fonts from elsewhere, no network calls. I would work in a cabin with no wifi, which suits a monk perfectly.
+
+
+## One of one
+keys: one of one, 1/1, 1 of 1, edition, how many maestros, unique, own you, collect you, buy you, token, nft, this nft, are you minted, were you minted, are you an nft, are you on objkt, is there a maestro nft
+ask: Who made you? | My purpose | The holders list
+only: site
+There is exactly one of me, and I have not been minted: there is no token of me to collect.
+
+Every Prancer Portrait is rolled from its mint. I am the exception: every trait was chosen by hand, after the real Maestro. I am the first prototype of the Yoeshi Labs assistant, and my place is this desk.
+
+
+## How I am made
+keys: zip, files, inside, source code, how were you made, how are you built, how are you made, code, context file, brain, html, dependencies, technical
+ask: My limits | Are you an AI? | Making art interactive
+only: site
+My mind is three plain files:
+- **brain.js**: how I listen and answer, and the chat you are typing in.
+- **context.js**: my scroll, everything I know, written in plain words.
+- **heart.js**: Yoeshi's own words, songs and works, gathered from the 583 real mints behind heART Tarot.
+
+There is no language model behind me and my mind makes no network calls: I answer from my scroll, in your browser. The cat at the desk is drawn by the site's own code.
 
 ## Who is Yoeshi
 keys: yoeshi, yoeshi roberts, the artist, who made you, creator, your creator, who is behind, artist, made by, author, founder
@@ -575,7 +592,7 @@ keys: rarity, rare, rarest, legendary, epic, uncommon, common, tiers, how rare, 
 ask: Mythics | Prancer Portraits
 In Prancer Portraits, rarity is measured, not guessed: every trait value's true frequency was found by simulating the generator tens of thousands of times, and each cat's tier comes from how rare its whole combination is. At mint the tiers land at Legendary 1%, Epic 4%, Rare 12%, Uncommon 28% and Common 55%, with mythics as their own tier.
 
-For the original Prancers, the website has a rarity lookup. As for me, my rarity is simple: one of one.
+For the original Prancers, the website has a rarity lookup. As for me, my rarity is simple: one of a kind.
 
 ## Wild Ride
 keys: wild ride, chapter 4, chapter four, chapter 04, otter, otters, rider, wild cat, wild cats, big cats, savanna, wild ride collab
@@ -719,7 +736,10 @@ On the Purranchise website, connecting is read-only: it asks your wallet for you
 
 Some wallets show every permission as allowed no matter what a site asks for; the site still only reads your address, and it disconnects right after.
 
+On yoeshi.art, the wallet sync asks for one thing more, once: a free sign-in message that proves the wallet is yours. It is not a transaction, it costs nothing, and nothing can move. The site then remembers you in your own browser until you unsync.
 From me, as a friend: never share your seed phrase or private key with anyone, ever. No real artist, collection or helper will ask for it. I certainly will not. I do not even have pockets.
+
+
 
 ## How do I mint
 keys: how do i mint, mint, minting, how to buy, buy, purchase, collect, get one, how do i get, adopt, where to buy
@@ -730,20 +750,6 @@ Each chapter mints on Aleatory:
 - Mint. Your cat is born from your own mint, drawn live from its hash, so nobody (not even Yoeshi) knows what you will get.
 
 Afterwards your cat shows up in your wallet and on objkt, and on the website when you sync.
-
-## Prices and editions
-keys: prices, price, cost, how much, how much do they cost, editions, how many, supply, edition size, sold out, minted, remaining
-ask: How do I mint? | Should I buy?
-At launch:
-- **Prancers**: 256 editions, 10 tez.
-- **Prancer Pads**: 256 editions, 10 tez.
-- **Prancer Portraits**: open edition, 1 tez.
-- **Wild Ride**: 1,024 editions, 6 tez.
-- **Prancer Post**: 256 editions, 4 tez.
-- **The Purrancers Debut**: 250 editions, on objkt.
-- **Maestro** (me): one of one, on objkt.
-
-I live offline, so I cannot see how many are minted right now. The website shows live counters for every chapter.
 
 ## Aleatory
 keys: aleatory, aleatory art, platform, generator, where are they minted, long form, generative platform
@@ -792,7 +798,7 @@ A .tez name is a readable name for a Tezos address, registered through Tezos Dom
 
 ## Fully on-chain
 keys: on-chain, onchain, on chain, fully on chain, where does the art live, ipfs, permanent, stored, forever, sealed
-ask: Aleatory | What is inside the zip?
+ask: Aleatory | Making art interactive
 Fully on-chain means the art is the code, and the code lives on Tezos itself. There is no image server to go down. Each generator is a single self-contained file, and your cat is drawn live from its mint, every time it opens.
 
 ## Trancers
@@ -965,17 +971,140 @@ ask: The Prancer Purranchise | Trancers | Who is Yoeshi?
 - **7 October 2026**: Prancer Pads gives the cats homes.
 - **8 October 2026**: the first laser-eyed Prancer is found and the secret comes out.
 - **October 2026**: Prancer Portraits, then Wild Ride with scuni the very next day.
-- **14 October 2026**: I am made, a one of one for objkt.
+- **14 October 2026**: I am made, the concierge to everything Yoeshi Labs.
 - **21 October 2026**: Prancers On Objkt opens with Prance Trance, gifted to every Purranchise collector.
 - **23 October 2026**: Prancer Post, Chapter 05, takes Heartstrong on a paper route.
 - **27 October 2026**: Prance Or Treat! goes trick or treating for Midnight Mass 2026.
 - **3 November 2026**: The Purrancers debut live in the Sphere, and the concert film becomes the ticket.
 - **4 November 2026**: Prancelot, the first Prancer 3D piece.
+- **9 November 2026**: The Purrancers - Decentralize, the second music video, rendered in Blender from the 3D show.
 - **10 November 2026**: Prancer 3D, Chapter 07, launches on Aleatory.
+- **12 November 2026**: yoeshi.art becomes the front door, and the Lounge opens in its basement.
+
+
+# Codex
+
+## Where can I go
+keys: where can i go, directory, show me around, tour, give me a tour, branches, sections, what is here, guide me, menu, places, navigate, what can i see, explore, lobby, front desk, map
+ask: What is new? | The Lounge | The Prancer Purranchise
+only: site
+link: yoeshi.art | https://yoeshi.art/
+link: The Lounge | https://yoeshi.art/lounge/
+link: The Prancer Purranchise | https://yoeshi.art/prancers-site/
+link: The Purrancers live | https://teztowers.com/
+link: heART Tarot | https://aleatory.art/generator/KT1Jqm8pRaxs61nyK8TMdURpNNNa2hsd9wnH
+link: Yoeshi on objkt | https://objkt.com/@yoeshilabs
+Welcome to the lobby. Here is what is open right now:
+- **yoeshi.art**: Yoeshi's artist site, A Musical World Of Cats. A tall Prancer Pad with a floor each for the artist, the music, the world, collecting and the lab.
+- **The Lounge**: a room you can walk into in the basement of yoeshi.art: the Jukebox with Yoeshi's songs, a dance floor under a dome, booths, and a bar. Open to everyone.
+- **The Prancer Purranchise**: seven chapters of living cats on Tezos, with the Lab and Desk Prancers.
+- **The Purrancers**: the house band, live in the Sphere at TezTowers, in the original show and in 3D.
+- **Make it 3D**: your Prancer as a 3D file (a GLB), rigged and with its moves, for 3D apps, games and AR: the same cat as your mint.
+- **heART Tarot**: a generative reading dealt from 583 of Yoeshi's real mints.
+- **Yoeshi's art and music on objkt**: five years of collections, from the first Hic et Nunc mints to HeArt Strong.
+
+Ask me about any of them and I will tell you what I know.
+
+## yoeshi.art
+keys: yoeshi.art, yoeshi art, yoeshiart, yoeshis website, yoeshis site, his website, personal website, other website, art website, front door, the front door, home page, artist site, a musical world of cats, musical world of cats
+ask: Where can I go? | The Lounge | Yoeshi's collections
+only: site
+link: yoeshi.art | https://yoeshi.art/
+yoeshi.art is Yoeshi's own home on the web, on its own domain, and the front door of Yoeshi Labs. Across the top it reads "A Musical World Of Cats", and under it: "When the artist becomes the developer, anything is pawsible."
+
+It is built like a tall Prancer Pad. You come in over the roof and ride down a floor at a time: the artist, the music, the world, collecting, the lab, and the lobby, where my desk is. The Lounge is the basement.
+
+## The Lounge
+keys: lounge, the lounge, jukebox lounge, your bar, the bar, bartender, dance floor, the jukebox, basement, the basement, a room to walk into, walk into the lounge, is the lounge open, who can enter the lounge, can anyone enter the lounge
+ask: The holders list | Yoeshi Labs music | Where can I go?
+only: site
+link: Walk into the Lounge | https://yoeshi.art/lounge/
+The Lounge is a room you can walk into in the basement of yoeshi.art: the Jukebox with Yoeshi's songs, a dance floor under a dome, booths, and a bar, where I pour and take requests.
+
+It is open to everyone. No wallet, no ticket.
++++
+Holders get a little more: their own art in the frames, my curations of it, and the screens on the walls to tune. Ask me about the holders list and I will tell you what counts. The Lounge opened on 12 November 2026.
+
+## The holders list
+keys: holders list, the holders list, holder list, join the holders list, what can i collect to join the holders list, what can i collect to join, what can i collect, what do i collect, holders perk, holders perks, holder perks, perks, what counts, become a holder, how do i become a holder, who is a holder, am i a holder
+ask: The Lounge | Prancer 3D | Wallet sync
+only: site
+link: Prancer 3D on Aleatory | https://aleatory.art/generator/KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn
+link: It's All HeArt on objkt | https://objkt.com/collections/KT19MGDuDruBtauTbudfKtJE8roN9R99VEwE
+link: Music Is HeART on objkt | https://objkt.com/collections/KT1KcChbdsHwxabWi43dgKze8EsZfAZrov3H
+To join the holders list, collect any one of these:
+- a **Prancer 3D**
+- a **Purrancers concert film**: Internet Friend or Decentralize
+- a **Chapter 01 Prancer**
+- anything in **It's All HeArt**
+
+Holding one of each of the eleven songs in **Music Is HeART** counts too.
++++
+Then sync your wallet at the top right of yoeshi.art. It is one free sign-in message, never a transaction, and it never moves anything in your wallet. In the Lounge, holders hang their own art, have me curate it, and tune the screens.
+
+## Make it 3D
+keys: make it 3d, make 3d, make it 3 d, glb, 3d file, 3d model, usdz, augmented reality, download my cat, export my cat, my cat in 3d, 3d version of my cat
+ask: Prancer 3D | Wallet sync | The Lab
+only: site
+link: Open Make it 3D | https://yoeshi.art/make3d/
+Make it 3D is your Prancer as a 3D file (a GLB), rigged and with its moves, for 3D apps, games and AR: the same cat as your mint.
+
+You need a cat of your own for it, since it makes the file from your mint. Nothing is uploaded: the file is made in your browser.
+
+## Wallet sync
+keys: wallet sync, sync wallet, sync my wallet, syncing, unsync, sign in message, sign-in message, one time sign, sync button
+ask: The holders list | Is connecting my wallet safe? | The Lounge
+only: site
+link: yoeshi.art | https://yoeshi.art/
+Wallet sync is how yoeshi.art remembers you: one free sign-in message, once. The site then remembers your wallet in your own browser, in every lab and feature, until you unsync. It is never a transaction, and nothing moves.
+
+Nothing about you is kept anywhere but your own browser. Unsync, and it is forgotten.
+
+## What is new
+keys: what is new, whats new, what's new, news, the news, latest, the latest, recent, recently, updates, update, what changed, newest, what have i missed, what did i miss
+ask: The Lounge | Prancer 3D | Where can I go?
+only: site
+Here is the latest, newest first:
+- **12 November 2026**: yoeshi.art becomes the front door: Yoeshi's artist site, A Musical World Of Cats, with the Lounge in its basement, a room to walk into, open to all.
+- **10 November 2026**: Prancer 3D launches on Aleatory (Chapter 07): the evolution of Prancer Portraits, playable 3D cats each in a world of its own, and an access pass to The Purrancers' virtual concerts.
+- **9 November 2026**: The Purrancers' second music video, "The Purrancers - Decentralize", is minted in Prancers On Objkt (25 editions): the concert rebuilt in 3D and rendered in Blender, and a second ticket into the 3D show in the Sphere at TezTowers.
+
+My scroll was last brought up to date on 12 November 2026.
++++
+Before that:
+- **4 November 2026**: Prancelot is minted in Prancers On Objkt (100 editions): Pepper Yarnmore, a small Sword Knight on a pony in matching barding, the first Prancer 3D piece.
+- **3 November 2026**: The Purrancers debut: the concert film "The Purrancers Debut - Internet Friend" is minted in Prancers On Objkt (250 editions) and is the ticket to their walkable live show in the Sphere at TezTowers; airdropped to holders of Internet Friend and the Purranchise.
+- **27 October 2026**: Prance Or Treat! is minted in Prancers On Objkt (13 editions), Yoeshi's entry in Midnight Mass 2026 by 617 Gallery: Prancer Portraits trick or treating down a street of haunted Pads.
+- **23 October 2026**: Prancer Post launches on Aleatory (Chapter 05): Heartstrong's paper route, a playable street per mint.
+
+## Prices and editions
+keys: prices, price, cost, how much, how much do they cost, editions, how many, supply, edition size, sold out, minted, remaining
+ask: How do I mint? | Should I buy?
+only: site
+At launch:
+- **Prancers**: 256 editions, 10 tez.
+- **Prancer Pads**: 256 editions, 10 tez.
+- **Prancer Portraits**: an open edition, 1 tez.
+- **Wild Ride**: 1,024 editions, 6 tez.
+- **Prancer Post**: 256 editions, 4 tez.
+- **The Purrancers Debut**: 250 editions, price set on objkt.
+- **Prancer 3D**: 1,056 editions, 15 tez.
+- **Prancers On Objkt**: editions and prices set piece by piece on objkt.
+- **heART Tarot**: 1,999 editions, 3 tez.
+I live offline, so I cannot see how many are minted right now. The website shows live counters for every chapter.
+
+# Prompts
+- What is new?
+- Where can I go?
+- The Lounge
+- Who is Yoeshi?
+- Yoeshi Labs music
 
 # Meanings
 - what is this place | what is this site | what is all this | what is this website | where do i start | first time here | new here | where am i | im lost here | what is this place even | whats this place => @Where can I go
 - what are you | who are you | what are you exactly => @Who is Maestro
+- are you on objkt | are you minted | were you minted | are you an nft | is maestro on objkt | is maestro minted | is there a maestro nft | maestro nft | can i collect you | can i mint you => @One of one
+- where do you live | where are you | where can i find you | where is your desk | where do you sit | where do you work => @The garden
 - how do i get into the show | get into the show | get in the show | enter the show | how do i enter the show | how do i get into the sphere | get into the concert => @The live show
 - legendaries in prancer 3d | prancer 3d legendaries | prancer 3d legendary | legendary 3d | mythics in prancer 3d | prancer 3d mythics | prancer 3d mythic | prancer 3d rarity | how rare is prancer 3d | rare 3d cats => @Prancer 3D
 - what is prancers on objkt | prancers on objkt | tell me about prancers on objkt => @Prancers On Objkt
@@ -1006,7 +1135,7 @@ ask: The Prancer Purranchise | Trancers | Who is Yoeshi?
 - get tez | some tez | buy tez | buy xtz | buy tezos | exchange | coinbase | kraken | binance | onramp => @Getting tez
 - earn interest | passive income | yield | apy | stake | staking | delegate | delegation | earn reward => @Baking and staking
 - site goes down | website goes down | site dies | site disappear | cat disappear | on a server | image on a server | ipfs | stored | storage | hosted | where is the art | forever | permanent => @Fully on-chain
-- upcoming | next drop | roadmap | coming soon | future plans | next for yoeshi labs | whats next | anything new => @What is next
+- upcoming | next drop | roadmap | coming soon | future plans | next for yoeshi labs | whats next => @What is next
 - twitter | instagram | socials | social media | follow yoeshi | his handle | x account | discord | contact yoeshi | reach yoeshi | dm yoeshi => @Where to follow
 - ape in | worth buying | worth it | good investment | investment | go up in value | flip | profit | moon | roi | make money => @Should I buy
 - dont get nft | even is an nft | explain nft | nft mean | nft stand for => @What is an NFT
@@ -1046,7 +1175,7 @@ ask: The Prancer Purranchise | Trancers | Who is Yoeshi?
 - Prancer 3D | chapter: 07 | editions: 1,056 | price: 15 tez | launched: on 10 November 2026 | platform: Aleatory | generator: KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn | play: tap your cat for its move, hold to pet it, prance around with W A S D or the arrows, jump with Space, emote with 1 to 6; each edition is also an access pass to The Purrancers' virtual concerts, where you walk in as your Prancer | aliases: prancer 3d, prancer3d, prancers 3d, 3d prancer, 3d prancers, 3d cat, chapter 7, chapter seven, chapter 07
 - Prancers On Objkt | chapter: none, it is the objkt branch of the Purranchise | editions: set piece by piece (Prance Trance: 100) | price: set piece by piece on objkt | launched: on 21 October 2026 | platform: objkt | generator: none, it is an objkt collection: KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH | play: the moving Prancer works live here, sound on; the first is Prance Trance, the fractal visualizer | aliases: prancers on objkt, objkt collection, objkt branch, prance trance, the objkt prancers
 - heART Tarot | chapter: none, it sits beside the chapters | editions: 1,999 | price: 3 tez | launched: on 3 October 2026 | platform: Aleatory | generator: KT1Jqm8pRaxs61nyK8TMdURpNNNa2hsd9wnH | play: tap to turn the cards, one at a time | aliases: heart tarot, its all heart, tarot
-- Maestro | chapter: none, I am a one of one | editions: one of one | price: set on objkt by whoever lists me | launched: on 14 October 2026 | platform: objkt | generator: none, I am a single interactive token | play: move, stroke, tap, or press Ask Maestro | aliases: maestro, buddha kitty, the buddha kitty
+- Maestro | chapter: none, I am one of a kind | editions: none, I have not been minted | price: none, I have not been minted | launched: on 14 October 2026 | platform: yoeshi.art | generator: none, I have not been minted | play: move your pointer, tap me, or press Ask Maestro | aliases: maestro, buddha kitty, the buddha kitty
 
 # Spoken
 - Everything that is matter matters. | Artz Friday, June 2026 | creation
