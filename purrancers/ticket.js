@@ -87,7 +87,8 @@ export async function walletSign(ui, why, code) {
     const payload = micheline(text, W.stringToBytes);
     const { signature } = await client.requestSignPayload({ signingType: W.SigningType.MICHELINE, payload, sourceAddress: address });
     return { address, publicKey, payload, signature };
-  } finally { try { await client.clearActiveAccount(); } catch (e) {} try { await client.destroy(); } catch (e) {} } }
+  } finally { try { await client.clearActiveAccount(); } catch (e) {} try { await client.destroy(); } catch (e) {}
+    try { for (const k of Object.keys(localStorage)) if (k.startsWith("beacon:")) localStorage.removeItem(k); } catch (e) {} } }   /* nothing of a pairing is left in the browser after a sign-in (the wallet library's advisory of 2026-11-13) */
 
 /* the check, the same wherever the message was signed: the text is this site's sign-in with this visit's code and the
    address in it, the key belongs to the address, and the signature is the key's */

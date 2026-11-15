@@ -137,3 +137,7 @@ js-sha3/src/sha3.js:
    * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
    * @license  MIT
    */
+
+@taquito/utils/dist/taquito-utils.es6.js:
+  /*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+  /*! noble-post-quantum - MIT License (c) 2024 Paul Miller (paulmillr.com) */
