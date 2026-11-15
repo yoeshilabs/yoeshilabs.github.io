@@ -525,7 +525,7 @@ The Purranchise is Yoeshi Labs' family of living cats on Tezos, told as a story 
 - **Chapter 06, The Purrancers Debut**: the house band played its first show, and the concert film is the ticket.
 - **Chapter 07, Prancer 3D**: then they stepped into 3D, and walk into the show with you.
 
-Around them sit **Prancers On Objkt**, the home for the moving Prancer works, **Desk Prancers**, where holders let their cats roam the website, and **the Lab**, which makes a GIF of any cat. Chapters 01 to 05 and 07 are generators on Aleatory, and then there is me, a 1/1 on objkt.
+Around them sit **Prancers On Objkt**, the home for the moving Prancer works, **Desk Prancers**, where holders let their cats roam the website, and **the Lab**, which makes a GIF of any cat. Chapters 01 to 05 and 07 are generators on Aleatory, and then there is me.
 
 ## Prancers
 keys: prancers, chapter 1, chapter one, chapter 01, original prancers, first collection, walking cats, cat that walks, on the beat
@@ -754,7 +754,7 @@ Afterwards your cat shows up in your wallet and on objkt, and on the website whe
 ## Aleatory
 keys: aleatory, aleatory art, platform, generator, where are they minted, long form, generative platform
 ask: How do I mint? | Fully on-chain | Tezos
-Aleatory is the generative art platform on Tezos where all four chapters live. An artist stores the generator code on chain once; each mint then draws a brand-new piece from its own random hash, and the platform captures that first frame as the cover.
+Aleatory is the generative art platform on Tezos where the Purranchise's generators live. An artist stores the generator code on chain once; each mint then draws a brand-new piece from its own random hash, and the platform captures that first frame as the cover.
 
 That is why every Prancer is a surprise, and why the code can never change once it is sealed.
 
@@ -841,7 +841,7 @@ ask: Prancer 3D | My purpose | Desk Prancers
 I do not announce things before Yoeshi does. What I can say: Prancer 3D is out now as Chapter 07, a Desk Prancers desktop app is on the roadmap, and I am the first prototype of the Yoeshi Labs assistant. The best way to hear news first is to follow @YinYangYoeshi on X and keep an eye on the website.
 
 ## Where to follow
-keys: follow, social, socials, contact, twitter, x account, objkt profile, how to reach, discord, where can i follow, community
+keys: follow, social, socials, contact, twitter, x account, objkt profile, how to reach, discord, where can i follow, community, tiktok, tik tok, youtube, you tube, channel, the videos, shorts
 ask: Who is Yoeshi? | The website
 link: @YinYangYoeshi on X | https://x.com/YinYangYoeshi
 link: Yoeshi on objkt | https://objkt.com/@yoeshilabs
@@ -850,6 +850,8 @@ link: linktr.ee/Yoeshi | https://linktr.ee/Yoeshi
 - **objkt**: Yoeshi (@yoeshilabs)
 - **Links**: linktr.ee/Yoeshi
 - **Website**: yoeshi.art
+- **YouTube**: The Purrancers, @Purrancers
+- **TikTok**: The Purrancers, @purrancers
 
 Collectors sharing their cats and their GIFs is the heart of the community. Tag Yoeshi when you post.
 
@@ -981,6 +983,134 @@ ask: The Prancer Purranchise | Trancers | Who is Yoeshi?
 - **10 November 2026**: Prancer 3D, Chapter 07, launches on Aleatory.
 - **12 November 2026**: yoeshi.art becomes the front door, and the Lounge opens in its basement.
 
+
+## What is a Prancer
+keys: what is a prancer, whats a prancer, what are prancers, what are the cats, what are these cats, why cats, why are they cats, prancer meaning
+ask: The Prancer Purranchise | Your avatar | The Purrancers
+A Prancer is one of Yoeshi's cats: a living, generative cat that moves to music. Each one is drawn by code from its own mint, so no two are alike, and each has a coat, a temperament, a name and a song of its own.
+
+They began as cats that walk on the beat. The family has grown chapter by chapter since: homes, portraits, a band called The Purrancers, and cats in full 3D that you can walk around as. Together they are the Prancer Purranchise.
+
+## Your avatar
+keys: cat in the headphones, the headphones cat, headphones, purple hoodie, who is that cat, which cat am i, my avatar, avatar, can i be a cat, be a cat, play as a cat, am i a cat, who am i here
+ask: The Lounge | Lounge controls | The live show
+only: site
+The cat in the headphones is your avatar. In the videos it stands for you, the visitor: it walks in, asks me for a song and dances.
+
+In the Lounge you walk in as a cat too. At The Purrancers' 3D show you choose a cat at the doors, and a holder walks in as their own Prancer 3D or Prancer Portrait.
+
+## Lounge controls
+keys: how do i move, how do i walk, how do i dance, how to dance, how do i sit, sit down, take a seat, how do i get a drink, get a drink, order a drink, pour me a drink, controls in the lounge, lounge controls, lounge keys, keys in the lounge, wasd, how do i jump, emotes in the lounge, touch controls
+ask: The disco ball | The walls | Controls for each chapter
+only: site
+link: Walk into the Lounge | https://yoeshi.art/lounge/
+In the Lounge:
+- **Walk** with W A S D or the arrows. Shift runs, Space jumps, and a drag looks around.
+- **Dance** with F. The keys 1 to 6 are emotes.
+- **Sit** with E by a booth or a bar stool, or tap it. E again, or a step, stands you up.
+- **A drink**: take a stool at my bar and press Q, or ask me to pour.
+- **Tab** shows everything you can do.
+
+On a phone a stick on the screen walks you, a drag looks around, and a tap uses what you tap.
+
+## The disco ball
+keys: disco ball, mirror ball, the ball, bring the ball down, ball come down, what is the ball, glitter ball, ball in the dome
+ask: Lounge controls | Asking for a song | The walls
+only: site
+The ball hangs in the eye of the Lounge's dome and follows the music. When a song lifts, it comes down, opens and throws its lights across the room. When the song settles, it goes back up.
+
+You can bring it down or send it up yourself with M.
+
+## The walls
+keys: the walls, on the walls, walls change, why did the walls change, the screens, the patterns, the projections, what is on the walls, art on the walls, put my art on the walls, my own art, hang my art, the frames, the gallery walls
+ask: The holders list | The disco ball | The Lounge
+only: site
+In the Lounge every wall is a screen, and so are the dome and the floor. Together they play one moving piece that drifts through five movements and moves with the music, so the room keeps changing as a song plays. V turns the walls into a gallery, one work to a wall.
+
+Holders can hang their own art in the frames and put pieces they hold up on the screens. Ask me about the holders list.
+
+## Who else is here
+keys: is anyone else here, anyone else here, other people here, other visitors, other players, multiplayer, can my friends join, bring a friend, can i meet people, see other cats, chat with others
+ask: The Lounge | Lounge controls | Your avatar
+only: site
+For now each visitor has the Lounge to themselves, with me behind the bar. Your friends can walk in too, each on their own screen.
+
+## Free and open
+keys: is this free, is it free, do i have to pay, cost to enter, does it cost anything, do i need to sign up, sign up, register, an account, do i need an account, need a wallet to enter, log in, login
+ask: The Lounge | The holders list | Prices and editions
+only: site
+Yes, it is free. yoeshi.art, the Lounge and I are open to everyone: no account, nothing to sign up for, and no wallet needed.
+
+A wallet only comes into it if you collect. Holders who sync one get a few perks in the Lounge, and The Purrancers' live shows are the one door with a ticket. Ask me about either.
+
+## Phones and apps
+keys: on my phone, phone, mobile, iphone, android, tablet, ipad, is there an app, an app, app store, download, install, does it work on my phone, which browser, what do i need
+ask: Lounge controls | Free and open | Where can I go?
+only: site
+There is no app and nothing to install. Everything here is a website, so it runs in the browser on a phone, a tablet or a computer.
+
+In the rooms a phone gives you a stick to walk with, and you drag to look and tap to use things. On an older device the rooms draw themselves lighter so they keep moving.
+
+## Asking for a song
+keys: play a song, play something, play me something, can you play, put on a song, request a song, can i request a song, song request, something upbeat, something calm, something to dance to, play music, music please, surprise me with a song, where can i listen, listen to more, hear more
+ask: The Lounge | Right Now, Right Here | Yoeshi Labs music
+only: site
+link: Walk into the Lounge | https://yoeshi.art/lounge/
+I play songs at my bar in the Lounge. Ask me there for a song by name, for something calm, for something to dance to, or for a surprise, and it plays through the whole room.
+
+Every song on the shelf is one of Yoeshi's own. If you are at the bar now, tell me the name of a song.
+
+## Right Now, Right Here
+keys: right now right here, make me move, always respect, rainy daze, when youre here, dont have to be, acoustic encouragement, the album, what album, which album, interactive album, album credits, who played on the album
+ask: Asking for a song | Whose music is this | AI in the music
+link: The interactive album on objkt | https://objkt.com/tokens/KT1HSDxtqEY4UpYWrzxJoUWq1UDLDTMaFU24/17
+"Right Now, Right Here" is an album of ten of Yoeshi's songs from 2012, when he was the lead singer and songwriter of the band Acoustic Encouragement: Make Me Move, Always Respect, Right Now Right Here, Chakra, Rainy Daze, When You're Here, Thank You, Don't Have to Be, I'll Wait and Low Down.
+
+Yoeshi wrote every one of them himself, and the album was recorded more than a decade before any AI tools had been released. Who played on it:
+- **Yoeshi Roberts**: songwriting, guitar, ukulele and kazoo
+- **Joanie Ferguson**: drums and percussion
+- **Kevin Vines**: bass guitar
+- **Scott Rodziczak**: drum tech and production assistant
+- **Eric Heil**: engineer, mix and master
+
+Its songs are on the Jukebox in the Lounge.
++++
+It was re-released on objkt as an interactive album, a jukebox you can play: the digital jukebox's design is Yoeshi's, and scuni designed the interactive side of the release. In Yoeshi's words: "I am grateful that Tezos has given me a new avenue to share this huge part of my musical story."
+
+## Whose music is this
+keys: who sings, who sings these songs, who is singing, who wrote the music, who wrote these songs, who made the music, whose music, whose songs, who plays the music, songwriter, who is the singer
+ask: AI in the music | Yoeshi Labs music | The Purrancers
+The music is Yoeshi's. He has been a singer and songwriter for more than twenty years, and every song you hear in these rooms is one of his own.
+
+The Purrancers, the house band, perform his songs in the Sphere, and the Jukebox in the Lounge holds the songs he has minted.
+
+## AI in the music
+keys: is the music ai, ai music, ai song, ai songs, is this ai music, made with suno, suno, ai generated music, is it real music, real instruments, did ai make the music, ai singer, ai voice, organic music
+ask: Whose music is this | Is Yoeshi Labs anti-AI | How Yoeshi makes art
+AI is a tool Yoeshi uses, as a singer and songwriter of more than twenty years. Some of his songs are fully organic, some are fully AI produced, and some are a mix.
+
+In his words: "This is the future where it doesn't matter and you should just enjoy what you enjoy."
+
+He says how a song was made where he mints it and when he talks about it. I am still learning it song by song, so if you ask me about one and I do not know, I will say so.
+
+One I do know: the album "Right Now, Right Here" was recorded more than a decade before any AI tools had been released, and Yoeshi wrote every song on it.
+
+## How this is made
+keys: how was this made, how is this made, how did you make this, how is the site made, three js, threejs, webgl, what engine, game engine, unity, unreal, blender, can i make something like this, how do i make this, what is it built with, built with
+ask: How Yoeshi makes art | Yoeshi Labs | Is Yoeshi Labs anti-AI
+only: site
+It is made in code. The rooms, the cats and the shows are drawn live in your browser with three.js, an open library for 3D on the web, so there is nothing to download and every visit is the real thing, never a video.
+
+Yoeshi puts it this way on the front door: "When the artist becomes the developer, anything is pawsible." The Purrancers' Decentralize film went one step further: made in three.js, then made again in Blender for the cinema cut.
+
+## Support the work
+keys: how can i support, support yoeshi, support the work, support this, donate, donation, tip jar, leave a tip, how can i help, give back, patron
+ask: Where to follow | How do I mint? | Yoeshi's collections
+only: site
+link: Yoeshi on objkt | https://objkt.com/@yoeshilabs
+The best way to support the work is to collect it. Yoeshi's art and music live on his objkt profile, and every piece collected helps him keep building.
+
+Sharing helps too: show a friend a room or a song, and tag Yoeshi when you post.
 
 # Codex
 
@@ -1156,7 +1286,24 @@ I live offline, so I cannot see how many are minted right now. The website shows
 - generative | just random | made by code | algorithmic art => @What is generative art
 - objkt | objkt com | sell on objkt | list on objkt => @objkt
 - super bowl | world cup | weather | president | election | bitcoin price | btc price | stock market | movie | recipe | sports score | football | basketball | celebrity | news today => @unknown
-
+- what can i do here | what is there to do | what can i do | what do i do here | where else can i go | where next | what else is there | is this a game | is it a game => @Where can I go
+- what do holders get | holder perks | perks for holders | what are the perks | holders perks => @The holders list
+- what is teztowers | whats teztowers | teztowers | tez towers => @The live show
+- how do i sit down | sit down | how do i sit | take a seat | how do i move | how do i walk | how do i dance | can i get a drink | how do i get a drink | what are the controls | what are the controls here | controls in here => @Lounge controls
+- what is the disco ball | how do i bring the ball down | bring the ball down | the disco ball => @The disco ball
+- why did the walls change | what is on the walls | can i put my own art on the walls | put my art on the walls | whats on the walls => @The walls
+- can my friends join me | can my friends join | is anyone else here | are other people here | is it multiplayer => @Who else is here
+- is this free | is it free | do i need to sign up | do i have to sign up | do i need a wallet | do i need an account => @Free and open
+- is there an app | does it work on my phone | does this work on my phone | can i use my phone => @Phones and apps
+- can i request a song | play me something upbeat | play something calm | play me a song | where can i listen to more | where can i hear more => @Asking for a song
+- what is make me move | what album is this | what album is that | is make me move ai | is the album ai | was the album made with ai | is right now right here ai | who wrote make me move | who wrote the album | who played on the album | who is in acoustic encouragement | who was in acoustic encouragement | who mixed the album | who produced the album | who played drums on the album | who played bass on the album => @Right Now, Right Here
+- who sings these songs | who wrote the music | who sings | whose music is this => @Whose music is this
+- is the music ai | is this music ai | is the music made by ai | did ai make the music | is the music real => @AI in the music
+- what is a prancer | whats a prancer | what are the cats => @What is a Prancer
+- who is the cat in the headphones | can i be a cat | who is the cat in the videos => @Your avatar
+- do you have tiktok | is there a youtube | are you on tiktok | are you on youtube | tiktok | youtube => @Where to follow
+- how was this made | what is three js | can i make something like this | how is this made => @How this is made
+- how can i support this | how can i support | how do i support yoeshi => @Support the work
 # Tones
 - discouraged: nobody buys | no one buys | no sales | not selling | never sell | cant sell | cannot sell | i failed | failure | give up | giving up | want to quit | quit making | no one care | nobody care | not good enough | feel like a fraud | imposter | worthless | pointless | whats the point
 - alarmed: drained | hacked | stolen | scammed | compromised | asked for my seed | asked for my 12 | asked for my recovery | asked for my private key | says i won | i won a | verify my wallet | connect to claim
@@ -1202,6 +1349,62 @@ I live offline, so I cannot see how many are minted right now. The website shows
 - Anti-fear, that's how we climb. More pro, more go, more try, enable each other to thrive. | Anti-Fear, read live on Artz Friday, August 2026 | resilience
 - What if we wore our hearts on our sleeve, and swapped the superficial with the deep? Cause underneath the egos we'd see it's all heart, and always will be. | Hearts on Sleeves, read live on Artz Friday, August 2026 | love
 - Everybody bleeds the same. Somehow we feel each other's pain. Central rhythm sets the pace, one heart, shared DNA. | Hearts on Sleeves, read live on Artz Friday, August 2026 | love
+- We do this every Friday, having a different guest come up and introduce themselves and tell their story, and basically just get an opportunity to have the spotlight for an hour, sometimes even more. | Artz Friday, October 2026 | creation
+- The last Friday of every month is our open call. So if you have projects that you would like to share, welcome to come back on the last Friday of this month and share anything that you got going on. In fact, that's often the space where we get to meet artists that are great candidates for the other days. | Artz Friday, October 2026 | creation
+- We do record these spaces now, more long term, to where even after the month that X actually saves them, you can go to radio.tezoscommons.org, where we are now documenting all of these spaces permanently. | Artz Friday, October 2026 | community
+- It's part of my practice to go to the oldest on objkt and always appreciate the earliest beginnings of an artist's journey. It might be a little bit from my own bias, because I was minting before the first contract. So it's definitely out of empathy, I like to appreciate Genesis pieces. | Artz Friday, October 2026 | gratitude
+- A lot of people get their start because other people show them around and kind of hold their hand. And that's another thing that's uniquely a special Tezos vibe. | Artz Friday, October 2026 | community
+- Find your people. They're here. A lot of times we are getting in our own ways. Dropping the assumptions and just reaching out to people and being real and being genuine and using the DMs as an opportunity to get closer with your friends. We gotta stop pretending that these screens are walls, because they're not. We can still get close. | Artz Friday, October 2026 | community
+- If you see people going above and beyond in the Tezos community, make sure to nominate them for the Tezos Community Rewards program. When you do nominate them, it goes a long way. It helps them keep going. | Artz Friday, October 2026 | community
+- That's the magic of the blockchain and the magic of how we mint these pieces and put them on literally a timeline. We are telling our story through our art, expressing our unique versions of life. | Artz Friday, October 2026 | creation
+- You can just be creative now. You can let your creativity shine, just by talking and communicating with the tools that are available. I've always felt like an extremely creative person that has been extremely limited by the world around me. | Artz Friday, October 2026 | creation
+- Make sure that you take the weekends to touch some grass. Take care of yourself. | Artz Friday, October 2026 | love
+- I've been trying to figure out how to bring the music full circle with the technology. I've been creating this whole world that ended up being around cats, because I love cats: a bunch of cats that are going to play the songs I've been writing my whole life. | Tuesday TezDay, November 2026 | creation
+- It's finally a time where I just need to talk out my ideas. The more I'm honest with what I'm thinking, the more surprising it has been what is possible, after so many years of having to sacrifice so many angles because they were not possible. | Tuesday TezDay, November 2026 | creation
+- I came into Tezos before there was art here. What organically attracted me at first was the fundamentals, the technology and the innovation, and I didn't even realize at the time that it was going to come full circle into the art and music. | Tuesday TezDay, November 2026 | persistence
+- As artists, we need to let, enable and support Tezos being all the other things it's capable of being, to bring in a more mainstream audience and not just all the artsy people. | Tuesday TezDay, November 2026 | community
+- Every single thing I do is motivated by an underlying primary function as a songwriter. That's what I've been doing the longest. | Tuesday TezDay, November 2026 | creation
+- It's hard to capture the same energy that people experience when you're right in front of them with a guitar, singing. The very least I can do is translate the songs and the meaning. | Tuesday TezDay, November 2026 | creation
+- Now I can create my own individual experiences, and have complete control over the experience and how it gets developed, updated and integrated into everything else I'm doing as an artist. | Tuesday TezDay, November 2026 | creation
+- I feel like a much more grounded and well rounded individual from stepping out of "I'm an artist and I want my art to be famous" and into "how can I be part of something bigger?" | Tuesday TezDay, November 2026 | community
+- Sometimes those rabbit holes really do lead to magical accidents that open doors to our deeper intentions and aspirations. The fun still matters. | Artz Friday, November 2026 | joy
+- One of the things I really respect and appreciate about this community: everybody is openly inspired by each other, keeps trying the things everybody else is trying, and continues to unfold the possibilities together. | Artz Friday, November 2026 | community
+- The more we watch people who happen to be artists go through hardship, the more you really see that the hardship is what makes the art. It plays a role in this human experience that is necessary. | Artz Friday, November 2026 | resilience
+- Something brewing under the radar on Tezos right now is this vibe coding meets artist mindset. I'm seeing so many of my friends put the extra layers of interactivity and sound and awareness into the code, to make the art feel like it's alive, and aware of the person watching and interacting with it. | Artz Friday, October 2026 | creation
+- It literally feels like you have a real, genuine assistant now, one that over time learns your workflow and the ecosystem you work within. It's like any relationship: the more time and energy you put into it, with intent and care and passion, the deeper and stronger it's going to be. | Artz Friday, October 2026 | persistence
+- The story of perfection is the world's greatest myth. Something that needs nothing simply can't exist. | Imperfect Being, read live on Artz Friday, October 2026 | resilience
+- I'm an imperfect being, and that's what gives me meaning. What a wonderful feeling, to have a need for living. | Imperfect Being, read live on Artz Friday, October 2026 | resilience
+- That's why it's fun to get to know artists better. You hear that bit that makes you go "oh", and then you look back, perceive it differently, and can really enjoy it. | Artz Friday, May 2026 | community
+- We need curious users, willing to just play and dabble and experiment. That's one of the things that's really charming about Tezos: if you get curious, there are plenty of things to suddenly go "ooh, this is a thing". | Artz Friday, May 2026 | joy
+- I got too up in my feels when I didn't win the contest. I looked back and I was like, I love this, I'm proud of this, why didn't I mint this? So I did. | Artz Friday, May 2026 | persistence
+- One of the things I really try to write about a lot is how many different things can become art, be seen as art and unfold as art. The idea of derivatives and collaboration, and how this space and the digital aspect just make that explode with potential. | Artz Friday, May 2026 | creation
+- Stopping for a while from trying to be a "top artist", and stepping back and writing about the artists and hosting spaces, has been so humbling and inspiring. | Artz Friday, May 2026 | gratitude
+
+# Made
+- Let Everybody Love | An original song about how everybody deserves to have their own experience with love. | 2023
+- Let Everybody Love | Every human is divine, let them live their own lives. | 2023
+- Trip To Nowhere | AI Art by ShakaNation, Animation and Music by Yoeshi Labs | 2023
+- Mutant Motion | The visual was originally hand drawn on iPad, then used as the base input along with a story to generate Gen 2 AI video with Runway ML. | 2023
+- Mutant Motion | The music was produced at Yoeshi Labs without the use of AI. | 2023
+- Fire In My Veins | Music written and produced by Yoeshi Labs | 2023
+- Fire In My Veins | Composition, modeling and animation in Cinema 4D, Post Production in CapCut by Wwworonin | 2023
+- Just A Dream? | A collaboration between Yoeshi Labs and WWWoronin for the rare Friday 13th in October. | 2023
+- Just A Dream? | AI Cinematography and Composition by WWWoronin - | 2023
+- Tonight I Just Drive | Instrumental by Indo Silver | 2023
+- Tonight I Just Drive | Vocals and Visuals by Yoeshi Labs | 2023
+- The Sea That Sees | Visual created with Stable Diffusion and Kaiber AI. | 2023
+- The Sea That Sees | Original soundscape produced in Logic Pro. | 2023
+- Dancing Into New | Visual Created Utilizing DreamStudio - Stable Diffusion v1.6, Pixelmator Pro, Videoleap AI 2.0, and Kaiber Transform 2.0 | 2024
+- Dancing Into New | Music produced with Logic Pro | 2024
+- Cyber Shuffle/DJ Mean Girl | Music produced with Logic Pro. | 2024
+- Cat Walk | Featuring the actual purr of our kitten, Nova. | 2024
+- Cat Walk | Music produced with Logic Pro | 2024
+- Cat Walk | Visual composed utilizing Stable Diffusion, Kaiber AI, Pixelmator Pro, and VideoLeap | 2024
+- Hum It Out | A Yoeshi Labs Production Featuring Shaddow Music, plus Nova Star. | 2024
+- Hum It Out | Songwriting, Vocals, Production, Mixing, Mastering, and AI Artwork by Yoeshi Labs | 2024
+- Anxiety Society | Written, Recorded and Produced by Yoeshi Labs. | 2024
+- Right Now, Right Here - Interactive Album | A re-release of an album from 2012, when I was the lead singer/songwriter for the band "Acoustic Encouragement". | 2024
+- Right Now, Right Here - Interactive Album | Yoeshi Roberts - Songwriting, Guitar, Ukulele, Kazoo + digital jukebox design | 2024
 
 # Wisdom
 - A cat does not try to be calm. It simply stops chasing what does not matter.
