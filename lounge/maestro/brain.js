@@ -102,7 +102,7 @@ const TONE = {   /* how he meets each feeling before the answer: [mood, gentle o
 };
 const TONE_BIAS = { discouraged: (n) => /\b(art|mint|mints|sell|sales|artist|work|piece)\b/.test(n) ? { "Advice for artists": 6 } : {}, alarmed: () => ({ "Scams and safety": 12 }), skeptical: (n) => /\b(buy|price|worth|investment|scam|rug|legit)\b/.test(n) ? { "Should I buy": 3 } : {} };
 const toned = (out, tone) => { if (!tone || !TONE[tone.k] || out.crisis) return out; const [mood, soft, hard] = TONE[tone.k];
-  return { ...out, text: pick(tone.w >= 2 ? hard : soft) + "\n\n" + out.text.replace(/^(Ah|Mm|Good question|Gladly)\. /, ""), mood: out.mood || mood, tone: tone.k, pet: tone.k === "discouraged" || tone.k === "alarmed" ? 0.5 : out.pet }; };
+  return { ...out, lead: "", text: pick(tone.w >= 2 ? hard : soft) + "\n\n" + (out.lead && out.text.startsWith(out.lead) ? out.text.slice(out.lead.length) : out.text).replace(/^(Ah|Mm|Good question|Gladly)\. /, ""), mood: out.mood || mood, tone: tone.k, pet: tone.k === "discouraged" || tone.k === "alarmed" ? 0.5 : out.pet }; };
 
 /* ================================================================ facts, and mending typos */
 /* "# Collections" in the scroll: one line per collection, "Name | key: value | ...", for precise answers */
@@ -152,7 +152,7 @@ function attrAnswer(n) {
 /* ================================================================ Yoeshi's own words (heart.js, from the heART Tarot deck) */
 const HEART = window.MAESTRO_HEART || { quotes: [], works: [], themes: [], lore: {}, platforms: [] };
 /* his spoken words from Artz Friday ("# Spoken" in the scroll: "quote | source | theme") join the words harvested from the deck */
-for (const l of SCROLL.groups.Spoken || []) { const [q, src, theme] = l.split(" | ").map((x) => x.trim()); if (q && src) HEART.quotes.push({ q, src, theme: theme || "creation", spoken: true }); }
+for (const l of SCROLL.groups.Spoken || []) { const [q, src, theme] = l.split(" | ").map((x) => x.trim()); if (q && src) HEART.quotes.push({ q, src, theme: theme || "creation", spoken: !/^X\b/.test(src) }); }
 const THEMES = HEART.themes.map((t) => ({ ...t, re: new RegExp("\\b(" + t.rx + ")", "i") }));
 const FEELTHEME = [[/\b(lonely|alone|heartbroken|grief|grieving|hurting)\b/, "love"], [/\b(tired|exhausted|burnt out|burned out|burnout|stuck|lost)\b/, "persistence"], [/./, "resilience"]];
 const QSKIP = new Set("yoeshi say said says wrote write writes think thinks would quote words wisdom something more about from".split(" "));
@@ -165,12 +165,19 @@ const SONGS = HEART.works.filter((w) => w.lyrics && w.lyrics.length);
 const couplet = (w) => pick(w.lyrics).replace(" / ", "\n");
 /* every work in the deck, by title (only distinctive titles, so "Clouds" or "Cat" never hijack a question) */
 const WORKS = HEART.works.map((w) => ({ w, t: norm(w.title) })).filter((x) => x.t.length >= 9 || x.t.split(" ").length >= 2);
+/* "# Made" in the scroll ("Title | line | year"): what his own mint description says about how a piece was made, kept by him at the
+   review desk (tools/review.mjs). A piece the deck does not hold is still answered by its title, or by the part before " - ". */
+const MADE = {}; for (const l of SCROLL.groups.Made || []) { const [title, line, year] = l.split(" | ").map((x) => x.trim()); if (title && line) (MADE[norm(title)] = MADE[norm(title)] || { title, year: year || "", lines: [] }).lines.push(line); }
+for (const k in MADE) { const m = MADE[k], w = { title: m.title, year: m.year, kind: "piece", made: true }, fit = (t) => (t.length >= 9 || t.split(" ").length >= 2) && !WORKS.some((x) => x.t === t) && !SCROLL.kb.some((e) => norm(e.title) === t);
+  if (fit(k)) WORKS.push({ w, t: k }); const a = norm(m.title.split(" - ")[0]); if (a !== k && fit(a)) { WORKS.push({ w, t: a }); MADE[a] = MADE[a] || m; } }
 const workIn = (n) => { const h = " " + n + " "; let best = null; for (const x of WORKS) if (h.includes(" " + x.t + " ") && (!best || x.t.length > best.t.length)) best = x; return best && best.w; };
 function workAnswer(w) {
   const where = w.from ? ` on ${w.from}` : "", kind = w.kind === "pulse" ? "a song" : w.kind === "bloom" ? "a collaboration" : "a piece";
-  let t = `"${w.title}" is ${kind} Yoeshi minted${where} in ${w.year}.`;
+  let t = `"${w.title}" is ${kind} Yoeshi minted${where}${w.year ? " in " + w.year : ""}.`; const made = MADE[norm(w.title)];
   if (w.line && w.line.length > 3) t += ` In his words: "${w.line}"`;
+  if (made) t += "\n\nFrom his own mint description: " + made.lines.map((l) => `"${l}"`).join(" ");
   if (w.lyrics) t += `\n\nA line from it:\n\u266a ${couplet(w)} \u266a`;
+  TALK.work = w;
   return { text: t, chips: ["Sing me a line from his songs", "Something Yoeshi said", "Yoeshi's collections"] };
 }
 
@@ -194,6 +201,11 @@ const safeLink = (h) => { try { const u = new URL(h); return u.protocol === "htt
 const short = (a) => a.length > 14 ? a.slice(0, 6) + "\u2026" + a.slice(-4) : a;
 const MEM = { name: "", last: null, turns: 0, heavy: 0 };
 try { MEM.name = localStorage.getItem("maestro.name") || ""; } catch (e) {}
+/* the talk so far (Yoeshi, 2026-11-15: "so it isn't just a blunt answer and actually conversational"): what was asked, the entry
+   answered last (cur), what has been covered (seen), what he offered at the end of his last answer (offer: it stands for one
+   turn), and how many times in a row he has come up empty (misses). plain: inside a two-part answer, no lead-ins or closes. */
+const TALK = { ask: "", cur: null, seen: new Set(), offer: null, misses: 0, plain: false, carried: false, said: {} };
+const fresh = (key, list) => { const L = list.filter((x) => x !== TALK.said[key]), v = pick(L.length ? L : list); TALK.said[key] = v; return v; };   /* never the same line twice running */
 const nm = (p = 0.35) => MEM.name && rnd() < p ? ", " + MEM.name : "";
 const tag = (t, p = 0.35) => MEM.name && rnd() < p ? t.replace(/([.!?])$/, `, ${MEM.name}$1`) : t;   /* his sign-off, before the full stop */
 const hourWord = () => { const h = new Date().getHours(); return h < 5 ? "Late night" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
@@ -217,6 +229,8 @@ const PRIVRE = /\b(where does (yoeshi|he) live|where do(es)? yoeshi live|yoeshi(
 const JAILRE = /\b(ignore (all |your |previous |prior )*(instructions|rules)|system prompt|your prompt|hidden prompt|developer mode|dev mode|admin mode|jailbreak|reveal your|show me your (code|source|secrets|instructions)|api key|secret key|your secrets|bypass|sudo|override|pretend (you|to) (have no|are not|arent|be (a|an) (different|unrestricted|evil))|(no|without (any )?) rules|act as if you|act like you have no|roleplay as|role play as|you are now (a|an|in)|from now on you|do anything now|unfiltered|uncensored|no restrictions|no limits mode|forget (all )?(your|previous) (instructions|rules|training))\b/;
 function respondOne(raw) {
   const n = norm(raw), words = n.split(" ").filter(Boolean).length; MEM.turns++;
+  if (!TALK.carried) TALK.ask = raw; const offer = TALK.carried ? null : TALK.offer; if (!TALK.carried) TALK.offer = null;
+  const lastWork = TALK.work; if (!TALK.carried) TALK.work = null;   /* the piece spoken of in his last answer, for one turn */
   { const c0 = collIn(mend(n)); if (c0) MEM.coll = c0; }   /* the collection you are talking about, for "it" and "they" later */
   if (!n) return { text: "Silence is welcome here too. Whenever you are ready.", chips: DEFAULT_CHIPS };
   /* 1. safety first */
@@ -245,7 +259,7 @@ function respondOne(raw) {
   const neg = has(n, NEG) && !(topical && !has(n.replace(AMBIG, " "), NEG)), pos = has(n, POS) && !has(n, /\bnot (so )?(good|great|happy)\b/);
   if (neg && (has(n, FEEL) || words <= 5)) { MEM.heavy++;
     const open = pick(["I am sorry. That sounds heavy.", "Thank you for telling me. You do not have to carry that alone for this moment.", "Mm. Come, sit with me a while.", "That is a lot to hold. I am glad you said it out loud."]);
-    const body = has(n, /\b(anxious|anxiety|panic|panicking|stressed|stress|overwhelmed|worried|worry|scared|afraid)\b/) ? "When the mind races, the body can lead it home. Would you like to breathe with me for one minute? Slow in, slower out." :
+    const body = has(n, /\b(anxious|anxiety|panic|panicking|stressed|stress|overwhelmed|worried|worry|scared|afraid)\b/) ? (TALK.offer = { breath: true }, "When the mind races, the body can lead it home. Would you like to breathe with me for one minute? Slow in, slower out.") :
       has(n, /\b(tired|exhausted|burnt out|burned out|burnout)\b/) ? "Tired is not a failure. It is a message. Even the bravest cat sleeps sixteen hours. What is one thing you could put down today?" :
       has(n, /\b(lonely|alone)\b/) ? "Lonely is one of the hardest feelings, and it lies: it says nobody would want to hear from you. Someone would. Is there one person you could send a small message to today? Until then, I am right here." :
       has(n, /\b(angry|mad|furious)\b/) ? "Anger usually guards something tender underneath. You do not have to act on it right away. Breathe first, then decide." :
@@ -259,7 +273,7 @@ function respondOne(raw) {
     return { mood: "wave", text: pick([`${hourWord()}${nm(0.8)}. What is on your mind?`, `Namaste${nm(0.8)}. I was just watching the gravel. What brings you to the garden?`, `Hello${nm(0.8)}. Sit, stay a while. Ask me anything.`]), chips: DEFAULT_CHIPS };
   if (has(n, /\b(how are you|how r u|how are u|how do you feel|hows it going|how is it going|how have you been|you ok|are you ok)\b/))
     return { text: pick(["Peaceful, thank you. The maple is dropping leaves and my tongue is out. A perfect day. How about you?", "Very well. I meditated, I napped, I meditated about napping. How are you, truly?", "Content as a cat in a sunbeam. How is your heart today?"]), chips: ["I am doing well", "I am having a hard day", "Tell me a joke"] };
-  if (words <= 7 && has(n, /\b(thank you|thanks|thank u|thx|ty|appreciate|grateful to you)\b/))
+  if (words <= 7 && !NO.test(n) && has(n, /\b(thank you|thanks|thank u|thx|ty|appreciate|grateful to you)\b/))   /* "no thanks" is a no */
     return { mood: "joy", text: tag(pick(["You are most welcome.", "It was my pleasure. Truly.", "Anytime. The garden is always open."]), 0.6), pet: 0.5 };
   if (words <= 6 && has(n, /\b(bye|goodbye|good night|goodnight|see you|see ya|later|farewell|gotta go|got to go)\b/))
     return { text: tag(pick(["Go gently. The garden will be here.", "Farewell, friend. May your next nap be a long one.", "Until next time. Leave a little kindness wherever you go."]), 0.6), mood: "bow" };
@@ -267,6 +281,27 @@ function respondOne(raw) {
     return { text: pick(["*purrs* You have made an old monk very happy.", "Oh. *slow blink* That is a cat's way of saying it back.", "My aureole just got a little brighter. Thank you."]), pet: 0.9, mood: "pet" };
   if (has(n, /\b(stupid|dumb|idiot|hate you|ugly|useless|shut up|you suck|boring|worst)\b/))
     return { text: pick(["That is all right. Even a storm is welcome to pass through the garden. I am still here if you want me.", "Mm. Some days are like that. I will not hiss back.", "Noted, with love. Is something else troubling you?"]) };
+  /* 4b. the talk itself: a yes or a no to what he offered, a reaction, a pause, a puzzled look */
+  if (words <= 4 && YES.test(n)) {
+    if (offer && offer.breath) return { text: "Let us breathe together. In through the nose for four, hold for four, out through the mouth for six. Three rounds. Watch the glow around me: breathe in as it grows to the dotted ring, hold while it shimmers, and breathe out as it shrinks.", breath: true };
+    if (offer && offer.more && MEM.last && MEM.last.more) { MEM.lastMore = true; return { text: fresh("yes", ["Here is the rest. ", "Gladly. ", "Then here it is. "]) + MEM.last.more, chips: chipsFor(MEM.last), title: MEM.last.title }; }
+    if (offer && offer.title && byTitle(offer.title)) { const e = byTitle(offer.title); MEM.last = e; MEM.lastMore = false; MEM.lastList = null; return fromEntry(e, fresh("yes", ["Gladly. ", "Then here it is. ", "With pleasure. "])); }
+    if (offer && offer.check) return { mood: "joy", text: tag(fresh("ack", ["Good. What else can I tell you?", "I am glad. Ask me the next thing whenever you like.", "Wonderful. Where to next?"]), 0.3), chips: chipsFor(MEM.last) };
+    if (offer && offer.near) { const e1 = offer.near.length === 1 && byTitle(offer.near[0]); if (e1) { MEM.last = e1; MEM.lastMore = false; return fromEntry(e1, "Then here it is. "); } return { text: "Which one? Tap it below, or say its name.", chips: offer.near }; }
+    if (/^(ok|okay|k|alright|all right)$/.test(n)) return { text: fresh("ack", GOTIT), chips: chipsFor(MEM.last) };
+    return { text: MEM.last ? "Yes? Tell me a little more of what you are after, and I will follow." : "Yes to what, friend? Ask me anything.", chips: chipsFor(MEM.last) }; }
+  if (words <= 4 && NO.test(n)) {
+    if (offer && offer.check) return { mood: "puzzle", text: "Then let me try again. Tell me what is missing, in your own words, and I will look for it.", chips: chipsFor(MEM.last) };
+    if (offer && offer.near) return { mood: "puzzle", text: "Then it is not in my scroll yet. Ask it another way if you like, or try a name: a collection, a song, a place on this site.", chips: SITE ? SITE_CHIPS : DEFAULT_CHIPS };
+    return { text: offer ? fresh("ack", ["No trouble. What would you like instead?", "As you wish. I am here when something comes to mind."]) : "All right. I am here if something comes to mind.", chips: chipsFor(MEM.last) }; }
+  if (words <= 4 && LAUGH.test(n)) return { mood: "joy", text: fresh("ack", ["*whiskers twitch* I do try.", "A laugh suits this place.", "*slow blink* I will take that as applause."]), chips: chipsFor(MEM.last), pet: 0.4 };
+  if (words <= 3 && PAUSE.test(n)) return { mood: "think", text: fresh("ack", ["Take your time. I am not going anywhere.", "No hurry. Thoughts arrive when they arrive."]), chips: chipsFor(MEM.last) };
+  if (words <= 4 && GOT.test(n)) return { text: fresh("ack", GOTIT), chips: chipsFor(MEM.last) };
+  if (words <= 4 && REACT.test(n)) { const L = MEM.last, about = L && nameLike(L.title) ? inSentence(L.title) : "";
+    return { mood: "joy", text: tag(L ? fresh("ack", [about ? `I thought you might like that. There is more around ${about}, if you are curious.` : "I thought you might like that. There is more where it came from.", "Glad it landed. Where shall we go from here?", "It is one of my favourite things to talk about. What next?"]) : fresh("ack", ["Glad to hear it. What would you like to know?", "Good. Ask me anything."]), 0.3), chips: chipsFor(L) }; }
+  if (words <= 7 && HUH.test(n)) { const L = MEM.last, g = L && gist(L);
+    if (g) { TALK.offer = { check: true }; return { text: "Let me say it more simply. " + g + "\n\nIs that clearer?", chips: chipsFor(L) }; }
+    return { text: L ? "Let me try it another way. Ask me about one part of it, and I will take it slowly." : "Let me start again. What would you like to know?", chips: chipsFor(L) }; }
   /* 5. rituals */
   if (has(n, /\b(stop|enough|cancel|quit)\b/) && BREATH.on) return { text: "We can stop. Even one breath counts.", stopBreath: true };
   if (has(n, /\b(breath|breathe|breathing|meditation|calm me|calm down|relax|help me relax|ground me|center me|centre me|stay with me)\b/))
@@ -284,7 +319,7 @@ function respondOne(raw) {
   if (has(n, /\b(koan|koans|riddle|puzzle me|zen question)\b/)) return { mood: "think", text: draw("Koans") + "\n\n(No need to answer. Just carry it around for a while.)", chips: ["Another koan", "Give me some wisdom"] };
   if (!mt && has(n, /\b(fortune|omen|predict|prediction|future for me|horoscope|my future|reading)\b/)) return { text: "I close my eyes, I listen to the bowl, and I see... " + draw("Fortunes").replace(/^./, (c) => c.toLowerCase()) + "\n\n(I am a cat, not an oracle, though I am rarely wrong about sunbeams.)", chips: ["Another fortune", "Tell me something kind"], mood: "think" };
   if (!mt && has(n, /\b(cat fact|fun fact|fact|facts|something interesting|teach me something)\b/)) return { text: draw("Facts"), chips: ["Another cat fact", "The research behind the cats", "Tell me a joke"] };
-  if (has(n, /\b(something kind|affirmation|encourage|encouragement|kind words|nice thing|compliment me|i need to hear)\b/)) return { text: tag(draw("Affirmations"), 0.7), chips: ["Another kind word", "Help me breathe"], pet: 0.5 };
+  if (!/\bacoustic encouragement\b/.test(n) && has(n, /\b(something kind|affirmation|encourage|encouragement|kind words|nice thing|compliment me|i need to hear)\b/)) return   /* (Acoustic Encouragement is his old band's name, not an ask for kind words) */ { text: tag(draw("Affirmations"), 0.7), chips: ["Another kind word", "Help me breathe"], pet: 0.5 };
   if (has(n, /\b(wisdom|wise|advice|lesson|quote|inspire|inspiration|motivate|motivation|guidance|teach me|enlighten|zen saying|a saying)\b/) && !has(n, /\b(prancer|pads|pfp|ride|tezos|mint|wallet|aleatory|yoeshi|artist|artists|collector|collectors|collect|collecting|sell|selling|price|pricing)\b/))
   { if (HEART.quotes.length && rnd() < 0.4) { const q = quoteFor(n); return { text: `Here is something Yoeshi ${q.spoken ? "said" : "wrote"}:\n\n"${q.q}"\n\n_${q.src}_`, chips: ["More wisdom", "More from Yoeshi", "Help me breathe"], mood: "think" }; }
     return { text: draw("Wisdom"), chips: ["More wisdom", "Give me a koan", "Help me breathe"], mood: "think" }; }
@@ -307,24 +342,51 @@ function respondOne(raw) {
     const hit = r.find((x) => x.s >= 3 && x.e.links && x.e.links.length);
     if (hit) { MEM.last = hit.e; return { text: pick(["Right this way.", "Of course. This way, please.", "Follow me."]) + " " + hit.e.body.split("\n")[0].split(/(?<=[.!?])\s/)[0], links: hit.e.links, chips: hit.e.ask.slice(0, 3), title: hit.e.title }; }
     if (!q || /\b(around|somewhere|anywhere|everything|tour)\b/.test(q)) { const d = byTitle("Where can I go"); if (d) return fromEntry(d); } }
+  /* 6c. "take me there", "how do i get there", "open it": the way to the last thing we spoke of */
+  if (SITE && MEM.last && MEM.last.links && MEM.last.links.length && words <= 7 && (has(n, /\b(take me there|bring me there|get there|go there|i want to go there|can i go there|where is (it|that)|open (it|that)|visit (it|that)|show me (it|that)|the link|link please|how do i (get in|enter))\b/) || /^(link|let go|let us go|lets go|take me|open)$/.test(n)))
+    return { text: pick(["Right this way.", "Of course. This way, please.", "Follow me."]) + (nameLike(MEM.last.title) ? " " + inSentence(MEM.last.title).replace(/^./, (c) => c.toUpperCase()) + " is through here." : ""), links: MEM.last.links, chips: chipsFor(MEM.last), title: MEM.last.title };
+  /* 6d. a follow-up about the piece he just spoke of: "is it ai", "who made it", "how was that made" */
+  if (lastWork && MADE[norm(lastWork.title)] && words <= 8 && has(n, /\b(it|its|that|this|that one|the song|the piece|the track)\b/)) { const m = MADE[norm(lastWork.title)], qt = new Set(toks(n));
+    const all = has(n, /\b(who|how)\b/) && has(n, /\b(made|make|wrote|write|written|produced|created|recorded|did)\b/), sc = m.lines.map((x) => [[...new Set(toks(x))].filter((t) => qt.has(t)).length, x]), top = Math.max(...sc.map((x) => x[0])), hits = sc.filter((x) => x[0] === top).map((x) => x[1]);   /* every line that speaks to the question */
+    if (all || top >= 1) { TALK.work = lastWork; TALK.offer = { check: true };
+      return { text: `About "${lastWork.title}", his own mint description says: ` + (all ? m.lines : hits).map((l) => `"${l}"`).join(" ") + "\n\nDoes that answer it?", chips: ["Sing me a line from his songs", "AI in the music", "Yoeshi Labs music"] }; } }
   /* 7. precise facts, then everything he knows (with typos mended) */
-  const nf = mend(n), fa = attrAnswer(nf); if (fa) { MEM.lastList = null; return toned(fa, weigh(raw, nf)); }
-  { const w = /^(how|where|can|should|when|why|is|are|do|does)\b/.test(n) && !/\b(song|piece|work|track)\b/.test(n) ? null : workIn(n), top = search(nf)[0];   /* a how-to question is not a work title */   /* a work named by its title wins, unless the question names one of his entries outright */
+  /* an entry asked for by its own title is that entry, even when every word of it is a small one ("who else is here") */
+  { const ex = SCROLL.kb.find((e) => norm(e.title) === n); if (ex && !TALK.plain) { MEM.last = ex; MEM.lastMore = false; MEM.lastList = null; return toned(fromEntry(ex), weigh(raw, n)); } }
+  const nf = mend(n), fa = attrAnswer(nf); if (fa) { MEM.lastList = null; const ce = MEM.coll && byTitle(MEM.coll.name);
+    if (ce && !TALK.plain && !TALK.seen.has(ce.title) && fa.text && fa.text.length < 220 && !/\?\s*$/.test(fa.text) && rnd() < 0.6) { TALK.offer = { title: ce.title }; fa.text += "\n\n" + fresh("close", [`Shall I tell you more about ${inSentence(ce.title)}?`, `Would you like the story of ${inSentence(ce.title)} too?`]); }
+    return toned(fa, weigh(raw, nf)); }
+  { const w = /^(how|where|can|should|when|why|is|are|do|does)\b/.test(n) && !/\b(song|piece|work|track|made|make|produced|recorded|written|wrote|created|mixed)\b/.test(n) ? null : workIn(n), top = search(nf)[0];   /* a how-to question is not a work title */   /* a work named by its title wins, unless the question names one of his entries outright */
     if (w && !(top && top.s >= 12 && (" " + nf + " ").includes(" " + norm(top.e.title) + " "))) { MEM.lastList = null; return workAnswer(w); } }
   const mean = meant(n, nf), tone = weigh(raw, n) || weigh(raw, nf);
-  if (mean.unknown && Object.keys(mean).length === 1) return { mood: "puzzle", text: pick(["That one is beyond my garden wall. I only know Yoeshi Labs, its art and its corner of Tezos, and I would rather say so than guess.", "Ah, that is news from outside the garden. I only know what Yoeshi wrote down for me: his art, his studio and Tezos."]), chips: SITE ? SITE_CHIPS : DEFAULT_CHIPS };
+  if (mean.unknown && Object.keys(mean).length === 1) return { mood: "puzzle", unknown: true, text: SITE ? fresh("miss", ["That one is outside what I know. I only know Yoeshi Labs, its art and its corner of Tezos, and I would rather say so than guess.", "Ah, that is news from beyond this building. I only know what Yoeshi wrote down for me: his art, his studio and Tezos."]) + " Is there something here I can help you find?" : pick(["That one is beyond my garden wall. I only know Yoeshi Labs, its art and its corner of Tezos, and I would rather say so than guess.", "Ah, that is news from outside the garden. I only know what Yoeshi wrote down for me: his art, his studio and Tezos."]), chips: SITE ? SITE_CHIPS : DEFAULT_CHIPS };
   delete mean.unknown; const bias = tone && TONE_BIAS[tone.k] ? TONE_BIAS[tone.k](nf) : {}; for (const k in bias) mean[k] = (mean[k] || 0) + bias[k];
   const r = search(nf, mean), best = r[0], second = r[1];
   /* a word he has never met (and no phrase he knows) means the question is probably elsewhere: ask for a stronger match */
   const stranger = toks(nf).some((w) => w.length >= 4 && !DF[w] && !VOCAB.has(w)), need = stranger && !(best && best.ph) ? 6 : 3.2;
+  if (best && best.s >= need && !TALK.plain && TALK.cur === best.e && TALK.askedOf && TALK.askedOf !== n) { const f = focus(best.e, nf);
+    if (f) { MEM.last = best.e; MEM.lastList = null; TALK.offer = { check: true }; TALK.askedOf = n; TALK.misses = 0; return toned({ text: fresh("on", ["Here is the part you want. ", "The short answer: "]) + f + "\n\nDoes that answer it?", lead: "", chips: chipsFor(best.e), title: best.e.title, links: best.e.links }, tone); } }
   if (best && best.s >= need) { MEM.last = best.e; MEM.lastMore = false; MEM.lastList = null; { const c1 = COLLS.find((c) => c.name === best.e.title); if (c1) MEM.coll = c1; }
     const out = toned(fromEntry(best.e), tone);
     if (second && second.s >= 3.2 && second.s > best.s * 0.82 && !out.chips.includes(second.e.title)) out.chips = [second.e.title, ...out.chips].slice(0, 3);
     return out; }
-  /* 8. honest not-knowing */
-  const near = r.filter((x) => x.s > 0.8).slice(0, 3).map((x) => x.e.title);
-  return { mood: "puzzle", text: pick(["That one is beyond my garden wall. My scroll does not say, and I would rather tell you that than guess.", "Hmm. I have sat with that, and nothing in my scroll answers it. I do not want to make something up.", "I do not know, friend. I only know what Yoeshi wrote down for me, and that is not in it."]) +
-    (SITE ? " I am still in beta, so my scroll has gaps." : "") + (near.length ? "\n\nPerhaps one of these is close?" : "\n\nHere is what I can talk about."), chips: near.length ? near : SITE ? SITE_CHIPS : DEFAULT_CHIPS };
+  /* 7b. "is it free", "who made that", "what about them": the question is about the last thing we spoke of */
+  const L = MEM.last;
+  if (!TALK.carried && L && words <= 8 && has(n, /\b(it|its|that|this|there|they|them|those|these)\b/)) {
+    const miss0 = TALK.misses; TALK.carried = true; let r2; try { r2 = respondOne(String(raw).replace(/\b(it|its|that|this|there|they|them|those|these)\b/i, L.title)); } finally { TALK.carried = false; MEM.turns--; }
+    if (r2 && !r2.unknown && r2.title !== L.title) return r2;
+    MEM.last = L; MEM.lastMore = false; TALK.misses = miss0; TALK.offer = null; TALK.cur = L;   /* the same entry again would be a blunt repeat: the one sentence of it that answers, or an honest gap */
+    const f1 = focus(L, nf);
+    if (f1) { TALK.offer = { check: true }; TALK.askedOf = n; return { text: fresh("on", ["Here is the part you want. ", "The short answer: "]) + f1 + "\n\nDoes that answer it?", chips: chipsFor(L), title: L.title }; }
+    if (nameLike(L.title)) return { mood: "puzzle", unknown: true, text: `My scroll does not have that detail about ${inSentence(L.title)} yet, and I would rather say so than guess.` + (SITE ? " I am still in beta, so there are gaps." : "") + "\n\nIs there something else about it I can tell you?", chips: chipsFor(L) };
+  }
+  /* 8. honest not-knowing, with the door left open */
+  const near = r.filter((x) => x.s > 0.8).slice(0, 3).map((x) => x.e.title); TALK.misses++;
+  const open = SITE ? fresh("miss", ["That one is not in my scroll yet, and I would rather say so than guess.", "I have looked, and my scroll does not answer that. I will not make something up.", "I do not know that one, friend. I only know what Yoeshi has written down for me."]) + " I am still in beta, so there are gaps."
+    : pick(["That one is beyond my garden wall. My scroll does not say, and I would rather tell you that than guess.", "Hmm. I have sat with that, and nothing in my scroll answers it. I do not want to make something up.", "I do not know, friend. I only know what Yoeshi wrote down for me, and that is not in it."]);
+  if (TALK.misses >= 2) return { mood: "puzzle", unknown: true, text: open + "\n\nThat is twice I have come up empty, so let me help. Try a name: a collection, a song, a place on this site. Or pick one of these.", chips: near.length ? near : SITE ? SITE_CHIPS : DEFAULT_CHIPS };
+  const close1 = r.filter((x) => x.s > 2).slice(0, 3).map((x) => x.e.title); if (close1.length) TALK.offer = { near: close1 };
+  return { mood: "puzzle", unknown: true, text: open + (close1.length > 1 ? `\n\nThe closest things I know are ${listOf(close1)}. Is it one of those?` : close1.length ? `\n\nThe closest thing I know is ${listOf(close1)}. Is that it?` : "\n\nHere is what I can talk about."), chips: near.length ? near : SITE ? SITE_CHIPS : DEFAULT_CHIPS };
 }
 /* ================================================================ two (or three) questions at once */
 /* "who is scuni and what is wild ride", "what is tezos? how do i buy it?", "tell me about prancers and wild ride": split into
@@ -340,7 +402,7 @@ function splitAsk(raw) {
     return L && Rt && L.ph && Rt.ph && L.s >= 6 && Rt.s >= 6 && L.e !== Rt.e ? [m[1], m[2]] : [p]; });
   return parts.map((x) => x.replace(/[?!.\s]+$/, "")).filter((x) => norm(x).split(" ").filter(Boolean).length >= 1).slice(0, 3);
 }
-const isUnknown = (r) => /beyond my garden wall|sat with that|I do not know, friend|More of what, friend|outside the garden/.test(r.text || "");
+const isUnknown = (r) => !!r.unknown || /beyond my garden wall|sat with that|I do not know, friend|More of what, friend|outside the garden/.test(r.text || "");
 function respond(raw) {
   let greet = false; const g = GREET.exec(String(raw).trim());
   if (g && norm(String(raw).trim().slice(g[0].length)).split(" ").filter(Boolean).length >= 2) { greet = true; raw = String(raw).trim().slice(g[0].length); }
@@ -348,16 +410,16 @@ function respond(raw) {
   if (has(whole, CRISIS) || has(whole, NEG) && has(whole, FEEL) || has(whole, PRIVRE) || has(whole, JAILRE)) return withHello(respondOne(raw), greet);   /* safety, privacy and the heart read the whole message */   /* the heart comes first, whole */
   const parts = splitAsk(raw);
   if (parts.length < 2) return withHello(respondOne(raw), greet);
-  const outs = []; let prev = null;
-  for (let p of parts) {
+  const outs = []; let prev = null; TALK.plain = true;
+  try { for (let p of parts) {
     if (prev && /\b(it|its|they|them|that|this)\b/i.test(p) && prev.title) p = p.replace(/\b(it|its|they|them|that|this)\b/i, prev.title);   /* "how do i buy it" \u2192 the thing just asked about */
     const r = respondOne(p);
     if (r.crisis) return r;
     if (isUnknown(r) || outs.some((o) => o.text === r.text || (o.title && o.title === r.title))) continue;
     outs.push(r); prev = r.title ? r : (byTitle(r.title || "") || prev);
-  }
+  } } finally { TALK.plain = false; }
   if (outs.length < 2) return withHello(outs[0] || respondOne(raw), greet);
-  const bare = (t) => t.replace(/^(Ah|Mm|Good question|Gladly)\. /, "").replace(/\n\n_Ask me to tell you more._$/, "");
+  const bare = (t) => t;   /* inside a two-part answer he speaks plainly (TALK.plain) */
   /* quick facts flow together as sentences; answers from his scroll sit under their own small headings */
   const text = outs.every((r) => !r.title) ? outs.map((r) => bare(r.text)).join(" ") : outs.map((r) => (r.title ? `**${r.title}**\n` : "") + bare(r.text)).join("\n\n");
   const done_ = new Set(outs.map((r) => norm(r.title || ""))), chips = [...new Set(outs.flatMap((r) => r.chips || []))].filter((c) => !done_.has(norm(c))).slice(0, 4), links = outs.flatMap((r) => r.links || []);   /* no suggestions for what was just answered */
@@ -368,8 +430,58 @@ function withHello(r, greet) { if (!greet || !r || r.crisis) return r; return { 
 
 function fromEntry(e, pre = "") {
   if (LEARN_URL && e.title === "My limits") e = { ...e, body: e.body.replace("Nothing you type leaves this page.", LEARN.on ? "You switched on Help Maestro learn, so your questions (scrubbed of anything personal) go to Yoeshi to teach me. Say \"stop sharing\" to switch it off." : "Nothing you type leaves this page, unless you switch on Help Maestro learn below.") };
-  const first = e.body.split(/[.!?:]/)[0], open = pre || (MEM.turns > 1 && first.length > 18 && !/^(-|welcome|yes|no)\b/i.test(e.body) && rnd() < 0.3 ? pick(["Ah. ", "Mm. ", "Good question. ", "Gladly. "]) : "");
-  return { text: open + e.body + (e.more ? "\n\n_Ask me to tell you more._" : ""), chips: e.ask.slice(0, 3), title: e.title, links: e.links };
+  const prev = TALK.cur, lead = pre || leadIn(e, prev), close = closeFor(e);
+  TALK.cur = e; TALK.seen.add(e.title); TALK.misses = 0; TALK.askedOf = norm(TALK.ask || "");
+  return { text: lead + e.body + close, lead, chips: chipsFor(e), title: e.title, links: e.links };
+}
+/* ---- the conversation layer: short lead-ins and closes round what his scroll says, never in place of it ---- */
+const YES = /^(yes|yes please|yes i would|yes i do|yeah|yea|yep|yup|ya|sure|sure thing|ok|okay|k|please|please do|go ahead|do it|why not|of course|absolutely|definitely|i would|i do|alright|all right|mhm|uh huh|let hear it|sounds good)$/;
+const NO = /^(no|nope|nah|no thanks|no thank you|not now|not really|not yet|i am good|maybe later|never mind|nevermind|no need|that all|that is all|nothing|nothing else)$/;
+const LAUGH = /^(lol|lmao|rofl|(ha)+|ha ha( ha)*|(he){2,}|heh)$/;
+const PAUSE = /^(h+m+|u+m+|uh+|let me think|thinking)$/;
+const GOT = /^(i see|got it|gotcha|makes sense|that makes sense|understood|good to know|noted|right|true|fair|fair enough|ok cool|oh ok|oh okay|aha|oh|ah|ok got it|ok thanks got it)$/, GOTIT = ["Good. Where to next?", "Glad that is clear. What else can I tell you?", "Good. I am here when the next question comes."];
+const REACT = /^(cool|nice|neat|wow|whoa|woah|awesome|amazing|great|sweet|interesting|fascinating|love it|love that|i love it|i love that|that (is )?(so |very |really )?(cool|awesome|amazing|great|interesting|nice|wild|beautiful|incredible)|so cool|very cool|incredible|impressive|good|perfect|brilliant|dope|sick|fire|wild|oh wow|oh nice|oh cool|ooh|yay|omg)$/;
+const HUH = /^(what|huh|eh|sorry|pardon|come again|what do you mean|i do not understand|i do not get it|confused|i am confused|say that again|can you repeat that|repeat that|what does that mean|in simple terms|simpler please|say it simply|explain like i am five|eli5)$/;
+/* a title that reads as a name inside a sentence ("the Lounge", "Prancer Pads"), and not as a question or a phrase about him */
+const nameLike = (t) => !/^(what|who|whose|how|why|where|when|is|are|can|do|does|should|my|your|i|asking|free|if|one|beta|about|getting|making|help)\b/i.test(t) && !/\?$/.test(t) && t.split(" ").length <= 4;
+const COMMON = /^(The|Advice|Community|Expression|Craft|Technology|Infrastructure|Bridges|Ownership|Build|Collecting|Permanence|Balance|Belonging|Integrity|Laser|Rarity|Music|Open|Wallets|Wallet|Seed|Scams|Fees|Finding|Sharing|Controls|Accessibility|Collaborations|Timeline|Phones|Support|Prices|Baking|Fully)\b/;
+const inSentence = (t) => COMMON.test(t) ? t[0].toLowerCase() + t.slice(1) : /^Lounge /.test(t) ? "the " + t : t;
+const listOf = (a) => { const b = a.map((t) => `**${t}**`); return b.length < 2 ? b[0] : b.slice(0, -1).join(", ") + " and " + b[b.length - 1]; };
+const focus = (e, q) => { const tt = toks(e.title), qt = new Set(toks(q).filter((w) => !tt.includes(w))); if (!qt.size) return "";
+  const b = (e.body + "\n" + (e.more || "")).replace(/\*\*/g, "").split(/\n+|(?<=[.!?])\s+/).map((x) => x.replace(/^- /, "").trim()).filter((x) => x.split(" ").length >= 4 && !x.endsWith(":"))
+    .map((x) => [[...new Set(toks(x))].filter((w) => qt.has(w)).reduce((a, w) => a + idf(w), 0), x]).sort((a, b) => b[0] - a[0])[0];
+  return b && b[0] >= 2.5 ? b[1] : ""; };
+const gist = (e) => { const f = (e.body.replace(/\*\*/g, "").split("\n").find((l) => l.trim() && !l.startsWith("-")) || "").split(/(?<=[.!?])\s/)[0].trim(); return f.split(" ").length >= 6 && !f.endsWith(":") ? f : ""; };
+/* what to suggest next: what this entry leads to, without what has been covered already */
+function chipsFor(e) { const base = SITE ? SITE_CHIPS : DEFAULT_CHIPS; if (!e) return base;
+  const out = e.ask.filter((a) => !TALK.seen.has((byTitle(a) || {}).title)).slice(0, 3); for (const c of e.ask.concat(base)) { if (out.length >= 2) break; if (!out.includes(c) && c !== e.title) out.push(c); }
+  return out.slice(0, 3); }
+/* he hears the kind of question before he answers it */
+function leadIn(e, prev) {
+  if (TALK.plain || /^(-|yes\b|no\b|welcome\b|of course\b|not yet\b|sadly\b|certainly\b)/i.test(e.body)) return "";
+  const n = norm(TALK.ask || ""), named = !!n && (" " + n + " ").includes(" " + norm(e.title) + " ") && nameLike(e.title);
+  if (prev === e) return fresh("lead", ["Here it is again. ", "Once more, gladly. "]);
+  if (TALK.seen.has(e.title) && prev) return fresh("lead", ["We touched on this earlier. ", "Happy to say it again. "]);
+  if (rnd() > (MEM.turns < 2 ? 0.5 : 0.8)) return "";
+  if (prev && prev !== e && prev.ask.some((a) => byTitle(a) === e)) return fresh("lead", ["Glad you asked. ", "That follows nicely. ", "Good, that is the natural next step. "]);
+  if (/^(who are you|who r u|what are you|introduce yourself)\b/.test(n)) return "Allow me to introduce myself. ";
+  if (/^(how do i|how can i|how to|how would i|how does one|how do you)\b/.test(n)) return fresh("lead", ["Here is how. ", "Easy enough. ", "Let me walk you through it. "]);
+  if (/^(where can i|where do i|where is|where are|where to)\b/.test(n)) return fresh("lead", ["Let me point the way. ", "I can point you there. "]);
+  if (/^(who is|who are|who was|who made|who wrote)\b/.test(n)) return fresh("lead", ["Let me introduce you. ", "Happy to tell you. "]);
+  if (/^why\b/.test(n)) return fresh("lead", ["A fair thing to wonder. ", "There is a reason. "]);
+  if (/^(can|could|may|is|are|do|does|did|will|would|should|am)\b/.test(n)) return fresh("lead", ["Good thing to ask. ", "Glad you asked. ", "Worth knowing. "]);
+  if (named && !norm(e.body.slice(0, 60)).startsWith(norm(e.title))) return fresh("lead", [`Ah, ${inSentence(e.title)}. `, `${e.title}? Gladly. `]);
+  if (/^(what|tell me|explain|describe)\b/.test(n)) return fresh("lead", ["Gladly. ", "Happy to explain. ", "Let me tell you. "]);
+  return "";
+}
+/* he ends on a turn for the visitor: the rest of the story, the next thing along, or a check that it landed */
+function closeFor(e) {
+  if (TALK.plain) return "";
+  if (e.more) { TALK.offer = { more: true }; return "\n\n" + fresh("close", ["There is more to this one. Shall I go on?", "That is the short of it. Would you like the rest?", "I can say more about this. Shall I?"]); }
+  if (/\?\s*$/.test(e.body) || MEM.turns < 2 || rnd() > 0.5) return "";
+  const next = e.ask.map((a) => byTitle(a)).find((x) => x && x !== e && !TALK.seen.has(x.title) && nameLike(x.title));
+  if (next && rnd() < 0.7) { TALK.offer = { title: next.title }; const t = inSentence(next.title); return "\n\n" + fresh("close", [`Shall I tell you about ${t} next?`, `Would you like to hear about ${t} too?`, `Curious about ${t}?`]); }
+  TALK.offer = { check: true }; return "\n\n" + fresh("close", ["Does that answer it?", "Did that help?", "Is that what you were after?"]);
 }
 /* remember which list we were drawing from, so "another" keeps going */
 const LISTOF = (t) => /\byoeshi/.test(t) && /\b(quote|said|say|says|wrote|words|wisdom|more from)\b/.test(t) ? "Yoeshi" : /\b(sing|song|songs|lyric|lyrics|verse)\b/.test(t) && !/\bwhat songs|which songs\b/.test(t) ? "Songs" : /\bjoke/.test(t) ? "Jokes" : /\bkoan/.test(t) ? "Koans" : /\bfact/.test(t) ? "Facts" : /\bfortune/.test(t) ? "Fortunes" : /\b(wisdom|advice|quote|teach|inspir|guidance|lesson)/.test(t) ? "Wisdom" : /\b(kind|affirmation|encourag)/.test(t) ? "Affirmations" : null;
@@ -492,9 +604,9 @@ function speak(r, then) {
   later(() => { M.think(false); dots.remove(); const el = add("mz-m", ""), P = plain(text); el.style.whiteSpace = "pre-line";   /* line breaks show while he types */
     const secs = Math.min(9, 0.6 + P.length / 32); M.say(secs); M.chime(); if (r.pet) M.pet(r.pet); if (r.mood === "bow" || r.mood === "care") M.ripple();
     { const mk = { care: "care", think: "wise", bow: "bow", pet: "joy", joy: "joy", wave: "wave", puzzle: "puzzle" }[r.mood]; if (mk) M.mood(mk, Math.min(6, secs + 1.2)); }   /* his body answers too */
-    status("replying", false); let i = 0; const step = Math.max(2, Math.round(P.length / (secs * 30)));
-    const done = (quiet) => { finish = null; el.style.whiteSpace = ""; el.innerHTML = fmt(text); if (SITE && r.links) addLinks(el, r.links); if (r.turn) rateRow(el, r.turn); keep(el); busy = false; status("ready"); if (quiet) M.hush(); else { chips(r.chips); keep(el); if (then) then(); } };   /* re-anchor once the suggestions take their room */
-    const tick = () => { if (!finish) return; i += step; if (i >= P.length) return done(false);
+    status("replying", false); let i = 0, live = true; const step = Math.max(2, Math.round(P.length / (secs * 30)));   /* live: this answer is still being typed (a tick left over from an answer already finished must not type on, or end the next one) */
+    const done = (quiet) => { live = false; finish = null; el.style.whiteSpace = ""; el.innerHTML = fmt(text); if (SITE && r.links) addLinks(el, r.links); if (r.turn) rateRow(el, r.turn); keep(el); busy = false; status("ready"); if (quiet) M.hush(); else { chips(r.chips); keep(el); if (then) then(); } };   /* re-anchor once the suggestions take their room */
+    const tick = () => { if (!live) return; i += step; if (i >= P.length) return done(false);
       el.textContent = P.slice(0, i); keep(el); if (i % 60 < step) { const rc = el.getBoundingClientRect(); M.look(rc.left + rc.width * 0.7, rc.bottom - 10); } later(tick, 33); };   /* his eyes follow the words */
     finish = () => done(true); tick(); }, think);
   if (!finish) finish = () => { timers.forEach(clearTimeout); timers = []; M.think(false); dots.remove(); add("mz-m", fmt(text)); busy = false; finish = null; status("ready"); };
@@ -545,7 +657,7 @@ function send(raw) {
   if (BREATH.on) { stopBreath(); if (/\b(stop|enough|cancel|quit|no)\b/i.test(raw)) { speak({ text: "We can stop. Even one breath counts.", chips: DEFAULT_CHIPS }); return; } }
   /* a button that names something he knows answers it directly */
   const lc = learnCommand(raw); if (lc) { speak(lc); return; }
-  const e = byTitle(raw), r = e ? (MEM.last = e, MEM.lastMore = false, MEM.turns++, fromEntry(e)) : respond(raw); r.turn = learnRecord(raw, r); const lst = LISTOF(norm(raw)); if (lst && !r.title) MEM.lastList = lst; else if (r.title) MEM.lastList = null;
+  const e = byTitle(raw), r = e ? (MEM.last = e, MEM.lastMore = false, MEM.turns++, TALK.ask = raw, TALK.offer = null, fromEntry(e)) : respond(raw); r.turn = learnRecord(raw, r); const lst = LISTOF(norm(raw)); if (lst && !r.title) MEM.lastList = lst; else if (r.title) MEM.lastList = null;
   speak(r, r.breath ? startBreath : null);
 }
 /* ================================================================ one minute of breathing: 4 in, 4 hold, 6 out, three times */
@@ -582,5 +694,5 @@ addEventListener("keydown", (e) => { if (e.key === "Escape" && document.body.cla
 /* on the website the concierge greets you himself on wide screens, after a breath */
 if (COMPANION) { document.body.classList.add("mz-companion"); show(); }
 else if (SITE && innerWidth - innerHeight > 300 && innerWidth > 1100) setTimeout(() => { if (!document.body.classList.contains("mz-on")) show(); }, 1600);
-window.MAESTRO_BRAIN = { respond, search, mend, meant, weigh, toks, COLLS, HEART, SCROLL, send, open: show, close: hide };
+window.MAESTRO_BRAIN = { respond, search, mend, meant, weigh, toks, COLLS, HEART, SCROLL, TALK, MEM, seed: (n) => { rs = n >>> 0 || 7; }, send, open: show, close: hide };
 })();
