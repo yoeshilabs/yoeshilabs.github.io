@@ -368,7 +368,7 @@ window.__title = (src) => loadImg(src).then((im) => { if (!im) return; gl.active
 /* the band at ts, as the guests' pieces read it (window.wall in the kit) */
 const levelsAt = (ts) => { const E = (k) => PERFORM.env(k, ts), b = PERFORM.beat(ts), lv = {};
   for (const k of ["vocals", "drums", "bass", "other", "piano", "guitar"]) lv[k] = Math.min(1, E(k) * 1.15);
-  return { beat: b, kick: Math.max(E("hits"), Math.exp(-((b % 1 + 1) % 1) * 6) * 0.6), levels: lv, energy: Math.min(1, (lv.drums + lv.bass + lv.vocals + lv.other) / 2.2), bands: PERFORM.bands ? PERFORM.bands(ts) : null }; };
+  return { beat: b, kick: Math.max(E("hits"), Math.exp(-((b % 1 + 1) % 1) * 6) * 0.6), levels: lv, energy: Math.min(1, (lv.drums + lv.bass + lv.vocals + lv.other) / 2.2), bands: PERFORM.bands ? PERFORM.bands(ts) : null, feed: PERFORM.feed ? PERFORM.feed(ts) : null }; };
 window.__frame = (ts, force) => { const E = (k) => PERFORM.env(k, ts), b = PERFORM.beat(ts), m = force || modeAt(ts), kick = Math.max(E("hits"), Math.exp(-((b % 1 + 1) % 1) * 6) * 0.6);
   gl.viewport(0, 0, Wd, Ht); gl.uniform2f(U("R"), Wd, Ht); gl.uniform1f(U("T"), ts); gl.uniform1f(U("BEAT"), b); gl.uniform1f(U("KICK"), kick);
   for (const [u_, k] of [["VOC", "vocals"], ["DRM", "drums"], ["BAS", "bass"], ["OTH", "other"], ["PNO", "piano"], ["GTR", "guitar"]]) gl.uniform1f(U(u_), Math.min(1, E(k) * 1.15));

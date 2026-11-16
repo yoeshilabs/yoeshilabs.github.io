@@ -89,7 +89,7 @@ addEventListener("message", (e) => { const bk = BOOKED.find((b) => b.frame && e.
 /* one step of a code piece to song time ts: the clock and the band's levels in, a frame back */
 function step(bk, ts, info) { if (!bk.frame || bk.wait) return bk.wait ? bk.wait.p : Promise.resolve();
   const id = ++seq; let done; const p = new Promise((r) => (done = r)); bk.wait = { id, at: performance.now(), done, p };
-  bk.frame.contentWindow.postMessage({ type: "wall:step", id, live: MODE === "live", info: { ...info, ...(bk.sound === false ? { bands: null } : {}), local: ts - bk.from, clock: Math.max(0, ts - (bk.from - bk.pre)), dur: bk.to - bk.from, t: ts } }, "*");   // sound: false books a piece without the song's three bands (to see what its sound feed does)
+  bk.frame.contentWindow.postMessage({ type: "wall:step", id, live: MODE === "live", info: { ...info, ...(bk.sound === false ? { bands: null, feed: null } : {}), local: ts - bk.from, clock: Math.max(0, ts - (bk.from - bk.pre)), dur: bk.to - bk.from, t: ts } }, "*");   // sound: false books a piece without the song's three bands (to see what its sound feed does)
   return p; }
 
 /* which booking shows at ts, and how far in or out it is (a piece let go mid-stretch fades out from its last frame);
@@ -106,7 +106,7 @@ function keep(ts) { for (const b of BOOKED) { const near = ts >= b.from - pre(b)
   if (near && !b.loading && !b.dead) b.loading = load(b).then(() => (b.ready = true)).catch((e) => { console.warn(`[guest ${b.slug}] did not load:`, e.message); b.dead = true; b.deadAt = -1e9; });
   else if (!near && b.loading) { unload(b); b.ready = false; } } }
 
-function info(ts, lv) { return { beat: lv.beat, bar: lv.beat / 4, phase: ((lv.beat % 1) + 1) % 1, kick: lv.kick, levels: lv.levels, energy: lv.energy, bands: lv.bands || null, section: SECTION, song: SONG }; }
+function info(ts, lv) { return { beat: lv.beat, bar: lv.beat / 4, phase: ((lv.beat % 1) + 1) % 1, kick: lv.kick, levels: lv.levels, energy: lv.energy, bands: lv.bands || null, feed: lv.feed || null, section: SECTION, song: SONG }; }
 
 /* the frame's part: called by the wall's __frame with the song's levels; returns the uniforms' values */
 /* live: each running piece stepped once a frame (every other frame while it is slow); a slow piece drawn smaller, then let go */

@@ -38,5 +38,16 @@ function rig(role, ph, ts) {
 window.PERFORM = { load: (m, bt) => Promise.all([fetch(m).then((r) => r.json()), fetch(bt).then((r) => r.json())]).then(([a, c]) => { MAP = a; B = c.beats; }), beat, rig, env: (k, ts) => env(k, ts), inChorus,
   /* the song's sound in three bands at ts, 0 to 1 each (map.json bands, from tools/bands.py), for a guest's piece that hears them; null where the song has none */
   bands: (ts) => { const Bd = MAP && MAP.bands; if (!Bd) return null; const x = Math.max(0, ts * Bd.fps), i = Math.floor(x), k = x - i, at = (a) => ((a[Math.min(i, a.length - 1)] || 0) * (1 - k) + (a[Math.min(i + 1, a.length - 1)] || 0) * k) / 255;
-    return { bass: at(Bd.bass), mid: at(Bd.mid), high: at(Bd.high) }; } };
+    return { bass: at(Bd.bass), mid: at(Bd.mid), high: at(Bd.high) }; },
+  /* the wider feed at ts (map.json feed, from tools/feed.py), for a piece that hears more than three bands (sphereFeed): beat, beatPhase,
+     barPhase, drums, percussion, synth, riser, pulse (0 to 1), hit (0 or 1) and wave (64 numbers, -1 to 1); null where the song has none */
+  feed: (ts) => { const Fd = MAP && MAP.feed; if (!Fd) return null; const x = Math.max(0, ts * Fd.fps), i = Math.floor(x), k = x - i, o = {};
+    const at = (a) => ((a[Math.min(i, a.length - 1)] || 0) * (1 - k) + (a[Math.min(i + 1, a.length - 1)] || 0) * k) / 255;
+    for (const f of ["beat", "drums", "percussion", "synth", "riser", "pulse"]) o[f] = at(Fd[f]);
+    o.beatPhase = (Fd.beatPhase[Math.min(i, Fd.beatPhase.length - 1)] || 0) / 255; o.barPhase = (Fd.barPhase[Math.min(i, Fd.barPhase.length - 1)] || 0) / 255;   // (a phase is not blended across its wrap)
+    let lo = 0, hi = Fd.hits.length; while (lo < hi) { const md = (lo + hi) >> 1; if (Fd.hits[md] <= i) lo = md + 1; else hi = md; }   // the last note started at or before this sixtieth
+    o.hit = lo > 0 && i - Fd.hits[lo - 1] < (Fd.hold || 2) ? 1 : 0;
+    if (!Fd._w) { const s = atob(Fd.wave.data), b = new Int8Array(s.length); for (let j = 0; j < s.length; j++) b[j] = (s.charCodeAt(j) << 24) >> 24; Fd._w = b; }
+    const n = Fd.wave.n, fr = Math.min(i, Fd._w.length / n - 1), w = new Array(n); for (let j = 0; j < n; j++) w[j] = Fd._w[fr * n + j] / 127; o.wave = w;
+    return o; } };
 })();
