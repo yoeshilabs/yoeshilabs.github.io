@@ -2,7 +2,7 @@
    library, so it can travel on chain with the generator):
      the coat   each coat part's pattern is baked into a texture through its UVs by the very shader that draws it live
                 (src/coat.js), so the cat looks like itself in any 3D app; glowing patterns get an emissive texture
-     the eyes   the iris, fibres, limbal ring and slit pupil are baked the same way
+     the eyes   the iris, fibres, limbal ring and pupil are baked the same way
      the rig    every part stays on its bone, as a node hierarchy (hips, chest, neck, head, arms, legs, the tail links)
      the moves  each clip is sampled from the live rig at 30 fps and stored as keyframes per bone: idle, wave, the
                 Posey Paw, paws up, dance, knead, spin (glTF animations; any viewer or game engine can play them)
@@ -11,12 +11,14 @@
      exportGLB(avatar, renderer, THREE, { clips, coat: COAT glsl, name }) -> ArrayBuffer */
 
 const SRGB = "vec3 srgb(vec3 c){ return mix(c * 12.92, 1.055 * pow(max(c, 0.0), vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c)); }";
-const IRIS = `uniform vec3 uIris; uniform float uGlow; varying vec3 vEye;
+/* the live iris (avatar.js eyeMesh), looking straight ahead: the lid's shade, the glow across from the catchlight, and its pupil as it is now (an almond, round when excited) */
+const IRIS = `uniform vec3 uIris; uniform float uGlow, uPupil; varying vec3 vEye;
   float eh(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
   vec3 iris(){ vec2 q = vEye.xy / 0.25; float rr = length(q), an = atan(q.y, q.x);
     vec3 c = uIris * (1.35 - 0.6 * rr) + 0.12 * sin(an * 37.0 + eh(vec2(floor(an * 12.0))) * 6.0) * uIris;
-    c = mix(c, uIris * 0.25, smoothstep(0.72, 0.98, rr)); float pd = length(vec2(q.x / 0.25, q.y / 0.86));
-    c = mix(c, vec3(0.01, 0.01, 0.025), smoothstep(1.05, 0.95, pd)); return vEye.z < 0.0 ? uIris * 0.2 : c; }`;
+    c *= 0.74 + 0.42 * smoothstep(0.6, -0.7, q.y); c += uIris * 0.55 * smoothstep(0.46, 0.04, length(q - vec2(0.27, -0.4)));
+    c = mix(c, uIris * 0.25, smoothstep(0.72, 0.98, rr)); float pw = 0.15 + 0.4 * uPupil, pd = length(vec2(q.x / pw, q.y / 0.84));
+    c = mix(c, vec3(0.01, 0.01, 0.025), smoothstep(1.06, 0.9, pd)); return vEye.z < 0.0 ? uIris * 0.2 : c; }`;
 
 /* paint a mesh's surface into a texture through its UVs, then grow the colours over the seams */
 function bake(T, renderer, geo, frag, uniforms, size) {
@@ -35,7 +37,7 @@ function bake(T, renderer, geo, frag, uniforms, size) {
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const xx = x + dx, yy = y + dy; if (xx < 0 || yy < 0 || xx >= size || yy >= size) continue; const j = (yy * size + xx) * 4; if (src[j + 3]) { r += src[j]; g += src[j + 1]; b += src[j + 2]; n++; } }
       if (n) { px[i] = r / n; px[i + 1] = g / n; px[i + 2] = b / n; px[i + 3] = 255; } } }
   const cv = document.createElement("canvas"); cv.width = cv.height = size; const x = cv.getContext("2d"), id = x.createImageData(size, size);
-  for (let y = 0; y < size; y++) id.data.set(px.subarray((size - 1 - y) * size * 4, (size - y) * size * 4), y * size * 4);   // the render target's rows run bottom up; glTF textures top down
+  id.data.set(px);   // row y of the render target is v = y / size, and glTF reads v = 0 at the picture's top: kept in that order (2026-11-16: turned over, every coat stood upside down in any 3D app)
   for (let i = 3; i < id.data.length; i += 4) id.data[i] = 255; x.putImageData(id, 0, 0); return cv;
 }
 const png = (cv) => { const s = atob(cv.toDataURL("image/png").split(",")[1]), b = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) b[i] = s.charCodeAt(i); return b; };
@@ -60,7 +62,7 @@ export function exportGLB(avatar, renderer, T, { clips = [], coat, name = "Pranc
       P.baseColorTexture = { index: image(bake(T, renderer, mesh.geometry, glsl + "c * 0.9), 1.0); }", u, size)) };
       const em = u.uNeon.value > 0.5 || u.uPat.value >= 21; if (em) { M.emissiveTexture = { index: image(bake(T, renderer, mesh.geometry, glsl + "min(e, vec3(1.0))), 1.0); }", u, size)) }; M.emissiveFactor = [1, 1, 1]; }
     } else if (m.userData && m.userData.iris) { const u = m.userData.iris;
-      P.baseColorTexture = { index: image(bake(T, renderer, mesh.geometry, `${IRIS}\n${SRGB}\nvoid main(){ gl_FragColor = vec4(srgb(iris()), 1.0); }`, { uIris: u.uIris, uGlow: u.uGlow }, 256)) };
+      P.baseColorTexture = { index: image(bake(T, renderer, mesh.geometry, `${IRIS}\n${SRGB}\nvoid main(){ gl_FragColor = vec4(srgb(iris()), 1.0); }`, { uIris: u.uIris, uGlow: u.uGlow, uPupil: u.uPupil || { value: 0.5 } }, 256)) };
       P.roughnessFactor = 0.25; if (u.uGlow.value > 0.5) { M.emissiveTexture = P.baseColorTexture; M.emissiveFactor = [0.8, 0.8, 0.8]; } }
     else { P.baseColorFactor = [...lin(m.color || new T.Color(1, 1, 1)), m.transparent ? m.opacity : 1];
       if (m.map && m.map.image) P.baseColorTexture = { index: image(m.map.image) };
