@@ -12,7 +12,8 @@
          screen    a giant screen above the stage in the piece's own shape
          equirect  the whole sky from a 2:1 equirectangular frame, the stage at its centre (for 360 work)
          wrap      wrapped round the dome above the light bars, repeated to keep its shape
-   While a guest is on, the singer's big picture makes way; the light bars, the beams and the band carry on.
+   While a guest is on, the singer's big picture makes way; the light bars, the beams and the band carry on (a booking
+   may ask the wall's light bars down while its piece is on, bars: 0 to 1, for a piece that fills the whole sky).
 
    The credit: signed in lights along the dome's own curve, centred on the back of the Sphere over the walkway (clear of the band),
    "VISUALS BY", the artist's name, then the title and their handle; bright as the piece arrives and as it leaves,
@@ -64,7 +65,7 @@ async function load(bk) {
   /* code: the piece's page, the kit ahead of it, in a sealed frame */
   KIT = KIT || await (await fetch(`${BASE}kit/wall-kit.js`)).text();
   const page = await (await fetch(dir + g.file)).text(), files = g.files ? await (await fetch(dir + g.files)).json() : {};
-  const cfg = { width: w, height: h, seed: g.seed || bk.slug, hash: g.hash || "", live: MODE === "live" };
+  const cfg = { width: w, height: h, seed: g.seed || bk.slug, hash: g.hash || "", live: MODE === "live", ...(g.query ? { query: g.query } : {}), ...(g.keys ? { keys: g.keys } : {}) };
   const head = `<meta http-equiv="Content-Security-Policy" content="${CSP}"><meta http-equiv="x-dns-prefetch-control" content="off"><script>window.__WALL_CFG=${JSON.stringify(cfg)};window.__WALL_FILES=${JSON.stringify(files).replace(/</g, "\\u003c")};<\/script><script>${KIT}<\/script>`;
   const doc = /<!--WALL-->/.test(page) ? page.replace("<!--WALL-->", head) : /<head[^>]*>/i.test(page) ? page.replace(/<head[^>]*>/i, (m) => m + head) : `<!doctype html><html><head>${head}</head><body>${page}</body></html>`;
   const f = bk.frame = document.createElement("iframe");
@@ -81,14 +82,14 @@ addEventListener("message", (e) => { const bk = BOOKED.find((b) => b.frame && e.
   if (d.bmp && d.bmp.close && !(d.type === "wall:frame" && bk.wait && d.id === bk.wait.id)) d.bmp.close();   // a picture nobody asked for is let go at once
   if (d.type === "wall:hello") bk.hello && bk.hello();
   else if (d.type === "wall:error") { if ((bk.errs = (bk.errs || 0) + 1) <= 5) console.warn(`[guest ${bk.slug}]`, String(d.msg).slice(0, 300)); }
-  else if (d.type === "wall:frame" && bk.wait && d.id === bk.wait.id) { const b = d.bmp, ok = b instanceof ImageBitmap && b.width <= MAXPX && b.height <= MAXPX;
+  else if (d.type === "wall:frame" && bk.wait && d.id === bk.wait.id) { const b = d.bmp, ok = b instanceof ImageBitmap && b.width <= (MODE === "film" ? 2 * MAXPX : MAXPX) && b.height <= (MODE === "film" ? 2 * MAXPX : MAXPX);   // a film may take a piece at twice the live show's size
     if (b && !ok && b.close) b.close(); bk.n = (bk.n || 0) + 1; const w = bk.wait; bk.wait = null; bk.ms = (bk.ms ?? 30) * 0.8 + (performance.now() - w.at) * 0.2;
     if (ok) { if (bk.bmp) bk.bmp.close(); bk.bmp = b; bk.fresh = true; } w.done(); } });
 
 /* one step of a code piece to song time ts: the clock and the band's levels in, a frame back */
 function step(bk, ts, info) { if (!bk.frame || bk.wait) return bk.wait ? bk.wait.p : Promise.resolve();
   const id = ++seq; let done; const p = new Promise((r) => (done = r)); bk.wait = { id, at: performance.now(), done, p };
-  bk.frame.contentWindow.postMessage({ type: "wall:step", id, live: MODE === "live", info: { ...info, local: ts - bk.from, clock: Math.max(0, ts - (bk.from - bk.pre)), dur: bk.to - bk.from, t: ts } }, "*");
+  bk.frame.contentWindow.postMessage({ type: "wall:step", id, live: MODE === "live", info: { ...info, ...(bk.sound === false ? { bands: null } : {}), local: ts - bk.from, clock: Math.max(0, ts - (bk.from - bk.pre)), dur: bk.to - bk.from, t: ts } }, "*");   // sound: false books a piece without the song's three bands (to see what its sound feed does)
   return p; }
 
 /* which booking shows at ts, and how far in or out it is (a piece let go mid-stretch fades out from its last frame);
@@ -105,7 +106,7 @@ function keep(ts) { for (const b of BOOKED) { const near = ts >= b.from - pre(b)
   if (near && !b.loading && !b.dead) b.loading = load(b).then(() => (b.ready = true)).catch((e) => { console.warn(`[guest ${b.slug}] did not load:`, e.message); b.dead = true; b.deadAt = -1e9; });
   else if (!near && b.loading) { unload(b); b.ready = false; } } }
 
-function info(ts, lv) { return { beat: lv.beat, bar: lv.beat / 4, phase: ((lv.beat % 1) + 1) % 1, kick: lv.kick, levels: lv.levels, energy: lv.energy, section: SECTION, song: SONG }; }
+function info(ts, lv) { return { beat: lv.beat, bar: lv.beat / 4, phase: ((lv.beat % 1) + 1) % 1, kick: lv.kick, levels: lv.levels, energy: lv.energy, bands: lv.bands || null, section: SECTION, song: SONG }; }
 
 /* the frame's part: called by the wall's __frame with the song's levels; returns the uniforms' values */
 /* live: each running piece stepped once a frame (every other frame while it is slow); a slow piece drawn smaller, then let go */
@@ -126,7 +127,7 @@ function frame(ts, lv) { if (!ON) { for (const x of BOOKED) if (x.loading) { unl
     upload(4, guestTex, b.video); }
   else if (b.fresh) { upload(4, guestTex, b.bmp || b.img); b.fresh = false; }
   gl.uniform1f(U("GFIT"), b.fit); gl.uniform1f(U("GASP"), b.asp);
-  return { mGuest: fade, mCredit: cr * fade, yieldFace: fade }; }   // the singer's big picture makes way while a guest is on (half of him under a band of art reads as a mistake)
+  return { mGuest: fade, mCredit: cr * fade, yieldFace: fade, bars: b.bars ?? 1 }; }   // the singer's big picture makes way while a guest is on (half of him under a band of art reads as a mistake)
 
 /* the film's part: everything at ts drawn and in hand before the wall draws (seeking a loop, stepping a piece) */
 async function sync(ts, lv) { if (!ON) return; keep(ts);

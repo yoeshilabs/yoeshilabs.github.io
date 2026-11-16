@@ -35,5 +35,8 @@ function rig(role, ph, ts) {
   const blink = bump(((ts * 0.31 + ph) % 3.7) / 0.09 - 1);
   return { rig: { head: -6 * pulse + 2, tilt: 4 * Math.sin(TAU * (b / 8 + ph)), lid: 0.72 * (1 - 0.9 * blink), ear: 6 * pulse, yaw: 0.25 * Math.sin(TAU * (b / 16 + ph)) }, bob: 4 * pulse, sway: 2.2 * Math.sin(TAU * (b / 4 + ph)) };
 }
-window.PERFORM = { load: (m, bt) => Promise.all([fetch(m).then((r) => r.json()), fetch(bt).then((r) => r.json())]).then(([a, c]) => { MAP = a; B = c.beats; }), beat, rig, env: (k, ts) => env(k, ts), inChorus };
+window.PERFORM = { load: (m, bt) => Promise.all([fetch(m).then((r) => r.json()), fetch(bt).then((r) => r.json())]).then(([a, c]) => { MAP = a; B = c.beats; }), beat, rig, env: (k, ts) => env(k, ts), inChorus,
+  /* the song's sound in three bands at ts, 0 to 1 each (map.json bands, from tools/bands.py), for a guest's piece that hears them; null where the song has none */
+  bands: (ts) => { const Bd = MAP && MAP.bands; if (!Bd) return null; const x = Math.max(0, ts * Bd.fps), i = Math.floor(x), k = x - i, at = (a) => ((a[Math.min(i, a.length - 1)] || 0) * (1 - k) + (a[Math.min(i + 1, a.length - 1)] || 0) * k) / 255;
+    return { bass: at(Bd.bass), mid: at(Bd.mid), high: at(Bd.high) }; } };
 })();
