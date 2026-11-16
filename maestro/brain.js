@@ -351,6 +351,8 @@ function respondOne(raw) {
     if (all || top >= 1) { TALK.work = lastWork; TALK.offer = { check: true };
       return { text: `About "${lastWork.title}", his own mint description says: ` + (all ? m.lines : hits).map((l) => `"${l}"`).join(" ") + "\n\nDoes that answer it?", chips: ["Sing me a line from his songs", "AI in the music", "Yoeshi Labs music"] }; } }
   /* 7. precise facts, then everything he knows (with typos mended) */
+  /* an entry asked for by its own title is that entry, even when every word of it is a small one ("who else is here") */
+  { const ex = SCROLL.kb.find((e) => norm(e.title) === n); if (ex && !TALK.plain) { MEM.last = ex; MEM.lastMore = false; MEM.lastList = null; return toned(fromEntry(ex), weigh(raw, n)); } }
   const nf = mend(n), fa = attrAnswer(nf); if (fa) { MEM.lastList = null; const ce = MEM.coll && byTitle(MEM.coll.name);
     if (ce && !TALK.plain && !TALK.seen.has(ce.title) && fa.text && fa.text.length < 220 && !/\?\s*$/.test(fa.text) && rnd() < 0.6) { TALK.offer = { title: ce.title }; fa.text += "\n\n" + fresh("close", [`Shall I tell you more about ${inSentence(ce.title)}?`, `Would you like the story of ${inSentence(ce.title)} too?`]); }
     return toned(fa, weigh(raw, nf)); }

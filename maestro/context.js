@@ -1292,7 +1292,7 @@ I live offline, so I cannot see how many are minted right now. The website shows
 - how do i sit down | sit down | how do i sit | take a seat | how do i move | how do i walk | how do i dance | can i get a drink | how do i get a drink | what are the controls | what are the controls here | controls in here => @Lounge controls
 - what is the disco ball | how do i bring the ball down | bring the ball down | the disco ball => @The disco ball
 - why did the walls change | what is on the walls | can i put my own art on the walls | put my art on the walls | whats on the walls => @The walls
-- can my friends join me | can my friends join | is anyone else here | are other people here | is it multiplayer => @Who else is here
+- can my friends join me | can my friends join | is anyone else here | are other people here | is it multiplayer | who else is here | who is here | who is in here | anyone here | anybody here | is it just me here => @Who else is here
 - is this free | is it free | do i need to sign up | do i have to sign up | do i need a wallet | do i need an account => @Free and open
 - is there an app | does it work on my phone | does this work on my phone | can i use my phone => @Phones and apps
 - can i request a song | play me something upbeat | play something calm | play me a song | where can i listen to more | where can i hear more => @Asking for a song
@@ -1379,6 +1379,30 @@ I live offline, so I cannot see how many are minted right now. The website shows
 - I got too up in my feels when I didn't win the contest. I looked back and I was like, I love this, I'm proud of this, why didn't I mint this? So I did. | Artz Friday, May 2026 | persistence
 - One of the things I really try to write about a lot is how many different things can become art, be seen as art and unfold as art. The idea of derivatives and collaboration, and how this space and the digital aspect just make that explode with potential. | Artz Friday, May 2026 | creation
 - Stopping for a while from trying to be a "top artist", and stepping back and writing about the artists and hosting spaces, has been so humbling and inspiring. | Artz Friday, May 2026 | gratitude
+- The spirit of HEN is omnipotent. It will never die. Not limited to a discord server nor a domain name. Here, Now, Everywhere and Forever. | X, November 2021 | community
+- Tezos community is a living, evolving canvas where collaboration fuels creativity and innovation pushes boundaries. Here, artists co-create, communities self-curate, and adaptability ensures we grow together. | X, February 2025 | creation
+- Tezos has a fountain for new artists, and Tezos artists have really cute cats. Spread the word. | X, February 2025 | creation
+- In contrast to the song "Empathy", I needed to write a song about "Apathy". | X, July 2025 | creation
+- Hey you, Tezos friend....go nominate some artists for tezARTicle. Thanks | X, March 2025 | creation
+- The connections you make are un-taxable gains. | X, September 2024 | creation
+- So painting on canvas is 3 dimensional and I\u2019ve never appreciated that until meow. | X, November 2025 | resilience
+- You can either focus on the problems in fear, Or you can build the solutions, cheers. | X, October 2021 | resilience
+- "We live in a simulation where fine art gets eaten, yet artists somehow starve" | X, January 2025 | resilience
+- Art created a few months ago isn\u2019t \u201cold work\u201d. In fact, all digital art is relatively new. Let\u2019s slow down a bit and spend more time appreciating each and every piece of our heArt we release into the world. | X, September 2026 | persistence
+- Never apologize to me for \u201cbad English\u201d. It is a confusing language and at least you are trying. I\u2019m sorry I haven\u2019t even tried to learn your native language. | X, February 2025 | persistence
+- Make something from nothing, with your hands and your heart. To me that's the only requirement, for something to be art. Do not get consumed with envy. Another's success is something worth celebrating. Stop complaining. Just keep creating. | X, March 2022 | persistence
+- We are building something magical and sustainable on tezos and I highly recommend that you TUNE IN. | X, March 2023 | persistence
+- I want to see a DigitalRenaissance, where the entire world shifts its focus from politics and violence, to this glorious, inclusive, and accessible culmination of creational energy we are experiencing on tezos. The tezoscommunity vibe will permeate over time. Keep building. | X, April 2022 | persistence
+- Followed all new collectors! Thank you so much for taking part in this first OpenEdition of "Acoustic Sessions". I am overflowing with motivation and so inspired thanks to all of you. Session 02 will be ready by the end of the weekend. | X, February 2023 | gratitude
+- Big personal milestone reaching 500 followers. Thank you frens. | X, April 2021 | gratitude
+- Through this screen we can be, examples of peace we wish to see. Send more flowers, empower humanity. \u201cA Flower For You\u201d is now live on Transient Labs. | X, February 2026 | gratitude
+- Most people just ride the waves gratefully, but for some reason we have to be marine biologists about every motion in the ocean. | X, November 2024 | gratitude
+- I long to go people-watch on these streets during a time of peace. 1/1 - "Bustling Streets" | X, October 2023 | gratitude
+- Overwhelmed with gratitude to even be mentioned out of something like 800 entries! | X, April 2023 | gratitude
+- Pouring my heart out on Tezos as a singer songwriter actively producing an album. At least 21 people are tuned in so far. I'd love for you to be the next person I connect with through music. Just a few clicks away, starting in the comments. DM's also open. | X, September 2025 | love
+- It\u2019s a \u201cpiece of art\u201d because it represents a piece of someone\u2019s heArt. It\u2019s the same chemistry as love manifested into our physical world. It\u2019s beautiful. It\u2019s ugly. It\u2019s messy. It\u2019s weird. It\u2019s life. Express yourself. That\u2019s art. One heArt, Infinite expressions of love. | X, September 2026 | love
+- My goal in life is simple. Be healthy, share love, make art. I have been creating, with those beacons at the forefront, for over 20 years now. Always seeking improvement. | X, August 2023 | love
+- I guarantee if you "stop to smell the roses" within web3 and for a moment forget about chasing gains....you will fall in love with tezos. Collectively the space needs that...which would in turn "correct" the evaluation of this magical place where artists find hope and power. | X, April 2023 | love
 
 # Made
 - Let Everybody Love | An original song about how everybody deserves to have their own experience with love. | 2023
@@ -1405,6 +1429,91 @@ I live offline, so I cannot see how many are minted right now. The website shows
 - Anxiety Society | Written, Recorded and Produced by Yoeshi Labs. | 2024
 - Right Now, Right Here - Interactive Album | A re-release of an album from 2012, when I was the lead singer/songwriter for the band "Acoustic Encouragement". | 2024
 - Right Now, Right Here - Interactive Album | Yoeshi Roberts - Songwriting, Guitar, Ukulele, Kazoo + digital jukebox design | 2024
+- Right Now, Right Here - Interactive Album | Joanie Ferguson - Drums, Percussion | 2024
+- Right Now, Right Here - Interactive Album | Scott Rodziczak - Drum Tech, Production Assistant | 2024
+- GOD Particle | Production, Vocals, Project Management - Yoeshi Labs @YinYangYoeshi | 2024
+- Cleopatra's Chamber | A meticulously crafted and composed scene utilizing several of the leading AI tools, paired with a custom recorded non-ai sound loop. | 2024
+- Only One Of The Miles | Recorded in one-take on Logic Pro, directly after writing. | 2024
+- Only One Of The Miles | Made the visual with Leonardo AI + Kaiber AI + Pixelmator Pro. | 2024
+- No Hurry | An acoustic song I wrote with my new guitar, Ruby. | 2024
+- No Hurry | Cover Art is mixed-media photography composition. | 2024
+- Back To My Heart | Written and Recorded July 2024 at Yoeshi Labs. | 2024
+- Float Away | Original lyrics inputted into UDIO with a specific song structure and style in mind. | 2024
+- Float Away | Meticulously crafted via extracting stems into DAO for editing, mixing and mastering. | 2024
+- Float Away | I then uploaded a sample of my new mix back into UDIO and did a remix with added outro. | 2024
+- Float Away | I hope you enjoy this song made from my HeArt in collaboration with AI. | 2024
+- Float Away | The visual was originally generated with Leonardo AI, edited by hand in Pixelmator Pro, and then upscaled with Krea AI. | 2024
+- New Holiday Tune | After writing and recording songs organically for decades, I'm allowing myself to have fun with SUNO. | 2025
+- New Holiday Tune | Some songs, I replace the AI vocals, but after some refinement, this "AI singer" simply executed the emotions better than I could with the equipment I have available...Wild times. | 2025
+- New Holiday Tune | Refined and Mastered in Logic Pro. | 2025
+- New Holiday Tune | Visual created with referenced models from an upcoming PFP project, generated with Nano Banana. | 2025
+- Internet Friend | Music created with SUNO with my custom-trained persona. | 2025
+- Internet Friend | Original lyrics written from the heart for a friend. | 2025
+- Build The Things - A Musical Foundation | Rap to it, remix it, or just enjoy the vibes. | 2022
+- OttezTune - Otterlist Edition | Lyrics are a summary of the lore: | 2022
+- OttezTune - Otterlist Edition | Upgraded so many times Tezos formed an AI. | 2022
+- Mekatron Anthem - Whitelist Edition | Cover art was a collaborative effort. | 2022
+- Mekatron Anthem - Whitelist Edition | Lyrics are a summary of the lore: | 2022
+- Oxtazy Tune | Cover art was a collaborative effort. | 2022
+- Good Weird - Yoeshi Labs Ft. Boost | A true passion project in collaboration with @SPP_SportsPICKS, from WuTez. | 2022
+- Buidl Blind - Gold Medal Ghost Ft. Yoeshi Labs | Cover art inspired by Flux Tribe Graduate, "Buidl Blind". | 2022
+- Buidl Blind - Gold Medal Ghost Ft. Yoeshi Labs | The music was produced by Gold Medal Ghost. | 2022
+- Buidl Blind - Gold Medal Ghost Ft. Yoeshi Labs | Lyrics and Vocals by Yoeshi Labs | 2022
+- Gotta Step Away (G.S.A) - U & Yoe Ft. FKB | A 2021 collab between Yoeshi Labs and IdeaUnsound (@unsound_musings) featuring FKB (@houseoftez). | 2022
+- Revitalize - by Yoeshi Labs | 2022 Yoeshi Labs Production. | 2022
+- Revitalize - by Yoeshi Labs | Yoeshi Labs is a music and art production studio that was built from the ground up on Tezos NFT sales. | 2022
+- Degen Anthem | 2022 Yoeshi Labs Production. | 2022
+- Art Within Your Heart | Everyone has a heart beat, | 2022
+- Art Within Your Heart | Find what makes that beat start. | 2022
+- Art Within Your Heart | A Yoeshi Labs Production. | 2022
+- Greatest At Being Me | Produced with love by Yoeshi Labs, featuring dance artist @TechnikoArt and saxophonist @Shaddowmusic. | 2022
+- Greatest At Being Me | These will be the only collectible files ever for this production. | 2022
+- Stay Up - Wutez Collab | An audio/ visual collab between Yoeshi Labs and AK creations, members of Wutez. | 2022
+- Stay Up - Wutez Collab | Backdrop of the Cover Art is a combination of AI and composition by Yoeshi. | 2022
+- Chakra - Acoustic Encouragement | Part of the "Right Now Right Here" album release from Acoustic Encouragement circa 2012. | 2022
+- Chakra - Acoustic Encouragement | Vocals, Song Writing, Guitar - Yoeshi Labs | 2022
+- Chakra - Acoustic Encouragement | Bass - Walter Kevin Vines | 2022
+- Chakra - Acoustic Encouragement | Drums, Percussion - Joanie Ferguson | 2022
+- Chakra - Acoustic Encouragement | Production, Master - Angelic Productions | 2022
+- Still Sinking | A Yoeshi Labs Production. | 2022
+- Still Sinking | This is a custom Teztune commission for Nadia (nadia.tez), who played an enormous role in the production process with thoughtful and passionate feedback. | 2022
+- Abundance | Song Writing/Vocals/Production: Yoeshi Labs | 2022
+- Abundance | Mixed Media cover art composed utilizing AI, by Yoeshi | 2022
+- Ups And Downs | Written, performed and recorded by Yoeshi, at Yoeshi Labs. | 2025
+- Ups And Downs | One take, One mic, Logic Pro. | 2025
+- Ups And Downs | The Visual: Mixed media composition with AI assistance. | 2025
+- Pursuit Of Happiness | Written, performed and recorded by Yoeshi, at Yoeshi Labs. | 2025
+- Pursuit Of Happiness | One take, One mic, Logic Pro. | 2025
+- Pursuit Of Happiness | The Visual: Mixed media composition with AI assistance. | 2025
+- Empathy (Acoustic) | Written, performed and recorded by Yoeshi, at Yoeshi Labs. | 2025
+- Empathy (Acoustic) | One take, One mic, Logic Pro. | 2025
+- Empathy (Acoustic) | The Visual: Mixed media composition with AI assistance. | 2025
+- Apathy (Acoustic) | Written, performed and recorded by Yoeshi, at Yoeshi Labs. | 2025
+- Apathy (Acoustic) | One take, One mic, Logic Pro. | 2025
+- Apathy (Acoustic) | The Visual: Mixed media composition with AI assistance. | 2025
+- So Grateful | Written, performed and recorded by Yoeshi. | 2025
+- So Grateful | One take, One mic, Logic Pro. | 2025
+- So Grateful | The Visual: Mixed media composition with AI assistance. | 2025
+- Stress Free Day | Written, performed and recorded by Yoeshi. | 2025
+- Stress Free Day | One take, One mic, Logic Pro. | 2025
+- Stress Free Day | The Visual: Mixed media composition with AI assistance. | 2025
+- No Hurry (Acoustic Session) | The Music: This is a first rendition aka acoustic session. | 2025
+- No Hurry (Acoustic Session) | Written, performed and recorded by Yoeshi, at Yoeshi Labs. | 2025
+- No Hurry (Acoustic Session) | One take, One mic, Logic Pro. | 2025
+- No Hurry (Acoustic Session) | The Visual: Mixed media composition with AI assistance. | 2025
+- Here To Write (Acoustic) | Written, performed and recorded by Yoeshi. | 2025
+- Here To Write (Acoustic) | One take, One mic, Logic Pro. | 2025
+- Here To Write (Acoustic) | This is also the most recently written song on this album production. | 2025
+- Here To Write (Acoustic) | The Visual: Mixed media composition with AI assistance. | 2025
+- A Love Story | Written, performed and recorded by Yoeshi, at Yoeshi Labs. | 2025
+- A Love Story | One take, One mic, Logic Pro. | 2025
+- A Love Story | This is also one of the most recently written songs on this album production. | 2025
+- A Love Story | The Visual: Mixed media composition with AI assistance. | 2025
+- You Hung The Moon | The Music: This is a first rendition aka acoustic session. | 2025
+- You Hung The Moon | Written, performed and recorded by Yoeshi, at Yoeshi Labs. | 2025
+- You Hung The Moon | One take, One mic, Logic Pro. | 2025
+- You Hung The Moon | The Visual: Mixed media composition with AI assistance. | 2025
+- Quiet Please (Intro) + Alt Album Cover Debut | This visual artwork is the first render of what will likely become my next "web2" album cover. | 2025
 
 # Wisdom
 - A cat does not try to be calm. It simply stops chasing what does not matter.
