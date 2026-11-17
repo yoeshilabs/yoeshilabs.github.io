@@ -11,11 +11,16 @@
    "tokenId": "5"
   },
   {
+   "name": "Prancer Park",
+   "contract": "KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH",
+   "tokenId": "6"
+  },
+  {
    "name": "Prancer 3D, any mint",
    "contract": "KT1AWMEruwAERUDcW2ppS8oXnEdjn6w4xqyn",
    "tokenId": ""
   }
  ],
- "need": "a Purrancers concert film (Internet Friend or Decentralize) or any Prancer 3D",
+ "need": "a Purrancers concert film (Internet Friend or Decentralize), Prancer Park or any Prancer 3D",
  "get": "https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH"
 }
