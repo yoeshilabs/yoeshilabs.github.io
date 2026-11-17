@@ -12,7 +12,13 @@ import*as THREE from"three";import{whiskers}from"./whiskers.js";const PART={tors
     vec3 cell = floor(q), o = h33(cell) * 0.6 + 0.2; float d = length((fract(q) - o).xz + (fract(q) - o).y * 0.3);
     float len = 0.5 + 0.5 * h31(cell + 5.0), k = vShell / len;
     /* at the silhouette the outer layers are seen edge on: there the strands thin, so the edge reads soft rather than spiked */
-    float gz = 1.0 - abs(dot(normalize(vNormal), normalize(vViewPosition))), thin = mix(1.0, 0.3, smoothstep(0.45, 1.0, gz) * smoothstep(0.2, 0.9, vShell));
+    /* (a faceted coat, Crystal's flatShading, has no vNormal: its face's normal from the derivatives, as three.js takes it) */
+#ifdef FLAT_SHADED
+    vec3 gNrm = normalize(cross(dFdx(vViewPosition), dFdy(vViewPosition)));
+#else
+    vec3 gNrm = normalize(vNormal);
+#endif
+    float gz = 1.0 - abs(dot(gNrm, normalize(vViewPosition))), thin = mix(1.0, 0.3, smoothstep(0.45, 1.0, gz) * smoothstep(0.2, 0.9, vShell));
     float rr = (0.5 * sqrt(max(0.0, 1.0 - k * k)) * (1.0 - 0.35 * k) + 0.035) * thin;
     /* soft tips (with the room's anti-aliasing, uSoft): a strand's edge and its last part fade rather than stop, as a real hair's tip does */
     float al = uSoft > 0.5 ? (1.0 - smoothstep(rr * 0.55, rr * 1.15, d)) * (1.0 - smoothstep(0.7, 1.0, k)) : step(d, rr) * step(k, 1.0);
