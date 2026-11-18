@@ -76,6 +76,28 @@
   .recap .sharebtns .btn { display: inline-block; padding: 10px 18px; border-radius: 999px; background: linear-gradient(180deg, #ff7fb8, #ffcf6e); color: #1a0b24; font-weight: 700; text-decoration: none; font-size: 15px; }
   .recap .sharebtns .btn.ghost { background: rgba(255, 255, 255, .1); color: var(--ink); border: 1px solid rgba(255, 255, 255, .2); }
   .recap .share small { display: block; margin-top: 8px; color: var(--dim); font-size: 12px; }
+  /* the doors, in order (Yoeshi, 2026-11-18: "refine the ui/ux of the door some more now. a lot of weird placement"): who you are tonight,
+     what you will see, one way in that stays on screen, and the rest folded away until it is wanted */
+  #doors .card { max-width: 460px; width: 100%; }
+  #doors .card > img { width: min(380px, 80vw); margin-bottom: 2px; }
+  #doors .lead { margin: 4px 0 16px; }
+  body:not(.in) #hud, body:not(.in) #score { display: none; }   /* the show's own corner labels wait until you are inside */
+  #doors .cats, #setfloat .cats { display: grid; grid-template-columns: repeat(9, 44px); gap: 6px; justify-content: center; } #doors .catbtn, #setfloat .catbtn { width: 44px; height: 44px; font-size: 18px; }
+  @media (max-width: 480px) { #doors .cats, #setfloat .cats { grid-template-columns: repeat(5, 50px); gap: 8px; } #doors .catbtn, #setfloat .catbtn { width: 50px; height: 50px; } }
+  #doors .mine { margin: 10px 0 4px; } #doors .catname { margin: 10px 0 8px !important; } #doors .ownseed { margin: 0 0 4px; }
+  #nightpick { margin: 0 0 14px; } #nightpick .nightlead { display: block; margin: 0 0 6px; font-size: 13px; color: var(--dim); }
+  .doorgo { margin: 16px 0 0; }
+  /* where the doors are taller than the screen (a phone, a short window), the way in stays on screen at the bottom */
+  @media (max-width: 899px), (max-height: 760px) { .doorgo { position: sticky; bottom: 0; z-index: 1; margin: 16px -16px 0; padding: 22px 16px 12px; background: linear-gradient(rgba(12, 5, 20, 0), rgb(12, 5, 20) 20px); } }
+  .doorgo #enter { min-width: 220px; }
+  .doorgo #ticketmsg { margin: 10px 0 0; font-size: 14px; }
+  .doorlinks { display: flex; flex-wrap: wrap; gap: 4px 16px; justify-content: center; align-items: center; margin-top: 8px; font-size: 14px; }
+  .doorlinks:empty { display: none; } .doorlinks a { color: var(--gold); } .doorlinks #invitedoor { margin: 0 !important; } .doorlinks #framenote { flex-basis: 100%; }
+  .fold { margin: 14px 0 0; text-align: left; border-top: 1px solid rgba(255, 255, 255, .1); padding-top: 10px; }
+  .fold summary { cursor: pointer; color: var(--dim); font-size: 14px; text-align: center; list-style: none; } .fold summary::-webkit-details-marker { display: none; }
+  .fold summary::after { content: " +"; color: var(--gold); } .fold[open] summary::after { content: " −"; } .fold[open] summary { margin-bottom: 10px; }
+  .fold .keys, .fold .touch { margin: 0 !important; font-size: 13px; text-align: center; }
+  #doors .warn { margin: 14px auto 0; }
 </style>
 <script type="importmap">{ "imports": { "three": "../lib/three.module.min.js" } }</script>
 </head>
@@ -93,13 +115,17 @@
 <div class="veil" id="doors">
   <div class="card">
     <img src="assets/purrancers-title.png" alt="The Purrancers">
-    <p>Live in the Sphere. Walk the floor, find your spot, and turn the sound up.
-      <span class="keys"><br>W A S D to walk (Shift to run), the mouse to look, E to use, Space to jump (hold for paws up), 1 to 9 to emote (7 claps on the beat), V or the middle mouse button to switch view (or scroll in and out), M to mute, O for settings, P to take a photo.</span>
-      <span class="touch"><br>The stick to walk, drag to look, and the buttons.</span></p>
+    <p class="lead">Live in the Sphere. Walk the floor, find your spot, and turn the sound up.</p>
     <div id="youpanel"></div>
-    <button id="enter" disabled>Doors opening…</button>
-    <p id="ticketmsg" hidden style="margin:14px 0 0"></p>
-    <a id="ticketget" hidden target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;color:var(--gold)">Get your ticket</a>
+    <div class="doorgo">
+      <button id="enter" disabled>Doors opening…</button>
+      <p id="ticketmsg" hidden></p>
+      <div class="doorlinks"><a id="ticketget" hidden target="_blank" rel="noopener">Get your ticket</a></div>
+    </div>
+    <details class="fold" id="doorset"><summary>Settings: view and graphics</summary><div id="setpanel"></div></details>
+    <details class="fold"><summary>How to play</summary>
+      <p class="keys">W A S D to walk (Shift to run), the mouse to look, E to use, Space to jump (hold for paws up), 1 to 9 to emote (7 claps on the beat), V or the middle mouse button to switch view (or scroll in and out), M to mute, O for settings, P to take a photo.</p>
+      <p class="touch">The stick to walk, drag to look, and the buttons.</p></details>
     <p class="warn"><b>Photosensitivity warning:</b> this show has flashing and pulsing lights, bright colours and fast-moving visuals.</p>
   </div>
 </div>

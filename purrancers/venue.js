@@ -29,7 +29,7 @@ export function buildVenue({ scene, STAGE, fanTex, fanMeta, pinFaces }) {
   for (let i = 0; i < 70; i++) { let a = -A_MAX + i * (2 * A_MAX) / 69; if (Math.abs(a) < GAP) a = Math.sign(a || 1) * GAP; const m = new THREE.Matrix4().setPosition(P(R_IN + 0.25, a, DECK + 0.5)); posts.setMatrixAt(i, m); } group.add(posts);
   const wall = new THREE.Mesh(new THREE.CylinderGeometry(R_OUT + 0.2, R_OUT + 0.2, 6, 120, 1, true, Math.PI - A_MAX - 0.06, 2 * A_MAX + 0.12), std(0x1c0f24, 0.9));
   wall.material.side = THREE.DoubleSide; wall.position.set(STAGE.x, DECK + 3, STAGE.z); wall.name = "backwall"; group.add(wall);   // (the 3D show re-skins it by name)
-  group.add(new THREE.Mesh(new THREE.TubeGeometry(new Arc(R_OUT + 0.1, DECK + 3.6), 200, 0.03, 6), glow(0x7fe6ff)));
+  { const wl = new THREE.Mesh(new THREE.TubeGeometry(new Arc(R_OUT + 0.1, DECK + 3.6), 200, 0.03, 6), glow(0x7fe6ff)); wl.name = "backwall light"; group.add(wl); }   // (named for the 3D show's open wall study, show3d/openwall.js)
 
   /* the centre aisle: from the concourse down the middle of the floor to an open pocket at the barrier */
   const carpet = std(0x5a1430, 0.9), nose = glow(0xffd36e);
@@ -102,11 +102,11 @@ export function buildVenue({ scene, STAGE, fanTex, fanMeta, pinFaces }) {
   const HALL = [["01-prancers", "Prancers", "Chapter 01 · Aleatory"], ["02-pads", "Prancer Pads", "Chapter 02 · Aleatory"], ["03-pfp", "Prancer Portraits", "Chapter 03 · Aleatory"],
     ["04-wild-ride", "Wild Ride", "Chapter 04 · with scuni"], ["05-prance-trance", "Prance Trance", "Prancers On Objkt"], ["06-post", "Prancer Post", "Chapter 05 · Aleatory"],
     ["07-prance-or-treat", "Prance Or Treat!", "Prancers On Objkt"], ["08-purrancers-debut", "The Purrancers Debut", "Chapter 06 · Prancers On Objkt"],
-    ["09-prancer-3d", "Prancer 3D", "Chapter 07 · Aleatory"]];   // the Purranchise only (heART Tarot stays out, Yoeshi 2026-11-01); 06 and 07 added 2026-11-07 (Yoeshi)
+    ["09-prancer-3d", "Prancer 3D", "Chapter 07 · Aleatory"], ["10-prancer-park", "Prancer Park", "Chapter 08 · Prancers On Objkt"]];   // the Purranchise only (heART Tarot stays out, Yoeshi 2026-11-01); 06 and 07 added 2026-11-07 (Yoeshi); Prancer Park 2026-11-18 (Yoeshi: "prancer park should be added to the art hall")
   const loader = new THREE.TextureLoader(), A0 = -1.38, A1 = A0 + 0.05 * HALL.length;   // a frame every 0.05 rad (1.33 m), the hall growing toward the food stand
   const hs = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.62), new THREE.MeshBasicMaterial({ map: sign("Prancer Art Hall", ["#c38bff", "#7fe6ff"]), transparent: true, toneMapped: false, fog: false }));
-  hs.position.copy(P(R_OUT - 0.05, (A0 + A1) / 2, DECK + 3.15)); hs.rotation.y = -(A0 + A1) / 2; group.add(hs);
-  HALL.forEach(([file, title, line], i) => { const a = A0 + (i + 0.5) * (A1 - A0) / HALL.length, g = new THREE.Group(); g.position.copy(P(R_OUT - 0.08, a, DECK)); g.rotation.y = -a; group.add(g);
+  hs.position.copy(P(R_OUT - 0.05, (A0 + A1) / 2, DECK + 3.15)); hs.rotation.y = -(A0 + A1) / 2; hs.name = "hall sign"; group.add(hs);
+  HALL.forEach(([file, title, line], i) => { const a = A0 + (i + 0.5) * (A1 - A0) / HALL.length, g = new THREE.Group(); g.position.copy(P(R_OUT - 0.08, a, DECK)); g.rotation.y = -a; g.name = "hall frame"; group.add(g);
     const tex = loader.load(`assets/hall/${file}.jpg`); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
     const fr = new THREE.Mesh(new THREE.BoxGeometry(1.12, 1.12, 0.06), std(0xd9b45a, 0.35, 0.8)); fr.position.set(0, 1.75, 0); g.add(fr);
     const art = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.0), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false })); art.position.set(0, 1.75, 0.035); g.add(art);
@@ -130,7 +130,7 @@ export function buildVenue({ scene, STAGE, fanTex, fanMeta, pinFaces }) {
   /* fans step out of the aisle and the pocket (and off the desk and the stands) */
   const keepClear = (x, z) => { const r = Math.hypot(x - STAGE.x, z - STAGE.z); if (z < STAGE.z && Math.abs(x - STAGE.x) < AISLE + 0.35 && r < R_IN + 0.5) return true;
     if (P(9.9, 0).setY(0).distanceTo(new THREE.Vector3(x, 0, z)) < POCKET + 0.3) return true; return colliders.some((c) => Math.hypot(x - c.x, z - c.z) < c.r + 0.3); };
-  return { group, stands, pins, colliders, FOH, P, update, keepClear, hall: { a0: A0, a1: A1 } };
+  return { group, stands, pins, colliders, FOH, P, update, keepClear, hall: { a0: A0, a1: A1, pieces: HALL } };
 }
 
 /* round pin faces for the band: each player's cell from the band video (colour, with its alpha from below), on a gold pin */

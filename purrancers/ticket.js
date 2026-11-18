@@ -135,10 +135,56 @@ export function windowSignIn(ui, why, done) {
   const watch = setInterval(() => { if (!w.closed) return; clearInterval(watch);
     setTimeout(() => { if (got) return; removeEventListener("message", on); ui.status("The sign-in window closed. Try again whenever you are ready.", true); }, 1500); }, 700); }
 
+/* Invite passes (Yoeshi, 2026-11-18: "i'd like to be able to generate an invite link to the sphere concerts so people I know that are just
+   not going to learn tezos can still see the show when I want them to. kind of like vip pass, or maybe even easier to have a reference code
+   they can enter at the door"). He makes a code on his Mac (tools/invite.mjs); a friend types it at the doors, or opens his link, which
+   carries it after a # (the part of an address no server is sent). invites.json, beside this file, holds only each code's hash and the day it
+   ends: no names, nothing about a guest, and the code itself is not in the page. A pass is kept for this tab's session, as a ticket's is. The
+   same honest limit as the ticket: a check in the page keeps casual visitors out, and a code can be passed on, so a code ends on its day and
+   he can take one back early (tools/invite.mjs revoke). No wallet, nothing signed, nothing sent anywhere. */
+const INV = "purrancers-invite";
+const normCode = (c) => String(c || "").toUpperCase().replace(/[^0-9A-Z]/g, "");
+async function inviteHash(code) { const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("purrancers-pass:" + normCode(code))); return Array.from(new Uint8Array(d), (b) => b.toString(16).padStart(2, "0")).join(""); }
+let invitesP = null;
+const loadInvites = () => invitesP || (invitesP = fetch(new URL("invites.json", import.meta.url), { cache: "no-store" }).then((r) => (r.ok ? r.json() : {})).then((j) => (Array.isArray(j.passes) ? j.passes : [])).catch(() => []));
+/* the code good tonight? -> the pass's id, or null */
+export async function tryInvite(code) {
+  if (normCode(code).length < 8) return null;
+  const [list, h] = await Promise.all([loadInvites(), inviteHash(code)]), now = Date.now();
+  const p = list.find((x) => x && x.h === h && (!x.until || Date.parse(x.until) > now) && (!x.from || Date.parse(x.from) <= now));
+  if (!p) return null;
+  try { sessionStorage.setItem(INV, JSON.stringify({ id: p.id, until: p.until || null })); } catch (e) {}
+  return p.id; }
+export const hasInvite = () => !!invitePass();
+const invitePass = () => { try { const v = JSON.parse(sessionStorage.getItem(INV)); return v && v.id && (!v.until || Date.parse(v.until) > Date.now()) ? v : null; } catch (e) { return null; } };
+/* the doors' invite line: "Have an invite code?" under the ticket link, opening a field; a link's #pass= fills it in and goes straight
+   in. open() is the doors' own way in (the button's click). Shown only while the doors ask for a ticket. */
+export function inviteDoor(after, cfg, open) {
+  if (!cfg || !cfg.contract || !after || document.getElementById("invitedoor")) return;
+  const wrap = document.createElement("div"); wrap.id = "invitedoor"; wrap.style.cssText = "margin:12px 0 0;font-size:14px";
+  const ask = document.createElement("button"); ask.type = "button"; ask.textContent = "Have an invite code?";
+  ask.style.cssText = "background:transparent;border:none;box-shadow:none;color:var(--gold);text-decoration:underline;font-size:14px;padding:2px 6px;cursor:pointer";
+  const form = document.createElement("form"); form.hidden = true; form.style.cssText = "margin:8px 0 0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap";
+  const inp = document.createElement("input"); inp.type = "text"; inp.autocomplete = "off"; inp.spellcheck = false; inp.placeholder = "XXXX-XXXX"; inp.setAttribute("aria-label", "Invite code"); inp.maxLength = 24;
+  inp.style.cssText = "font:inherit;font-size:16px;letter-spacing:.12em;text-transform:uppercase;text-align:center;width:11em;padding:7px 10px;border-radius:8px;border:1px solid var(--gold);background:rgba(0,0,0,.35);color:inherit";
+  const go = document.createElement("button"); go.type = "submit"; go.textContent = "Come in"; go.style.cssText = "font-size:14px;padding:7px 16px";
+  const msg = document.createElement("p"); msg.hidden = true; msg.style.cssText = "margin:8px 0 0;font-size:13px;opacity:.9";
+  form.append(inp, go); wrap.append(ask, form, msg); after.after(wrap);   // (the 3D doors keep it beside the ticket link, in their links row)
+  ask.onclick = () => { ask.hidden = true; form.hidden = false; inp.focus(); };
+  const attempt = async (code) => { go.disabled = true; msg.hidden = false; msg.textContent = "Checking your code…";
+    const id = await tryInvite(code); go.disabled = false;
+    if (!id) { msg.textContent = "That code is not open tonight. Check it with the person who gave it to you."; return; }
+    msg.textContent = "Welcome. Opening the doors…"; open(); };
+  form.onsubmit = (e) => { e.preventDefault(); attempt(inp.value); };
+  const m = /(?:^|[#&])pass=([^&]+)/.exec(location.hash || "");
+  if (m) { const code = decodeURIComponent(m[1]); try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}   // the code off the address bar
+    ask.hidden = true; form.hidden = false; inp.value = code; attempt(code); } }
+
 /* ui: { status(text, stop) }; returns true when the visitor may enter */
 export async function checkTicket(cfg, ui) {
   if (!cfg.contract) return true;                                                               // no ticket set yet: doors open
   if (testDoor()) return true;   // testing on this Mac
+  if (invitePass()) return true;   // a friend with his invite code
   const pass = session.get(); if (pass && pass.contract === cfg.contract) return true;
   const address = await signIn(ui); if (!address) return false;
   try {

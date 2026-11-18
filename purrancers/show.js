@@ -18,7 +18,7 @@ import { OutputPass } from "./lib/jsm/postprocessing/OutputPass.js";
 import { RoomEnvironment } from "./lib/jsm/environments/RoomEnvironment.js";
 import { buildVenue, makePinFaces, floorAt, A_MAX } from "./venue.js";
 import { createGame, COATS } from "./game.js";
-import { loadTicket, checkTicket, frameNote } from "./ticket.js";
+import { loadTicket, checkTicket, frameNote, inviteDoor, hasInvite } from "./ticket.js";
 
 const $ = (id) => document.getElementById(id);
 const B = ([x, y, z]) => new THREE.Vector3(x, z, -y);
@@ -110,6 +110,9 @@ const fanMeta = await (await fetch("assets/fans.json")).json();
 const fanTex = await new THREE.TextureLoader().loadAsync("assets/fans.webp"); fanTex.colorSpace = THREE.SRGBColorSpace; fanTex.anisotropy = 4;
 const pinCanvases = Array.from({ length: 8 }, () => Object.assign(document.createElement("canvas"), { width: 256, height: 256 }));
 const venue = buildVenue({ scene, STAGE, fanTex, fanMeta, pinFaces: pinCanvases });
+/* the concourse's back wall put away, so the dome's picture runs down behind the stands, and the Art Hall as glass screens (openwall.js, as
+   the 3D show; Yoeshi, 2026-11-18: "definitely an upgrade to add across the shows"; ?open=0 is the room as it was) */
+if (new URLSearchParams(location.search).get("open") !== "0") { const { openWall } = await import("./openwall.js"); openWall({ THREE, sphere: null, venue, STAGE }); }
 lay.fans = lay.fans.filter((f) => { const p = B([f.x, f.y, f.z]); return !venue.keepClear(p.x, p.z); });
 const fanGeo = new THREE.InstancedBufferGeometry().copy(new THREE.PlaneGeometry(1, 1).translate(0, 0.46, 0)); fanGeo.instanceCount = lay.fans.length;
 const rnd = ((z) => () => (z = (z * 1664525 + 1013904223) >>> 0) / 4294967296)(20261101);
@@ -217,10 +220,12 @@ const ticketUi = { status(text, stop) { tmsg.textContent = text; tmsg.hidden = f
 if (ticket.get) tget.href = ticket.get;
 frameNote(tget, ticket, { ui: { status: (s, stop) => ticketUi.status(s, stop && !enter.disabled) }, done: () => { if (!enter.disabled) enter.click(); else tmsg.textContent = "Signed in. Show your ticket when the doors open."; } });   // inside TezTowers: Temple cannot connect there; a sign-in window of the show's own, or the phone (ticket.js)
 const enter = $("enter");
+/* a friend's invite code (ticket.js): good, the doors' button says so and opens them (or opens them once they are ready) */
+inviteDoor(tget, ticket, () => { tmsg.hidden = true; if (!enter.disabled) enter.click(); else enter.dataset.invite = "1"; });
 band.addEventListener("loadeddata", () => { band.addEventListener("seeked", () => { makePinFaces(band, pinCanvases); venue.pins.forEach((p) => (p.sprite.material.map.needsUpdate = true));
-    band.currentTime = START; enter.disabled = false; enter.textContent = ticket.contract ? "Show your ticket" : "Enter the show"; }, { once: true }); band.currentTime = 70; }, { once: true }); band.load();
+    band.currentTime = START; enter.disabled = false; enter.textContent = ticket.contract && !hasInvite() ? "Show your ticket" : "Enter the show"; }, { once: true }); band.currentTime = 70; }, { once: true }); band.load();
 enter.addEventListener("click", async () => { enter.disabled = true; tget.hidden = true; if (!(await checkTicket(ticket, ticketUi))) return;
-  $("doors").remove(); live = true; audio.currentTime = START; band.currentTime = START;
+  $("invitedoor")?.remove(); $("doors").remove(); live = true; audio.currentTime = START; band.currentTime = START;
   try { await audio.play(); } catch (e) {   // a long wallet visit can use up the click that allowed sound: one more tap starts it
     const g = $("soundgate"); g.hidden = false; await new Promise((res) => g.addEventListener("click", res, { once: true })); g.hidden = true; await audio.play().catch(() => {}); }
   band.play().catch(() => {});

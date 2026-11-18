@@ -1,0 +1,4 @@
+{
+ "_about": "Invite passes to the doors (tools/invite.mjs): each code's SHA-256 hash and its dates, nothing else. Who each is for stays on the Mac.",
+ "passes": []
+}
