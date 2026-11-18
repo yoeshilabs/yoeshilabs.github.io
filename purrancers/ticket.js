@@ -144,7 +144,22 @@ export function windowSignIn(ui, why, done) {
    he can take one back early (tools/invite.mjs revoke). No wallet, nothing signed, nothing sent anywhere. */
 const INV = "purrancers-invite";
 const normCode = (c) => String(c || "").toUpperCase().replace(/[^0-9A-Z]/g, "");
-async function inviteHash(code) { const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("purrancers-pass:" + normCode(code))); return Array.from(new Uint8Array(d), (b) => b.toString(16).padStart(2, "0")).join(""); }
+/* SHA-256 of the code. The browser's own where it gives it (only to a secure page: inside a frame whose top page is plain http it does not),
+   else this plain one, so the doors never hang */
+function sha256hex(bytes) { const K = [], H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+  for (let n = 2, c = 0; c < 64; n++) { let p = true; for (let i = 2; i * i <= n; i++) if (n % i === 0) { p = false; break; } if (p) K[c++] = (Math.cbrt(n) % 1) * 2 ** 32 | 0; }
+  const l = bytes.length, m = new Uint8Array(((l + 9 + 63) >> 6) << 6); m.set(bytes); m[l] = 0x80; const dv = new DataView(m.buffer); dv.setUint32(m.length - 4, l * 8); dv.setUint32(m.length - 8, Math.floor(l / 2 ** 29));
+  const r = (x, n) => (x >>> n) | (x << (32 - n)), w = new Array(64);
+  for (let o = 0; o < m.length; o += 64) { for (let i = 0; i < 16; i++) w[i] = dv.getUint32(o + i * 4);
+    for (let i = 16; i < 64; i++) { const a = w[i - 15], b = w[i - 2]; w[i] = (w[i - 16] + (r(a, 7) ^ r(a, 18) ^ (a >>> 3)) + w[i - 7] + (r(b, 17) ^ r(b, 19) ^ (b >>> 10))) | 0; }
+    let [A, B, C, D, E, F, G, Hh] = H;
+    for (let i = 0; i < 64; i++) { const t1 = (Hh + (r(E, 6) ^ r(E, 11) ^ r(E, 25)) + ((E & F) ^ (~E & G)) + K[i] + w[i]) | 0, t2 = ((r(A, 2) ^ r(A, 13) ^ r(A, 22)) + ((A & B) ^ (A & C) ^ (B & C))) | 0;
+      Hh = G; G = F; F = E; E = (D + t1) | 0; D = C; C = B; B = A; A = (t1 + t2) | 0; }
+    H[0] = (H[0] + A) | 0; H[1] = (H[1] + B) | 0; H[2] = (H[2] + C) | 0; H[3] = (H[3] + D) | 0; H[4] = (H[4] + E) | 0; H[5] = (H[5] + F) | 0; H[6] = (H[6] + G) | 0; H[7] = (H[7] + Hh) | 0; }
+  return H.map((x) => (x >>> 0).toString(16).padStart(8, "0")).join(""); }
+async function inviteHash(code) { const bytes = new TextEncoder().encode("purrancers-pass:" + normCode(code));
+  if (globalThis.crypto && crypto.subtle) { try { const d = await crypto.subtle.digest("SHA-256", bytes); return Array.from(new Uint8Array(d), (b) => b.toString(16).padStart(2, "0")).join(""); } catch (e) {} }
+  return sha256hex(bytes); }
 let invitesP = null;
 const loadInvites = () => invitesP || (invitesP = fetch(new URL("invites.json", import.meta.url), { cache: "no-store" }).then((r) => (r.ok ? r.json() : {})).then((j) => (Array.isArray(j.passes) ? j.passes : [])).catch(() => []));
 /* the code good tonight? -> the pass's id, or null */
