@@ -388,7 +388,7 @@ window.__frame = (ts, force) => { const E = (k) => PERFORM.env(k, ts), b = PERFO
      made this context resolve its drawing (opening DevTools did; so did one readPixels), and then it followed live. So: once at the start, once
      when a guest's piece comes on, and every 120 frames after (the PC's Windows test of LoveFromGaia's frozen dome, 2026-11-19) */
   const gOn = gs.mGuest > 0.001; RES.n++;
-  if (!RES.done || (gOn && !RES.guest) || RES.n % 120 === 0) { gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, RES.px); RES.done = true; if (gOn) RES.guest = true; }
+  if (!RES.done || (gOn && !RES.guest) || RES.n % 120 === 0) { setTimeout(() => gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, RES.px), 0); RES.done = true; if (gOn) RES.guest = true; }   // (in a task of its own, after the frame: read inside the draw it did not count, the PC found)
   if (!gOn) RES.guest = false;
   return new Promise((r) => requestAnimationFrame(() => r(m))); };
 const RES = { n: 0, done: false, guest: false, px: new Uint8Array(4) };
