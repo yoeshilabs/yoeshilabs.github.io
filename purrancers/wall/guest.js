@@ -39,8 +39,11 @@ const tex = (unit) => { const t = gl.createTexture(); gl.activeTexture(gl.TEXTUR
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0])); return t; };
 const guestTex = tex(4), creditTex = tex(5); gl.uniform1i(U("GUEST"), 4); gl.uniform1i(U("CREDIT"), 5);
+/* what the wall did with a guest's frames, for a check from the page (window.__guestDebug(): read only, nothing about a visitor) */
+const DBG = { frames: 0, uploads: 0, uploadErr: "", glErr: 0, last: null, w: 0, h: 0, alphaZero: null };
 const upload = (unit, t, src) => { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src); };
+  try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src); } catch (e) { DBG.uploadErr = String(e && e.message || e).slice(0, 200); }
+  const er = gl.getError(); if (er) DBG.glErr = er; if (unit === 4) { DBG.uploads++; DBG.w = src.width || src.videoWidth || 0; DBG.h = src.height || src.videoHeight || 0; } };
 
 /* ------------------------------------------------------------------ the credit, drawn once per booking */
 const CREDIT = Object.assign(document.createElement("canvas"), { width: 2048, height: 256 });
@@ -85,7 +88,8 @@ addEventListener("message", (e) => { const bk = BOOKED.find((b) => b.frame && e.
   else if (d.type === "wall:error") { if ((bk.errs = (bk.errs || 0) + 1) <= 5) console.warn(`[guest ${bk.slug}]`, String(d.msg).slice(0, 300)); }
   else if (d.type === "wall:frame" && bk.wait && d.id === bk.wait.id) { const b = d.bmp, ok = b instanceof ImageBitmap && b.width <= (MODE === "film" ? 2 * MAXPX : MAXPX) && b.height <= (MODE === "film" ? 2 * MAXPX : MAXPX);   // a film may take a piece at twice the live show's size
     if (b && !ok && b.close) b.close(); bk.n = (bk.n || 0) + 1; const w = bk.wait; bk.wait = null; bk.ms = (bk.ms ?? 30) * 0.8 + (performance.now() - w.at) * 0.2;
-    if (ok) { if (bk.bmp) bk.bmp.close(); bk.bmp = b; bk.fresh = true; } w.done(); } });
+    DBG.frames++; if (ok && DBG.alphaZero === null && b.width) { try { const c = new OffscreenCanvas(8, 8), x = c.getContext("2d"); x.drawImage(b, 0, 0, 8, 8); const px = x.getImageData(0, 0, 8, 8).data; let a = 0, rgb = 0; for (let i = 0; i < px.length; i += 4) { a += px[i + 3]; rgb += px[i] + px[i + 1] + px[i + 2]; } DBG.alphaZero = a === 0; DBG.rgbSum = rgb; } catch (e) { DBG.alphaZero = "?"; } }
+    if (ok) { if (bk.bmp) bk.bmp.close(); bk.bmp = b; bk.fresh = true; } else DBG.rejected = (DBG.rejected || 0) + 1; w.done(); } });
 
 /* one step of a code piece to song time ts: the clock and the band's levels in, a frame back */
 function step(bk, ts, info) { if (!bk.frame || bk.wait) return bk.wait ? bk.wait.p : Promise.resolve();
@@ -133,10 +137,10 @@ function govern(b, ts, lv) { const now = performance.now(); if (!b.bornAt) b.bor
   b.tick = (b.tick || 0) + 1;
   if (!b.wait && b.tick % every === 0) step(b, ts, { ...info(ts, lv), fade: ts >= b.from ? fadeOf(b, ts) : 0 }); }
 
-function frame(ts, lv) { if (!ON) { for (const x of BOOKED) if (x.loading) { unload(x); x.ready = false; } return { mGuest: 0, mCredit: 0, yieldFace: 0 }; }
+function frame(ts, lv) { if (!ON) { DBG.last = { ts: +ts.toFixed(2), why: "guests off" }; for (const x of BOOKED) if (x.loading) { unload(x); x.ready = false; } return { mGuest: 0, mCredit: 0, yieldFace: 0 }; }
   keep(ts); if (MODE === "live") for (const x of BOOKED) if (x.ready && x.frame && running(x, ts)) govern(x, ts, lv);
   const b = active(ts);
-  if (!b || !b.ready) return { mGuest: 0, mCredit: 0, yieldFace: 0 };
+  if (!b || !b.ready) { DBG.last = { ts: +ts.toFixed(2), why: !b ? "no booking on at this time" : "not ready", on: ON }; return { mGuest: 0, mCredit: 0, yieldFace: 0 }; }
   if (current !== b) { current = b; drawCredit(b.credit); if (b.bmp || b.img) b.fresh = true; else upload(4, guestTex, new ImageData(1, 1)); }
   const fade = fadeOf(b, ts), cr = creditOf(b, ts);
   if (b.video && b.video.readyState >= 2) { const d = b.video.duration || 1, want = (ts - b.from) % d;
@@ -144,6 +148,7 @@ function frame(ts, lv) { if (!ON) { for (const x of BOOKED) if (x.loading) { unl
     upload(4, guestTex, b.video); }
   else if (b.fresh) { upload(4, guestTex, b.bmp || b.img); b.fresh = false; }
   gl.uniform1f(U("GFIT"), b.fit); gl.uniform1f(U("GASP"), b.asp);
+  DBG.last = { ts: +ts.toFixed(2), mGuest: +fade.toFixed(3), fit: b.fit, ready: !!b.ready, hasBmp: !!b.bmp };
   return { mGuest: fade, mCredit: cr * fade, yieldFace: fade, bars: b.bars ?? 1 }; }   // the singer's big picture makes way while a guest is on (half of him under a band of art reads as a mistake)
 
 /* the film's part: everything at ts drawn and in hand before the wall draws (seeking a loop, stepping a piece) */
@@ -156,6 +161,7 @@ return {
   book(list) { BOOKED.forEach(unload); current = null; BOOKED = (list || []).map((b) => ({ ...b })); return Promise.resolve(); },
   mode(m) { MODE = m; }, song(name) { SONG = name; }, section(s) { SECTION = s || ""; }, on(v) { ON = !!v; },
   now(ts) { const b = active(ts); return b && b.ready ? { ...b.credit, slug: b.slug, fade: fadeOf(b, ts) } : null; },
+  debug() { return { ...DBG, booked: BOOKED.map((b) => ({ slug: b.slug, from: b.from, to: b.to, ready: !!b.ready, dead: !!b.dead, ms: b.ms && Math.round(b.ms), every: b.every, frame: !!b.frame })), on: ON, mode: MODE, maxTex: gl.getParameter(gl.MAX_TEXTURE_SIZE), renderer: (() => { const x = gl.getExtension("WEBGL_debug_renderer_info"); return x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : "?"; })() }; },
   load() { const b = current; return b && b.ready && !b.dead && b.frame ? { ms: b.ms ?? 0, every: b.every || 1, young: !b.bornAt || performance.now() - b.bornAt < 6000 } : null; },   /* how hard a running piece is working, for the show's own guard */
   get any() { return BOOKED.length > 0; },
   frame, sync };
