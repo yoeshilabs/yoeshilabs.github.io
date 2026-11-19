@@ -56,7 +56,8 @@ function drawCredit(c) { const x = CREDIT.getContext("2d"), cx = 1024; x.clearRe
 /* ------------------------------------------------------------------ loading a piece */
 async function load(bk) {
   const g = bk.g = await (await fetch(`${BASE}${bk.slug}/dist/guest.json`)).json(), dir = `${BASE}${bk.slug}/dist/`;
-  bk.fit = FITS[bk.fit || g.fit || "screen"] ?? 0; bk.asp = bk.fit === 1 ? 2 : bk.fit === 3 ? 1 : g.aspect || 1; bk.credit = { ...g.credit, ...(bk.credit || {}) };
+  bk.fitName = bk.fitName || (typeof bk.fit === "string" ? bk.fit : "") || g.fit || "screen";   // (kept by name: a piece loaded again, after a restart or a set change, once read its own number as a name and came back as a flat band behind the stage: LoveFromGaia's test, 2026-11-19)
+  bk.fit = FITS[bk.fitName] ?? 0; bk.asp = bk.fit === 1 ? 2 : bk.fit === 3 ? 1 : g.aspect || 1; bk.credit = { ...g.credit, ...(bk.credit || {}) };
   bk.pre = bk.pre ?? g.preroll ?? PREROLL; bk.scale = bk.startScale || 1;   // (a piece back after a slow spell starts at half size)
   const [w, h] = g.size || (bk.fit === 1 ? [2048, 1024] : bk.fit === 3 ? [1024, 1024] : bk.asp >= 1 ? [1024, Math.round(1024 / bk.asp)] : [Math.round(1024 * bk.asp), 1024]); bk.w = w; bk.h = h;
   if (g.kind === "image") { bk.img = new Image(); bk.img.src = dir + g.file; await bk.img.decode().catch(() => {}); bk.fresh = true; return; }
@@ -71,7 +72,7 @@ async function load(bk) {
   const f = bk.frame = document.createElement("iframe");
   f.setAttribute("sandbox", "allow-scripts"); f.setAttribute("allow", "camera 'none'; microphone 'none'; geolocation 'none'; display-capture 'none'; usb 'none'; serial 'none'; bluetooth 'none'; payment 'none'; clipboard-read 'none'; clipboard-write 'none'");
   f.setAttribute("referrerpolicy", "no-referrer"); f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
-  f.style.cssText = `position:fixed;left:0;top:0;width:${Math.round(w * bk.scale)}px;height:${Math.round(h * bk.scale)}px;border:0;opacity:0;pointer-events:none;`;
+  f.style.cssText = `position:fixed;left:0;top:0;width:${Math.round(w * bk.scale)}px;height:${Math.round(h * bk.scale)}px;border:0;opacity:1;z-index:-1;pointer-events:none;`;   // drawn, under the wall's own canvas: Chrome slows a frame it takes to be hidden (opacity 0), and his piece stood still until DevTools was opened
   const hello = new Promise((r) => { bk.hello = r; setTimeout(r, 10000); });
   f.srcdoc = doc; document.body.appendChild(f); await hello; }
 function unload(bk) { if (bk.frame) bk.frame.remove(); if (bk.video) { bk.video.pause(); bk.video.removeAttribute("src"); bk.video.load(); } if (bk.bmp) bk.bmp.close();
