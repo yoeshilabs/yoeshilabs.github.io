@@ -11,6 +11,11 @@
    "tokenId": "5"
   },
   {
+   "name": "CATTITUDE",
+   "contract": "KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH",
+   "tokenId": "7"
+  },
+  {
    "name": "Prancer Park",
    "contract": "KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH",
    "tokenId": "6"
@@ -21,6 +26,6 @@
    "tokenId": ""
   }
  ],
- "need": "a Purrancers concert film (Internet Friend or Decentralize), Prancer Park or any Prancer 3D",
+ "need": "a Purrancers concert film (Internet Friend, Decentralize or CATTITUDE), Prancer Park or any Prancer 3D",
  "get": "https://objkt.com/collections/KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH"
 }
