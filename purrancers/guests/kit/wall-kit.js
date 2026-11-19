@@ -99,15 +99,18 @@ async function svgFrame(svg) {   // an SVG piece: drawn to a canvas through an i
   if (!svgBusy) { svgBusy = true; const im = new Image(), xml = new XMLSerializer().serializeToString(svg);
     await new Promise((r) => { im.onload = r; im.onerror = r; src.set.call(im, "data:image/svg+xml;charset=utf-8," + encodeURIComponent(xml)); }); svgImg = im; svgBusy = false; }
   const g = c.getContext("2d"); g.clearRect(0, 0, W, H); if (svgImg && svgImg.width) g.drawImage(svgImg, 0, 0, W, H); return c; }
+let fast = false;   // the show's ?capfast=1 (dev/guest.js CAPFAST)
 async function capture() {
   let cv = wall.canvas || biggest();
   if (!cv || !cv.width) { const svg = document.querySelector("svg"); if (!svg) return null; cv = await svgFrame(svg); }
   const k = Math.min(1, cv.width / W);   // never upscaled: a piece drawn smaller to keep up hands over its own size
+  if (fast) { const same = Math.round(W * k) === cv.width && Math.round(H * k) === cv.height;
+    try { return await createImageBitmap(cv, same ? undefined : { resizeWidth: Math.max(1, Math.round(W * k)), resizeHeight: Math.max(1, Math.round(H * k)), resizeQuality: "low" }); } catch (e) { report(e); return null; } }
   try { return await createImageBitmap(cv, { resizeWidth: Math.max(1, Math.round(W * k)), resizeHeight: Math.max(1, Math.round(H * k)), resizeQuality: "medium", premultiplyAlpha: "none", colorSpaceConversion: "none" }); }
   catch (e) { report(e); return null; } }
 addEventListener("message", async (e) => {
   if (e.source !== HOST || !e.data || e.data.type !== "wall:step") return;
-  const m = e.data; Object.assign(wall, m.info); if (m.info.levels) wall.levels = m.info.levels;
+  const m = e.data; fast = !!m.fast; Object.assign(wall, m.info); if (m.info.levels) wall.levels = m.info.levels;
   /* a piece made to hear sound in three bands through window.sphereAudio(bass, mid, high) (the convention of the first
      piece made for this Sphere, 2026-11-14) is fed the song's own, before every frame it draws */
   const audio = wall.bands && typeof window.sphereAudio === "function" ? () => { try { window.sphereAudio(wall.bands.bass, wall.bands.mid, wall.bands.high); } catch (er) { report(er); } } : null;
@@ -120,8 +123,8 @@ addEventListener("message", async (e) => {
   if (target > now) {   // the piece's clock only runs forward; a step back (a film's retake) shows the last frame again
     const ticks = Math.min(m.live ? (lastCost > 12 ? 1 : 2) : 8, Math.max(1, Math.round((target - now) / TICK)));   // live, a heavy piece draws once a frame
     for (let k = 1; k <= ticks; k++) { now = k === ticks ? target : now + (target - now) / (ticks - k + 1); runTimers(); if (feed) feed(); for (const fn of wall._on) { try { fn(wall); } catch (er) { report(er); } } runFrames(); } }
-  lastCost = realNow() - c0; const bmp = await capture();
-  HOST.postMessage({ type: "wall:frame", id: m.id, bmp }, "*", bmp ? [bmp] : []);
+  lastCost = realNow() - c0; const c1 = realNow(), bmp = await capture();
+  HOST.postMessage({ type: "wall:frame", id: m.id, bmp, step: +lastCost.toFixed(1), cap: +(realNow() - c1).toFixed(1) }, "*", bmp ? [bmp] : []);
 });
 addEventListener("load", () => HOST.postMessage({ type: "wall:hello" }, "*"));
 })();

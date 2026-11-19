@@ -40,7 +40,10 @@ const tex = (unit) => { const t = gl.createTexture(); gl.activeTexture(gl.TEXTUR
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0])); return t; };
 const guestTex = tex(4), creditTex = tex(5); gl.uniform1i(U("GUEST"), 4); gl.uniform1i(U("CREDIT"), 5);
 /* what the wall did with a guest's frames, for a check from the page (window.__guestDebug(): read only, nothing about a visitor) */
-const DBG = { frames: 0, uploads: 0, uploadErr: "", glErr: 0, last: null, w: 0, h: 0, alphaZero: null };
+const DBG = { frames: 0, uploads: 0, uploadErr: "", glErr: 0, last: null, w: 0, h: 0, alphaZero: null, capMs: null, stepMs: null };
+/* ?capfast=1 on the show's address (a test switch, 2026-11-19): the kit captures the piece's canvas as it is (premultiplied, no colour conversion, no
+   resize at full size), which Chrome can do on the card; the kit's own time for the capture and for the piece's step come back in DBG (capMs, stepMs) */
+const CAPFAST = (() => { try { return new URLSearchParams(parent.location.search).get("capfast") === "1"; } catch (e) { return false; } })();
 const upload = (unit, t, src) => { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
   try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src); } catch (e) { DBG.uploadErr = String(e && e.message || e).slice(0, 200); }
   const er = gl.getError(); if (er) DBG.glErr = er; if (unit === 4) { DBG.uploads++; DBG.w = src.width || src.videoWidth || 0; DBG.h = src.height || src.videoHeight || 0; } };
@@ -88,13 +91,13 @@ addEventListener("message", (e) => { const bk = BOOKED.find((b) => b.frame && e.
   else if (d.type === "wall:error") { if ((bk.errs = (bk.errs || 0) + 1) <= 5) console.warn(`[guest ${bk.slug}]`, String(d.msg).slice(0, 300)); }
   else if (d.type === "wall:frame" && bk.wait && d.id === bk.wait.id) { const b = d.bmp, ok = b instanceof ImageBitmap && b.width <= (MODE === "film" ? 2 * MAXPX : MAXPX) && b.height <= (MODE === "film" ? 2 * MAXPX : MAXPX);   // a film may take a piece at twice the live show's size
     if (b && !ok && b.close) b.close(); bk.n = (bk.n || 0) + 1; const w = bk.wait; bk.wait = null; bk.ms = (bk.ms ?? 30) * 0.8 + (performance.now() - w.at) * 0.2;
-    DBG.frames++; if (ok && DBG.alphaZero === null && b.width) { try { const c = new OffscreenCanvas(8, 8), x = c.getContext("2d"); x.drawImage(b, 0, 0, 8, 8); const px = x.getImageData(0, 0, 8, 8).data; let a = 0, rgb = 0; for (let i = 0; i < px.length; i += 4) { a += px[i + 3]; rgb += px[i] + px[i + 1] + px[i + 2]; } DBG.alphaZero = a === 0; DBG.rgbSum = rgb; } catch (e) { DBG.alphaZero = "?"; } }
+    DBG.frames++; if (typeof d.cap === "number") DBG.capMs = DBG.capMs == null ? d.cap : DBG.capMs * 0.9 + d.cap * 0.1; if (typeof d.step === "number") DBG.stepMs = DBG.stepMs == null ? d.step : DBG.stepMs * 0.9 + d.step * 0.1; if (ok && DBG.alphaZero === null && b.width) { try { const c = new OffscreenCanvas(8, 8), x = c.getContext("2d"); x.drawImage(b, 0, 0, 8, 8); const px = x.getImageData(0, 0, 8, 8).data; let a = 0, rgb = 0; for (let i = 0; i < px.length; i += 4) { a += px[i + 3]; rgb += px[i] + px[i + 1] + px[i + 2]; } DBG.alphaZero = a === 0; DBG.rgbSum = rgb; } catch (e) { DBG.alphaZero = "?"; } }
     if (ok) { if (bk.bmp) bk.bmp.close(); bk.bmp = b; bk.fresh = true; } else DBG.rejected = (DBG.rejected || 0) + 1; w.done(); } });
 
 /* one step of a code piece to song time ts: the clock and the band's levels in, a frame back */
 function step(bk, ts, info) { if (!bk.frame || bk.wait) return bk.wait ? bk.wait.p : Promise.resolve();
   const id = ++seq; let done; const p = new Promise((r) => (done = r)); bk.wait = { id, at: performance.now(), done, p };
-  bk.frame.contentWindow.postMessage({ type: "wall:step", id, live: MODE === "live", info: { ...info, ...(bk.sound === false ? { bands: null, feed: null } : {}), local: ts - bk.from, clock: Math.max(0, ts - (bk.from - bk.pre)), dur: bk.to - bk.from, t: ts } }, "*");   // sound: false books a piece without the song's three bands (to see what its sound feed does)
+  bk.frame.contentWindow.postMessage({ type: "wall:step", id, live: MODE === "live", fast: CAPFAST, info: { ...info, ...(bk.sound === false ? { bands: null, feed: null } : {}), local: ts - bk.from, clock: Math.max(0, ts - (bk.from - bk.pre)), dur: bk.to - bk.from, t: ts } }, "*");   // sound: false books a piece without the song's three bands (to see what its sound feed does)
   return p; }
 
 /* which booking shows at ts, and how far in or out it is (a piece let go mid-stretch fades out from its last frame);
