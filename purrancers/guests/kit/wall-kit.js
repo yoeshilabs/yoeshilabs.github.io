@@ -41,6 +41,11 @@ window.setInterval = (fn, ms, ...a) => { const id = ++timerId, e = Math.max(4, +
 window.clearTimeout = window.clearInterval = (id) => { timers.delete(id); };
 try { performance.now = () => now; } catch (e) { Object.defineProperty(performance, "now", { value: () => now }); }
 Date.now = () => EPOCH + Math.floor(now);
+/* always shown: the sealed frame's page says it is visible, and its visibility changes never reach the piece. The wall's clock decides when
+   it draws. A piece that rightly pauses itself on a hidden page (LoveFromGaia's v3 does) was frozen in Chrome on Windows, which took the
+   sealed frame for hidden while the show played, until DevTools was opened (his tests, 2026-11-19) */
+try { Object.defineProperty(Document.prototype, "hidden", { configurable: true, get: () => false }); Object.defineProperty(Document.prototype, "visibilityState", { configurable: true, get: () => "visible" }); } catch (e) {}
+for (const ev of ["visibilitychange", "webkitvisibilitychange", "pagehide", "freeze"]) { window.addEventListener(ev, (e) => e.stopImmediatePropagation(), true); document.addEventListener(ev, (e) => e.stopImmediatePropagation(), true); }
 function runTimers() { for (let n = 0; n < 2000; n++) { let next = null;
     for (const [id, tm] of timers) if (tm.at <= now && (!next || tm.at < next[1].at)) next = [id, tm];
     if (!next) return; const [id, tm] = next; if (tm.every) tm.at += tm.every; else timers.delete(id);
