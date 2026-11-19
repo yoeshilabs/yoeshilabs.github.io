@@ -72,18 +72,21 @@ const nonce = () => Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) =>
    second try starts clean (a client left running beside a new one was what Beacon warned about on "Try again",
    2026-11-11). Returns { address, publicKey, payload, signature }, or throws. Also used by the sign-in window. */
 export async function walletSign(ui, why, code) {
+  const textFor = (address) => `Tezos Signed Message: ${location.origin} ${new Date().toISOString()} The Purrancers, live in the Sphere. ${why} This is free and does not move anything. Address: ${address} Code: ${code}`;
+  /* Temple, when it is in this page, directly (temple.js): its chooser in the wallet library does not always see it */
+  const T = await import("./temple.js"); if (await T.available()) { ui.status("Temple is opening…"); return T.signIn("The Purrancers, live in the Sphere", textFor, ui); }
   await guardLocks();
   const W = await import("./lib/ticket-wallet.js");
   const client = new W.DAppClient({ name: "The Purrancers, live in the Sphere", iconUrl: new URL("assets/purrancers-title.png", import.meta.url).href, appUrl: location.origin + location.pathname, network: { type: W.NetworkType.MAINNET } });
   for (const m of OFF) client[m] = () => Promise.reject(new Error("The show only asks for a sign-in message."));
   try {
-    await client.clearActiveAccount();
+    await client.clearActiveAccount(); await new Promise((r) => setTimeout(r, 500));   // (the library looks for wallet extensions as it starts: a chooser opened at once can miss them)
     const perm = await client.requestPermissions({ scopes: [W.PermissionScope.SIGN] });
     const address = perm && (perm.address || perm.accountInfo?.address); let publicKey = perm && (perm.publicKey || perm.accountInfo?.publicKey);
     if (!ADDR.test(address || "")) throw new Error("No address came back from the wallet.");
     if (!publicKey) { const r = await fetch(`https://api.tzkt.io/v1/accounts/${address}?select=publicKey`); publicKey = r.ok ? await r.json() : null; }
     ui.status("Sign the message in your wallet. It is free and moves nothing.");
-    const text = `Tezos Signed Message: ${location.origin} ${new Date().toISOString()} The Purrancers, live in the Sphere. ${why} This is free and does not move anything. Address: ${address} Code: ${code}`;   // the site and the time first, the way Tezos sign-in messages name where they come from
+    const text = textFor(address);   // the site and the time first, the way Tezos sign-in messages name where they come from
     const payload = micheline(text, W.stringToBytes);
     const { signature } = await client.requestSignPayload({ signingType: W.SigningType.MICHELINE, payload, sourceAddress: address });
     return { address, publicKey, payload, signature };
