@@ -1,4 +1,10 @@
 {
  "_about": "Invite passes to the doors (tools/invite.mjs): each code's SHA-256 hash and its dates, nothing else. Who each is for stays on the Mac.",
- "passes": []
+ "passes": [
+  {
+   "id": "1a73c2",
+   "h": "bd8f68954d18ac4cd428b0679ca933af114e890b422cbdbfd5a13f6354f5161f",
+   "until": "2026-11-20T00:39:24.128Z"
+  }
+ ]
 }
