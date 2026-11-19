@@ -57,7 +57,7 @@ function drawCredit(c) { const x = CREDIT.getContext("2d"), cx = 1024; x.clearRe
 async function load(bk) {
   const g = bk.g = await (await fetch(`${BASE}${bk.slug}/dist/guest.json`)).json(), dir = `${BASE}${bk.slug}/dist/`;
   bk.fit = FITS[bk.fit || g.fit || "screen"] ?? 0; bk.asp = bk.fit === 1 ? 2 : bk.fit === 3 ? 1 : g.aspect || 1; bk.credit = { ...g.credit, ...(bk.credit || {}) };
-  bk.pre = bk.pre ?? g.preroll ?? PREROLL; bk.scale = 1;
+  bk.pre = bk.pre ?? g.preroll ?? PREROLL; bk.scale = bk.startScale || 1;   // (a piece back after a slow spell starts at half size)
   const [w, h] = g.size || (bk.fit === 1 ? [2048, 1024] : bk.fit === 3 ? [1024, 1024] : bk.asp >= 1 ? [1024, Math.round(1024 / bk.asp)] : [Math.round(1024 * bk.asp), 1024]); bk.w = w; bk.h = h;
   if (g.kind === "image") { bk.img = new Image(); bk.img.src = dir + g.file; await bk.img.decode().catch(() => {}); bk.fresh = true; return; }
   if (g.kind === "video") { const v = bk.video = Object.assign(document.createElement("video"), { muted: true, loop: true, playsInline: true, preload: "auto", crossOrigin: "anonymous" });
@@ -71,7 +71,7 @@ async function load(bk) {
   const f = bk.frame = document.createElement("iframe");
   f.setAttribute("sandbox", "allow-scripts"); f.setAttribute("allow", "camera 'none'; microphone 'none'; geolocation 'none'; display-capture 'none'; usb 'none'; serial 'none'; bluetooth 'none'; payment 'none'; clipboard-read 'none'; clipboard-write 'none'");
   f.setAttribute("referrerpolicy", "no-referrer"); f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
-  f.style.cssText = `position:fixed;left:0;top:0;width:${w}px;height:${h}px;border:0;opacity:0;pointer-events:none;`;
+  f.style.cssText = `position:fixed;left:0;top:0;width:${Math.round(w * bk.scale)}px;height:${Math.round(h * bk.scale)}px;border:0;opacity:0;pointer-events:none;`;
   const hello = new Promise((r) => { bk.hello = r; setTimeout(r, 10000); });
   f.srcdoc = doc; document.body.appendChild(f); await hello; }
 function unload(bk) { if (bk.frame) bk.frame.remove(); if (bk.video) { bk.video.pause(); bk.video.removeAttribute("src"); bk.video.load(); } if (bk.bmp) bk.bmp.close();
@@ -97,12 +97,21 @@ function step(bk, ts, info) { if (!bk.frame || bk.wait) return bk.wait ? bk.wait
 const pre = (b) => b.pre ?? b.preroll ?? PREROLL, running = (b, ts) => !b.dead && ts >= b.from - pre(b) && ts < b.to;
 const active = (ts) => { let on = null; for (const b of BOOKED) if (ts >= b.from && ts < b.to && (!b.dead || ts - b.deadAt < FADE)) on = b; return on; };
 const fadeOf = (b, ts) => Math.max(0, Math.min(1, (ts - b.from) / FADE, (b.to - ts) / FADE, b.dead ? 1 - (ts - b.deadAt) / FADE : 1));
-function kill(b, ts, why) { console.warn(`[guest ${b.slug}] ${why}: the wall carries on without it`); b.dead = true; b.deadAt = ts; if (b.frame) b.frame.remove(); b.frame = null; b.wait = null; }
+/* a piece let go comes back (live only): a slow spell (a busy computer, a tab in the background) took his art off the wall for the rest of the
+   song (Yoeshi, 2026-11-18: "it feels like LFG's generator is not up for a lot of the song and the equalizer bars are back"). It tries again
+   12 s later at half size, up to three times; after that the wall carries on without it */
+/* a piece that stopped answering is started again behind its last picture, which stays on the wall meanwhile */
+function restart(b, ts) { console.warn(`[guest ${b.slug}] stopped answering: started again, its last picture on the wall meanwhile`); if (b.frame) b.frame.remove(); b.frame = null; b.wait = null; b.n = 0; b.ms = 30; b.bornAt = 0;
+  b.loading = load(b).then(() => (b.ready = true)).catch((e) => { console.warn(`[guest ${b.slug}] did not load again:`, e.message); }); }
+function kill(b, ts, why) { const again = MODE === "live" && (b.revives || 0) < 3 && ts < b.to - 18;
+  console.warn(`[guest ${b.slug}] ${why}: ${again ? "the wall carries on and tries it again in a moment" : "the wall carries on without it"}`); b.dead = true; b.deadAt = ts; b.reviveAt = again ? ts + 12 : null;
+  if (b.frame) b.frame.remove(); b.frame = null; b.wait = null; }
 const creditOf = (b, ts) => { const k = (a, z) => (ts < a || ts > z ? 0 : Math.min(1, (ts - a) / 0.6, (z - ts) / 0.6)), len = b.to - b.from;   // bright on arriving and leaving, a signature's glow between
   return Math.max(0.55 * Math.min(1, (ts - b.from - CREDIT_IN) / 1.2), k(b.from + CREDIT_IN, b.from + CREDIT_IN + CREDIT_LEN), len > 2 * CREDIT_LEN + 6 ? k(b.to - CREDIT_LEN - 1, b.to - 1) : 0); };
 
 /* keep pieces loaded near their stretch (a few seconds ahead), and let go of them after */
 function keep(ts) { for (const b of BOOKED) { const near = ts >= b.from - pre(b) - 8 && ts < b.to + 2;
+  if (b.dead && b.reviveAt != null && ts >= b.reviveAt) { b.dead = false; b.reviveAt = null; b.revives = (b.revives || 0) + 1; b.startScale = b.shrink === false ? 1 : 0.5; b.loading = null; b.ready = false; b.n = 0; b.ms = 30; b.bornAt = 0; console.info(`[guest ${b.slug}] back on the wall (try ${b.revives})`); }
   if (near && !b.loading && !b.dead) b.loading = load(b).then(() => (b.ready = true)).catch((e) => { console.warn(`[guest ${b.slug}] did not load:`, e.message); b.dead = true; b.deadAt = -1e9; });
   else if (!near && b.loading) { unload(b); b.ready = false; } } }
 
@@ -110,11 +119,18 @@ function info(ts, lv) { return { beat: lv.beat, bar: lv.beat / 4, phase: ((lv.be
 
 /* the frame's part: called by the wall's __frame with the song's levels; returns the uniforms' values */
 /* live: each running piece stepped once a frame (every other frame while it is slow); a slow piece drawn smaller, then let go */
-function govern(b, ts, lv) { if (b.wait && performance.now() - b.wait.at > 3000) return kill(b, ts, "stalled");
-  if (b.n > 8 && b.ms > 250) return kill(b, ts, `too slow (${b.ms.toFixed(0)} ms a frame)`);
-  if (b.n > 8 && b.ms > 45) { if (b.scale > 0.5) { b.scale -= 0.25; b.n = 0; b.frame.style.width = `${Math.round(b.w * b.scale)}px`; b.frame.style.height = `${Math.round(b.h * b.scale)}px`; console.info(`[guest ${b.slug}] drawn at ${b.scale * 100}% to keep up`); }
-    else if (b.ms > 100) return kill(b, ts, `too slow (${b.ms.toFixed(0)} ms a frame)`); }
-  if (!b.wait && (b.ms <= 40 || (b.skip = !b.skip))) step(b, ts, { ...info(ts, lv), fade: ts >= b.from ? fadeOf(b, ts) : 0 }); }
+/* A slow piece is asked for fewer frames first (every 2nd, 3rd, then 4th of the show's): a painting that changes at 15 frames a second still
+   reads as his, where a piece dropped leaves the wall's own bars for the rest of the song. A booking with shrink: false is never drawn
+   smaller (a piece that sizes its own canvas from its window keeps painting at its old size in a smaller frame, and only a strip of it came
+   through: Yoeshi, 2026-11-18, "errors on the screen"). Its first seconds (its shaders building) are not judged. Let go only when it stalls or
+   is far too slow even then. */
+function govern(b, ts, lv) { const now = performance.now(); if (!b.bornAt) b.bornAt = now; const young = now - b.bornAt < 6000;
+  if (b.wait && now - b.wait.at > (young ? 8000 : 3000)) return restart(b, ts);   // (live, a piece is never let go: the show sheds its own load first, show3d.js)
+  if (!young && b.n > 12 && b.ms > 45 && b.shrink !== false && b.scale > 0.5) { b.scale -= 0.25; b.n = 0; b.frame.style.width = `${Math.round(b.w * b.scale)}px`; b.frame.style.height = `${Math.round(b.h * b.scale)}px`; console.info(`[guest ${b.slug}] drawn at ${b.scale * 100}% to keep up`); }
+  const every = young || b.ms <= 40 ? 1 : b.ms <= 90 ? 2 : b.ms <= 180 ? 3 : 4;
+  if (every !== b.every) { if (every > 1 && every > (b.every || 1)) console.info(`[guest ${b.slug}] one frame in ${every} to keep up (${b.ms.toFixed(0)} ms a frame)`); b.every = every; }
+  b.tick = (b.tick || 0) + 1;
+  if (!b.wait && b.tick % every === 0) step(b, ts, { ...info(ts, lv), fade: ts >= b.from ? fadeOf(b, ts) : 0 }); }
 
 function frame(ts, lv) { if (!ON) { for (const x of BOOKED) if (x.loading) { unload(x); x.ready = false; } return { mGuest: 0, mCredit: 0, yieldFace: 0 }; }
   keep(ts); if (MODE === "live") for (const x of BOOKED) if (x.ready && x.frame && running(x, ts)) govern(x, ts, lv);
@@ -139,6 +155,7 @@ return {
   book(list) { BOOKED.forEach(unload); current = null; BOOKED = (list || []).map((b) => ({ ...b })); return Promise.resolve(); },
   mode(m) { MODE = m; }, song(name) { SONG = name; }, section(s) { SECTION = s || ""; }, on(v) { ON = !!v; },
   now(ts) { const b = active(ts); return b && b.ready ? { ...b.credit, slug: b.slug, fade: fadeOf(b, ts) } : null; },
+  load() { const b = current; return b && b.ready && !b.dead && b.frame ? { ms: b.ms ?? 0, every: b.every || 1, young: !b.bornAt || performance.now() - b.bornAt < 6000 } : null; },   /* how hard a running piece is working, for the show's own guard */
   get any() { return BOOKED.length > 0; },
   frame, sync };
 };

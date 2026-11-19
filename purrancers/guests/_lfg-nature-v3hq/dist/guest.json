@@ -1,0 +1,18 @@
+{
+ "slug": "_lfg-nature-v3hq",
+ "kind": "code",
+ "fit": "equirect",
+ "seed": "_lfg-nature-v3hq",
+ "hash": "",
+ "preroll": 4,
+ "query": "q=0&seed=20261114",
+ "credit": {
+  "role": "Visuals by",
+  "name": "LoveFromGaia",
+  "title": "Cattitude",
+  "handle": "@LFG",
+  "link": "https://www.lovefromgaia.com"
+ },
+ "file": "piece.html",
+ "aspect": 2
+}
