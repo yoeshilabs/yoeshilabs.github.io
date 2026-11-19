@@ -43,7 +43,8 @@ const guestTex = tex(4), creditTex = tex(5); gl.uniform1i(U("GUEST"), 4); gl.uni
 const DBG = { frames: 0, uploads: 0, uploadErr: "", glErr: 0, last: null, w: 0, h: 0, alphaZero: null, capMs: null, stepMs: null };
 /* ?capfast=1 on the show's address (a test switch, 2026-11-19): the kit captures the piece's canvas as it is (premultiplied, no colour conversion, no
    resize at full size), which Chrome can do on the card; the kit's own time for the capture and for the piece's step come back in DBG (capMs, stepMs) */
-const CAPFAST = (() => { try { return new URLSearchParams(parent.location.search).get("capfast") === "1"; } catch (e) { return false; } })();
+const CAPFAST = (() => { let v = null; try { v = new URLSearchParams(parent.location.search).get("capfast"); } catch (e) {} if (v === "1") return true; if (v === "0") return false;
+  return !/Firefox\//.test(navigator.userAgent); })();   // the default since the PC's table (2026-11-19: the capture from about 20 ms to 0.03 in Chrome and Edge, his piece drawn every frame); not yet in Firefox (one crash in two runs with it there, cause unknown)
 const upload = (unit, t, src) => { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
   try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src); } catch (e) { DBG.uploadErr = String(e && e.message || e).slice(0, 200); }
   const er = gl.getError(); if (er) DBG.glErr = er; if (unit === 4) { DBG.uploads++; DBG.w = src.width || src.videoWidth || 0; DBG.h = src.height || src.videoHeight || 0; } };

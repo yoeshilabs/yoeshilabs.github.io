@@ -388,10 +388,10 @@ window.__frame = (ts, force) => { const E = (k) => PERFORM.env(k, ts), b = PERFO
      made this context resolve its drawing (opening DevTools did; so did one readPixels), and then it followed live. So: once at the start, once
      when a guest's piece comes on, and every 120 frames after (the PC's Windows test of LoveFromGaia's frozen dome, 2026-11-19) */
   const gOn = gs.mGuest > 0.001; RES.n++;
-  if (!RES.done || (gOn && !RES.guest) || RES.n % RES.every === 0) { setTimeout(() => gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, RES.px), 0); RES.done = true; if (gOn) RES.guest = true; }   // (in a task of its own, after the frame: read inside the draw it did not count, the PC found)
+  if (!RES.done || (gOn && !RES.guest) || RES.n % (RES.every || (gOn && RES.win ? 1 : 120)) === 0) { setTimeout(() => gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, RES.px), 0); RES.done = true; if (gOn) RES.guest = true; }   // (in a task of its own, after the frame: read inside the draw it did not count, the PC found)
   if (!gOn) RES.guest = false;
   return new Promise((r) => requestAnimationFrame(() => r(m))); };
-const RES = { n: 0, done: false, guest: false, px: new Uint8Array(4), every: (() => { try { const v = +new URLSearchParams(parent.location.search).get("wallread"); return v >= 1 ? Math.round(v) : 120; } catch (e) { return 120; } })() };   // ?wallread=N on the show's address: a pixel read every N frames (a test switch, 2026-11-19: LoveFromGaia's laptop showed a new picture every 4 to 5 s, about 120 frames at its rate)
+const RES = { n: 0, done: false, guest: false, px: new Uint8Array(4), every: (() => { try { const v = +new URLSearchParams(parent.location.search).get("wallread"); return v >= 1 ? Math.round(v) : 0; } catch (e) { return 0; } })(), win: /Windows/.test(navigator.userAgent) };   // 0: the default, every frame on Windows while a guest's piece is on, else every 120 (the PC, 2026-11-19: with a read every 120 frames Chrome and Edge showed his piece's new picture only every 4.2 to 4.4 s; every frame, 9 a second)   // ?wallread=N on the show's address: a pixel read every N frames (a test switch, 2026-11-19: LoveFromGaia's laptop showed a new picture every 4 to 5 s, about 120 frames at its rate)
 window.__modeAt = modeAt;
 /* another song on the same wall (the 3D show's setlist): its map and beats, its score, when its chain draws; the
    live show never calls this, so Internet Friend's wall is as it was */
