@@ -81,10 +81,10 @@ export function makeKiosk({ THREE, works, logo, conf }) {
   function sat(h) { const n = parseInt(h.slice(1), 16), r = n >> 16, gg = (n >> 8) & 255, b = n & 255, mx = Math.max(r, gg, b), mn = Math.min(r, gg, b); return mx ? (mx - mn) / mx * (mx / 255) : 0; }
 
   /* ---- the stand: a wide screen filling the arch on two posts, a lit frame round it and a teia.art marquee over it, both in the theme's colour */
-  const group = new THREE.Group(), SW = 4.5, SH = SW * H / W, BASE = 0.75, CY = BASE + SH / 2 + 0.08;
+  const group = new THREE.Group(), SW = 5.5, SH = SW * H / W, BASE = 0.75, CY = BASE + SH / 2 + 0.08;
   const dark = new THREE.MeshStandardMaterial({ color: 0x141018, roughness: 0.45, metalness: 0.6 }), trim = new THREE.MeshStandardMaterial({ color: 0x2a2433, roughness: 0.3, metalness: 0.8 });
   const add = (geo, mat, p) => { const m = new THREE.Mesh(geo, mat); m.position.set(...p); m.castShadow = true; group.add(m); return m; };
-  add(new THREE.BoxGeometry(3.4, 0.14, 1.0), dark, [0, 0.07, 0]); for (const sx of [-1, 1]) add(new THREE.BoxGeometry(0.18, BASE + 0.4, 0.18), trim, [sx * 1.2, 0.14 + (BASE + 0.4) / 2 - 0.07, -0.08]);
+  add(new THREE.BoxGeometry(4.0, 0.14, 1.0), dark, [0, 0.07, 0]); for (const sx of [-1, 1]) add(new THREE.BoxGeometry(0.2, BASE + 0.4, 0.2), trim, [sx * 1.6, 0.14 + (BASE + 0.4) / 2 - 0.07, -0.08]);
   add(new THREE.BoxGeometry(SW + 0.16, SH + 0.16, 0.12), dark, [0, CY, -0.05]);
   const screen = add(new THREE.PlaneGeometry(SW, SH), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }), [0, CY, 0.02]); screen.castShadow = false;
   const lit = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }), FR = 0.045;
@@ -93,7 +93,7 @@ export function makeKiosk({ THREE, works, logo, conf }) {
   const marquee = () => { mx.clearRect(0, 0, 1024, 192); mx.fillStyle = "#0a0a0a"; mx.beginPath(); mx.roundRect(4, 4, 1016, 184, 30); mx.fill(); mx.strokeStyle = accent; mx.lineWidth = 8; mx.stroke();
     for (let i = 0; i < 26; i++) { mx.fillStyle = i % 2 ? accent : "#fff6e8"; mx.beginPath(); mx.arc(40 + i * 37.7, 22, 6, 0, Math.PI * 2); mx.arc(40 + i * 37.7, 170, 6, 0, Math.PI * 2); mx.fill(); }
     mx.shadowColor = accent; mx.shadowBlur = 28; mx.fillStyle = "#ffffff"; mx.font = `700 104px ${FONT}`; mx.textAlign = "center"; mx.textBaseline = "middle"; mx.fillText("teia.art", 512, 100); mx.shadowBlur = 0; mtex.needsUpdate = true; };
-  const sign = add(new THREE.PlaneGeometry(2.4, 0.45), new THREE.MeshBasicMaterial({ map: mtex, transparent: true, toneMapped: false }), [0, CY + SH / 2 + 0.48, 0.03]); sign.castShadow = false;
+  const sign = add(new THREE.PlaneGeometry(2.8, 0.525), new THREE.MeshBasicMaterial({ map: mtex, transparent: true, toneMapped: false }), [0, CY + SH / 2 + 0.48, 0.03]); sign.castShadow = false;
   marquee();
 
   /* ---- the browser: DOM over the room, Teia's dark look */
@@ -144,7 +144,7 @@ export function makeKiosk({ THREE, works, logo, conf }) {
 
   const esc = (e) => { if (e.key === "Escape") api.close(); };
   const api = { group, screen, isOpen: false,
-    update(T) { if (T - pageT > 8) { pageT = T; page++; screenDirty = true; } if (!screenDirty && T - last < 1) return; last = T; draw(T); },
+    update(T) { if (T - pageT > 12) { pageT = T; page++; screenDirty = true; } if (!screenDirty && T - last < 1) return; last = T; draw(T); },
     setTheme(c) { const ok = Array.isArray(c) && c.every((h) => /^#[0-9a-f]{6}$/i.test(h)); accent = ok ? c.slice().sort((a, b) => sat(b) - sat(a))[0] : "#ffffff"; lit.color.set(accent); marquee();
       sel = ok ? list.findIndex((w) => w.theme && Array.isArray(w.theme.colors) && w.theme.colors.join() === c.join()) : -1; page = 0; screenDirty = true; if (ui) { ui.S.tab = Math.max(-1, curEv()); ui.render(); } },
     select(i) { sel = i; page = 0; screenDirty = true; },

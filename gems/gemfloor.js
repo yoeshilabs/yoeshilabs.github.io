@@ -8,7 +8,7 @@
    images: the logos as loaded images, white on clear. The texture is square and mapped in plan: its top toward the stage. */
 export function makeFloor({ THREE, images, colors }) {
   const N = 1024, C = N / 2, TAU = Math.PI * 2, cv = document.createElement("canvas"); cv.width = cv.height = N;
-  const g = cv.getContext("2d"), texture = new THREE.CanvasTexture(cv); texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = 8;
+  const g = cv.getContext("2d"), texture = new THREE.CanvasTexture(cv); texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = 8; texture.center.set(0.5, 0.5);   /* the floor turns by the texture's own rotation, on the GPU: the canvas is redrawn only when a logo changes (Yoeshi, 2026-11-20: "the graphics move a bit too fast and the room feels heavy on my mac") */
   const L = (images || []).filter((im) => im && (im.naturalWidth || im.width));
   const ROOM = ["#140a26", "#fff6e8", "#ffd76a", "#a98bff"];   /* before any theme: the Lounge's own purple and gold */
   const lum = (h) => { const n = parseInt(h.slice(1), 16); return 0.2126 * (n >> 16) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255); };
@@ -36,15 +36,15 @@ export function makeFloor({ THREE, images, colors }) {
     g.globalAlpha = 1;
     if (!L.length) { texture.needsUpdate = true; return; }
     /* ripples: a swell running outward every 4 s lifts the logos as it passes */
-    const swell = (rad) => { const p = ((T / 4) % 1) * 1.3 - 0.15; return 1 + 0.35 * Math.exp(-(((rad - p) / 0.07) ** 2)); };
+    const swell = () => 1;
     RINGS.forEach(([rad, n, dir, sp], k) => { const p = P(rad), col = p.ink[k % p.ink.length], h = C * rad * TAU / n * 0.32 * swell(rad);
-      for (let i = 0; i < n; i++) { const a = i / n * TAU + dir * T * sp * TAU, x = C + rad * C * Math.cos(a), y = C + rad * C * Math.sin(a);
+      for (let i = 0; i < n; i++) { const a = i / n * TAU + dir * Math.floor(T / 2) * sp * 0.5, x = C + rad * C * Math.cos(a), y = C + rad * C * Math.sin(a);
         /* every 6 s a logo in each ring gives way to another */
-        const swap = Math.floor(T / 6 + i * 0.37 + k), idx = (seats[k][i] + swap * 7) % L.length, im = tinted(idx, col), w = Math.min(h * im.width / im.height, C * rad * TAU / n * 0.92), hh = w * im.height / im.width;
+        const swap = Math.floor(T / 10 + i * 0.37 + k), idx = (seats[k][i] + swap * 7) % L.length, im = tinted(idx, col), w = Math.min(h * im.width / im.height, C * rad * TAU / n * 0.92), hh = w * im.height / im.width;
         g.save(); g.translate(x, y); g.rotate(a + Math.PI / 2); g.globalAlpha = 0.9; g.drawImage(im, -w / 2, -hh / 2, w, hh); g.restore(); } });
     /* the heart: one logo, large, breathing, changing every 4 s with a crossfade, read from the stage side and turning slowly */
-    const n = Math.floor(T / 4), f = (T / 4) % 1, k2 = Math.min(1, f / 0.15), p = P(0.1), rot = Math.sin(T * 0.3) * 0.15;
-    for (const [i, a] of [[n - 1, 1 - k2], [n, k2]]) { if (a <= 0) continue; const im = tinted(((i * 13) % L.length + L.length) % L.length, p.ink[0]), w = C * 0.36 * (1 + 0.04 * Math.sin(T * TAU / 2)), hh = Math.min(w * im.height / im.width, C * 0.3), ww = hh * im.width / im.height;
+    const n = Math.floor(T / 8), f = (T / 8) % 1, k2 = Math.min(1, f / 0.15), p = P(0.1), rot = 0;
+    for (const [i, a] of [[n - 1, 1 - k2], [n, k2]]) { if (a <= 0) continue; const im = tinted(((i * 13) % L.length + L.length) % L.length, p.ink[0]), w = C * 0.36, hh = Math.min(w * im.height / im.width, C * 0.3), ww = hh * im.width / im.height;
       g.save(); g.translate(C, C); g.rotate(rot); g.globalAlpha = a; g.drawImage(im, -ww / 2, -hh / 2, ww, hh); g.restore(); }
     g.globalAlpha = 1;
     /* the rim fades into the room's floor */
@@ -53,6 +53,7 @@ export function makeFloor({ THREE, images, colors }) {
   };
   draw(0);
   return { texture,
-    update(T, beat) { if (T - last < 1 / 30) return; last = T; draw(T); },
+    /* the canvas is redrawn twice a second, ten times a second only while the heart's logo or a theme is crossfading */
+    update(T, beat) { texture.rotation = -T * 0.012; const fading = (T / 8) % 1 < 0.17 || T - t0 < 1.8; if (T - last < (fading ? 0.1 : 0.5)) return; last = T; draw(T); },
     setTheme(c) { const next = pal(c); if (next.bg === cur.bg && next.ink.join() === cur.ink.join()) return; prev = cur; cur = next; t0 = last < 0 ? 0 : last; } };
 }
