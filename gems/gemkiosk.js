@@ -34,7 +34,8 @@ export function makeKiosk({ THREE, works, logo, conf }) {
   /* (the tags are plain words, checked above, so they sit in the query as they are) */
   const Q = `{ tokens(where: { fa2_address: { _eq: "${HEN}" }, editions: { _gt: 0 }, tags: { _or: [${ALLTAGS.map((t) => `{ tag: { _ilike: "${t}" } }`).join(", ")}] } }, order_by: { minted_at: desc }, limit: 240) {
     token_id name description editions minted_at mime_type thumbnail_uri display_uri artist_address artist_profile { name } teia_meta { content_rating accessibility } tags { tag } } }`;
-  const load = () => (D.busy ??= (async () => { try {
+  let filmed = false;   /* a film freezes the data once it has it, so every take is the same */
+  const load = () => (filmed && D.at ? Promise.resolve() : D.busy ??= (async () => { try {
       const m = await mod(), r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: Q }) });
       const j = await r.json(), T = (j && j.data && j.data.tokens) || [];
       D.tokens = T.filter((t) => t && /^\d+$/.test(String(t.token_id)) && !m.wallet.has(t.artist_address) && !m.objkt.has(String(t.token_id)) && !m.nsfw.has(String(t.token_id)) && !(t.teia_meta && t.teia_meta.content_rating === "mature"))
@@ -148,8 +149,13 @@ export function makeKiosk({ THREE, works, logo, conf }) {
     setTheme(c) { const ok = Array.isArray(c) && c.every((h) => /^#[0-9a-f]{6}$/i.test(h)); accent = ok ? c.slice().sort((a, b) => sat(b) - sat(a))[0] : "#ffffff"; lit.color.set(accent); marquee();
       sel = ok ? list.findIndex((w) => w.theme && Array.isArray(w.theme.colors) && w.theme.colors.join() === c.join()) : -1; page = 0; screenDirty = true; if (ui) { ui.S.tab = Math.max(-1, curEv()); ui.render(); } },
     select(i) { sel = i; page = 0; screenDirty = true; },
-    pick(uv) { return -1; },   /* the whole screen opens the browser */
-    open() { if (api.isOpen) return; ui ??= build(); document.addEventListener("keydown", esc, true); ui.S.tab = curEv(); ui.S.one = null; document.body.appendChild(ui.root); api.isOpen = true; ui.render(); load(); clearInterval(poll); poll = setInterval(load, 60000); },
+    pick(uv) { return -1; },
+    /* for a film (?film=1): the room hands over the kiosk's state each frame; tab is an event's index or -1, one a mint's OBJKT id or null */
+    film(st, T) { filmed = true; if (!ui || !st) return; const tab = typeof st.tab === "number" ? st.tab : -1, one = st.one ? D.tokens.find((t) => t.id === String(st.one)) || null : null;
+      if (tab !== ui.S.tab || one !== ui.S.one) { ui.S.tab = tab; ui.S.one = one; ui.render(); } },
+    /* true once the data is in and the screen's current page of pictures has loaded */
+    settled() { if (!D.at) return false; const k = curEv(), toks = of(k), pages = Math.max(1, Math.ceil(toks.length / 10)), p = page % pages; return toks.slice(p * 10, p * 10 + 10).every((t) => { const im = pic(t.flash ? t.still : t.thumb); return !im || im.complete; }); },   /* the whole screen opens the browser */
+    open() { if (api.isOpen) return; ui ??= build(); document.addEventListener("keydown", esc, true); ui.S.tab = curEv(); ui.S.one = null; document.body.appendChild(ui.root); api.isOpen = true; ui.render(); load(); clearInterval(poll); if (!filmed) poll = setInterval(load, 60000); },
     close() { if (!api.isOpen) return; api.isOpen = false; document.removeEventListener("keydown", esc, true); clearInterval(poll); poll = 0; ui.root.querySelectorAll("video").forEach((v) => v.pause()); ui.root.remove(); } };
   load(); draw(0);
   return api;
