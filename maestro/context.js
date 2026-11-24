@@ -1176,7 +1176,7 @@ link: It's All HeArt on objkt | https://objkt.com/collections/KT19MGDuDruBtauTbu
 link: Music Is HeART on objkt | https://objkt.com/collections/KT1KcChbdsHwxabWi43dgKze8EsZfAZrov3H
 To join the holders list, collect any one of these:
 - a **Prancer 3D**
-- a **Purrancers concert film**: Internet Friend or Decentralize
+- a **Purrancers concert film**: Internet Friend, Decentralize or Cattitude
 - a **Chapter 01 Prancer**
 - anything in **It's All HeArt**
 - **Prancer Park**, the #200tez 1/1
@@ -1208,17 +1208,17 @@ keys: what is new, whats new, what's new, news, the news, latest, the latest, re
 ask: The Lounge | Prancer 3D | Where can I go?
 only: site
 Here is the latest, newest first:
+- **19 November 2026**: The Purrancers' third concert film, "CATTITUDE", is minted in Prancers On Objkt (25 editions, 25 tez): the first collaborative concert experience, Yoeshi's song with LoveFromGaia's projection across the Sphere's dome and a jungle growing up behind the stage; an access pass to the 3D show in the Sphere and to premium yoeshi.art features.
 - **17 November 2026**: Prancer Park is minted in Prancers On Objkt (Chapter 08), a 1/1 made for #200tez: The Purrancers playing The Pawvilion, the new outdoor venue, with the rest of the world so far behind them; the composition became the first design for the world's game map, and the token is an access pass to future token-gated experiences by Yoeshi Labs and The Purrancers.
 - **12 November 2026**: yoeshi.art becomes the front door: Yoeshi's artist site, A Musical World Of Cats, with the Lounge in its basement, a room to walk into, open to all.
-- **10 November 2026**: Prancer 3D launches on Aleatory (Chapter 07): the evolution of Prancer Portraits, playable 3D cats each in a world of its own, and an access pass to The Purrancers' virtual concerts.
 
-My scroll was last brought up to date on 17 November 2026.
+My scroll was last brought up to date on 19 November 2026.
 +++
 Before that:
+- **10 November 2026**: Prancer 3D launches on Aleatory (Chapter 07): the evolution of Prancer Portraits, playable 3D cats each in a world of its own, and an access pass to The Purrancers' virtual concerts.
 - **9 November 2026**: The Purrancers' second music video, "The Purrancers - Decentralize", is minted in Prancers On Objkt (25 editions): the concert rebuilt in 3D and rendered in Blender, and a second ticket into the 3D show in the Sphere at TezTowers.
 - **4 November 2026**: Prancelot is minted in Prancers On Objkt (100 editions): Pepper Yarnmore, a small Sword Knight on a pony in matching barding, the first Prancer 3D piece.
 - **3 November 2026**: The Purrancers debut: the concert film "The Purrancers Debut - Internet Friend" is minted in Prancers On Objkt (250 editions) and is the ticket to their walkable live show in the Sphere at TezTowers; airdropped to holders of Internet Friend and the Purranchise.
-- **27 October 2026**: Prance Or Treat! is minted in Prancers On Objkt (13 editions), Yoeshi's entry in Midnight Mass 2026 by 617 Gallery: Prancer Portraits trick or treating down a street of haunted Pads.
 
 ## Prices and editions
 keys: prices, price, cost, how much, how much do they cost, editions, how many, supply, edition size, sold out, minted, remaining
