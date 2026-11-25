@@ -3,50 +3,14 @@
 <head>
 <meta charset="utf-8">
 <title>Prancer Band: the Sphere's wall</title>
-<style>html, body { margin: 0; background: #000; } canvas { display: block; }</style>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <script src="perform.js"></script>
 <script src="guest.js"></script>
-<script>
-/* The inside wall of the Sphere: one equirectangular frame per moment of the song, for wrapping the dome in 3D.
-   No words, no titles: a show made of light, the way a real sphere is. Every pixel is drawn from its own direction
-   on the sphere (a WebGL shader), so nothing stretches or pinches where the wall curves overhead.
-
-   The wall has modes that cross-fade by section of the song (see SCORE):
-     dawn   a painted sunset sky: a low sun, layered clouds lit from beneath, the first stars
-     trance the Prance Trance tunnel: rings of walking Prancers (their own sprite sheets) streaming out of a point
-            above the stage, forever, one ring every eight beats, trails of light between the rings
-     face   the singer's face, many storeys tall, as a giant LED image on the wall above the stage
-     star   deep night: three layers of stars turning slowly, a faint nebula and an aurora along the horizon
-     bloom  a twelve-fold kaleidoscope of the tunnel, colour turning with the song, opening on every kick
-     freeze the wall stalls: blocks of the picture hold and slip, colour splits, then lets go
-     chain  (over the others, for the bridge) a chain of glowing blocks draws itself across the night, block by block on
-            the beat, each linked to the last, light running along the links
-   For Decentralize (the 3D show's second song; window.__song sets its score and timings):
-     garden vines and flowers growing up the dome from the horizon as GROW runs 0..1 ("the kind that grow without a
-            patent, wild and awake"), over a warm evening
-     cage   (over the others) bars coming down over the dome as CAGEK runs 0..1 ("they built the cage and named it safety")
-     net    (over the others) a net of points and threads with no centre, light pulsing out from the stage every bar
-            ("take it back, decentralize")
-     freq   the bridge: slow rings of light rising out of the ground, the stars coming through ("frequencies the earth
-            has kept")
-     soul   a mandala of rings opening from above the stage ("the open soul")
-     word   a word in lights above the stage, now and then, where a line earns it (window.__song's words)
-   Always on: a ring of light bars all round the horizon, each stretch an instrument of the song; and the LED
-   pitch of the wall itself, panel seams and pixels, so it reads as a screen the size of a building.
-   Guest artists (dev/guest.js, guests/README.md): another artist's piece on the wall for a stretch of a song, as a
-   screen above the stage, the whole sky or a band round the dome, with their name in lights as it arrives and leaves;
-   nothing booked, nothing drawn (the wall is then exactly as it was).
-   ?w=3072 sets the width (height is half). window.__frame(songSeconds) draws a moment. */
-const q = new URLSearchParams(location.search), Wd = +(q.get("w") || 2048), Ht = Wd / 2;
-const cv = document.getElementById("c"); cv.width = Wd; cv.height = Ht;
-const gl = cv.getContext("webgl2", { preserveDrawingBuffer: true, antialias: false });
-
-const VS = `#version 300 es
-in vec2 p; out vec2 uv; void main() { uv = p * 0.5 + 0.5; uv.y = 1.0 - uv.y; gl_Position = vec4(p, 0, 1); }`;
-const FS = `#version 300 es
+<script>const q=new URLSearchParams(location.search),Wd=+(q.get("w")||2048),Ht=Wd/2;const cv=document.getElementById("c");cv.width=Wd;cv.height=Ht;const gl=cv.getContext("webgl2",{preserveDrawingBuffer:true,antialias:false});const VS=`#version 300 es
+in vec2 p; out vec2 uv; void main() { uv = p * 0.5 + 0.5; uv.y = 1.0 - uv.y; gl_Position = vec4(p, 0, 1); }`;const FS=`#version 300 es
 precision highp float; precision highp sampler2DArray;
 in vec2 uv; out vec4 o;
 uniform vec2 R; uniform float T, BEAT, KICK, VOC, DRM, BAS, OTH, PNO, GTR, AIR;
@@ -281,133 +245,6 @@ void main() { vec2 u = uv;
   float seam = 1.0 - 0.22 * (smoothstep(0.485, 0.5, sm.x) + smoothstep(0.485, 0.5, sm.y));
   vec2 px = fract(u * R * 0.5); float pit = 0.9 + 0.1 * smoothstep(0.5, 0.3, length(px - 0.5));
   c *= seam * pit * (1.0 - mDark);
-  o = vec4(pow(max(c, 0.0), vec3(0.95)), 1); }`;
-
-function shader(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; }
-const prog = gl.createProgram(); gl.attachShader(prog, shader(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog);
-if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
-gl.useProgram(prog);
-const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-const loc = gl.getAttribLocation(prog, "p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-const U = (n) => gl.getUniformLocation(prog, n);
-
-/* the Prancers for the tunnel: walking sprite sheets (10 x 10 frames of 150 x 181), halved, as a texture array */
-const IDS = Array.from({ length: 20 }, (_, i) => (i * 7 + 3) % 91), SW = 750, SH = 905;
-const catTex = gl.createTexture(); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D_ARRAY, catTex);
-gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 1, gl.RGBA8, SW, SH, IDS.length);
-gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-const faceTex = gl.createTexture(); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, faceTex);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
-const wordTex = gl.createTexture(), wordC = Object.assign(document.createElement("canvas"), { width: 1100, height: 130 });   // a word in lights, drawn here
-gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, wordTex); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
-function setWord(w) { if (w === WORDNOW) return; WORDNOW = w; const x = wordC.getContext("2d"); x.clearRect(0, 0, 1100, 130); if (w) { x.font = "900 104px 'Arial Rounded MT Bold', 'Arial Black', sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
-    x.shadowColor = "rgba(255,150,60,0.9)"; x.shadowBlur = 18; x.fillStyle = "#fff4e2"; x.fillText(w, 550, 68, 1060); }
-  gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, wordTex); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, wordC); }
-const titleTex = gl.createTexture(); gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, titleTex);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
-gl.uniform1i(U("CATS"), 0); gl.uniform1i(U("FACE"), 1); gl.uniform1i(U("TITLE"), 2); gl.uniform1i(U("WORD"), 3); gl.uniform1f(U("NCATS"), IDS.length);
-const GW = window.GUESTWALL(gl, U);   // guest artists' pieces (units 4 and 5): nothing booked, nothing drawn
-const half = document.createElement("canvas"); half.width = SW; half.height = SH; const hx = half.getContext("2d");
-const loadImg = (src) => new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
-const sheetsReady = Promise.all(IDS.map((n, i) => loadImg(`sprites/150/${n}.webp`).then((im) => { if (!im) return;
-  hx.clearRect(0, 0, SW, SH); hx.drawImage(im, 0, 0, SW, SH); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D_ARRAY, catTex);
-  gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, i, SW, SH, 1, gl.RGBA, gl.UNSIGNED_BYTE, half); })));
-
-/* the score: which mode the wall is in, by song time (seconds), with cross-fades; from SHOTLIST.md */
-let SCORE = [
-  [0, { dawn: 0.35 }], [8, { dawn: 0.7 }], [15, { dawn: 1 }], [30, { dawn: 0.6, face: 0.9 }], [36.5, { dawn: 1 }], [43, { star: 1 }], [49, { star: 0.6, trance: 0.45 }],
-  [54.4, { trance: 1 }], [64, { trance: 0.6, face: 1 }], [70, { trance: 1 }], [76, { trance: 0.5, face: 1 }], [82, { bloom: 1, freeze: 0.25 }], [93, { dawn: 0.5, star: 0.6 }],
-  [100.3, { trance: 1, freeze: 0.5 }], [101.6, { trance: 1 }], [106, { dawn: 0.5, star: 0.6, face: 1 }], [112, { dawn: 0.5, star: 0.6 }], [119, { bloom: 1 }], [133, { bloom: 0.5, face: 1 }], [147, { trance: 0.55 }],
-  [159.6, { star: 1 }], [163, { star: 1, chain: 1 }], [172.7, { star: 0.5, trance: 0.7, chain: 0.6 }], [178, { star: 0.3, trance: 0.9 }], [184, { bloom: 1 }], [197, { bloom: 0.5, face: 1 }], [204, { bloom: 1 }], [208, { bloom: 0.5, face: 1 }],
-  [211.5, { trance: 1 }], [216.8, { bloom: 1 }], [222, { trance: 1 }], [227, { bloom: 1 }], [236, { dawn: 0.45 }], [245.5, { trance: 0.9 }], [252.4, { trance: 0.6 }]];   // Prance Trance over the ending (Yoeshi, 2026-11-01)
-const FADE = 0.9, MODES = ["dawn", "trance", "face", "star", "bloom", "freeze", "dark", "chain", "garden", "cage", "net", "freq", "soul"];
-let EXTRA = null, WORDNOW = "";   // Decentralize's timings: { grow: [[from, to]], cage: [[from, to]], words: [[from, to, "WORD"]] } (window.__song)
-let CHAIN0 = 163, CHAIN1 = 172;   // the chain draws itself over the bridge
-/* the chain's layouts, each block: where it sits, the step it appears on, the block or two it links back to (-1: none) and
-   its id (see chain() in the shader)
-     spiral  Internet Friend's own, as the live show plays it: one block after another in a spiral from above the stage,
-             out over the crowd and back, low on the dome
-     crown   the 3D show's (Yoeshi, 2026-11-07: higher on the inner dome, spread out symmetrically): fourteen blocks evenly
-             round the dome at CROWN_LAT degrees up (extra.chainLat for another), mirrored across the stage's centre
-             line, as the light rig is; the first block above the stage, the chain growing out both ways at once, a
-             mirrored pair on each beat, round to the last block at the back, which links to both sides and closes the ring
-   window.__song's extra.chain picks one; the live show never calls __song, so it keeps the spiral */
-const CROWN_LAT = 50;
-const at = (lonDeg, latDeg) => { const lon = lonDeg * Math.PI / 180, lat = latDeg * Math.PI / 180; return [Math.cos(lat) * Math.sin(lon), Math.sin(lat), Math.cos(lat) * Math.cos(lon)]; };
-const crown = (lat) => [{ at: at(0, lat), step: 0, prev: -1, prev2: -1, id: 0 },
-  ...Array.from({ length: 6 }, (_, j) => [1, -1].map((s) => ({ at: at(s * (j + 1) * 360 / 14, lat), step: j + 1, prev: j ? 2 * j - (s > 0 ? 1 : 0) : 0, prev2: -1, id: j + 1 }))).flat(),
-  { at: at(180, lat), step: 7, prev: 11, prev2: 12, id: 7 }];
-const SPIRAL = Array.from({ length: 14 }, (_, i) => ({ at: at(20 + i * 26, 16 + 14 * Math.sin(i * 1.3) + i * 1.2), step: i, prev: i - 1, prev2: -1, id: i }));
-const CHAINS = { spiral: () => SPIRAL, crown: (x) => crown(x.chainLat || CROWN_LAT) };
-let CHAINNOW = "";
-function useChain(x) { const name = Object.hasOwn(CHAINS, (x && x.chain) || "") ? x.chain : "spiral", key = name + (x && x.chainLat || ""); if (key === CHAINNOW) return; CHAINNOW = key;
-  const L = CHAINS[name](x || {});
-  gl.uniform3fv(U("NODES[0]"), L.flatMap((b) => b.at)); gl.uniform1fv(U("CSTEP[0]"), L.map((b) => b.step)); gl.uniform1fv(U("CID[0]"), L.map((b) => b.id));
-  gl.uniform1iv(U("CPREV[0]"), L.map((b) => b.prev)); gl.uniform1iv(U("CPREV2[0]"), L.map((b) => b.prev2)); gl.uniform1f(U("CN"), Math.max(...L.map((b) => b.step)) + 1); }
-function modeAt(ts) { let i = 0; while (i < SCORE.length - 1 && SCORE[i + 1][0] <= ts) i++;
-  const cur = SCORE[i][1], prev = i ? SCORE[i - 1][1] : cur, k = Math.min(1, (ts - SCORE[i][0]) / FADE), e = k * k * (3 - 2 * k), out = {};
-  for (const m of MODES) out[m] = (prev[m] || 0) * (1 - e) + (cur[m] || 0) * e; return out; }
-
-let FACEIMG = null;
-window.__ready = Promise.all([PERFORM.load("../data/map.json", "../data/beats.json"), sheetsReady]).then(() => true);
-/* the face: a frame of the singer's card (a transparent PNG); FACEBOX picks the head out of it */
-window.__face = (src, box) => loadImg(src).then((im) => { if (!im) return; gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, faceTex); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); gl.uniform4f(U("FACEBOX"), ...box); });
-/* a band's name for the wall (a transparent PNG, 2.5 wide per 0.62 high), shown when the mode has title > 0 */
-/* the singer from a canvas already in hand (the live show composes him from its band video): box as for __face */
-window.__faceEl = (el, box) => { gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, faceTex); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, el); gl.uniform4f(U("FACEBOX"), ...box); };
-window.__title = (src) => loadImg(src).then((im) => { if (!im) return; gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, titleTex); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im); });
-/* the band at ts, as the guests' pieces read it (window.wall in the kit) */
-const levelsAt = (ts) => { const E = (k) => PERFORM.env(k, ts), b = PERFORM.beat(ts), lv = {};
-  for (const k of ["vocals", "drums", "bass", "other", "piano", "guitar"]) lv[k] = Math.min(1, E(k) * 1.15);
-  return { beat: b, kick: Math.max(E("hits"), Math.exp(-((b % 1 + 1) % 1) * 6) * 0.6), levels: lv, energy: Math.min(1, (lv.drums + lv.bass + lv.vocals + lv.other) / 2.2), bands: PERFORM.bands ? PERFORM.bands(ts) : null, feed: PERFORM.feed ? PERFORM.feed(ts) : null }; };
-window.__frame = (ts, force) => { const E = (k) => PERFORM.env(k, ts), b = PERFORM.beat(ts), m = force || modeAt(ts), kick = Math.max(E("hits"), Math.exp(-((b % 1 + 1) % 1) * 6) * 0.6);
-  gl.viewport(0, 0, Wd, Ht); gl.uniform2f(U("R"), Wd, Ht); gl.uniform1f(U("T"), ts); gl.uniform1f(U("BEAT"), b); gl.uniform1f(U("KICK"), kick);
-  for (const [u_, k] of [["VOC", "vocals"], ["DRM", "drums"], ["BAS", "bass"], ["OTH", "other"], ["PNO", "piano"], ["GTR", "guitar"]]) gl.uniform1f(U(u_), Math.min(1, E(k) * 1.15));
-  for (const [u_, k] of [["mDawn", "dawn"], ["mTrance", "trance"], ["mFace", "face"], ["mStar", "star"], ["mBloom", "bloom"], ["mFreeze", "freeze"], ["mDark", "dark"], ["mChain", "chain"], ["mTitle", "title"], ["mSym", "sym"], ["TITLEUP", "titleUp"],
-    ["mGarden", "garden"], ["mCage", "cage"], ["mNet", "net"], ["mFreq", "freq"], ["mSoul", "soul"]]) gl.uniform1f(U(u_), m[k] || 0);
-  /* Decentralize's timings: how far the garden has grown and the cage has closed (each holds when its span ends), and
-     the word now in lights (fading in and out over a quarter second) */
-  const span = (list) => { let v = 0; for (const [a, z] of list || []) if (ts >= a) v = Math.min(1, (ts - a) / (z - a)); return v; };
-  gl.uniform1f(U("GROW"), EXTRA ? span(EXTRA.grow) : 0); gl.uniform1f(U("CAGEK"), EXTRA ? span(EXTRA.cage) : 0);
-  const w = EXTRA && (EXTRA.words || []).find(([a, z]) => ts >= a - 0.25 && ts < z + 0.25); if (w) setWord(w[2]);
-  gl.uniform1f(U("mWord"), w ? Math.min(1, (ts - w[0] + 0.25) / 0.25, (w[1] + 0.25 - ts) / 0.25) : 0);
-  const gs = GW.any ? GW.frame(ts, levelsAt(ts)) : { mGuest: 0, mCredit: 0, yieldFace: 0 };   // a guest's piece on now: its fade, its credit's, and the singer's big picture making way
-  gl.uniform1f(U("mGuest"), gs.mGuest); gl.uniform1f(U("mCredit"), gs.mCredit); gl.uniform1f(U("RINGK"), 1 - (1 - (gs.bars ?? 1)) * gs.mGuest); if (gs.yieldFace) gl.uniform1f(U("mFace"), (m.face || 0) * (1 - gs.yieldFace));
-  gl.uniform1f(U("CHAIN"), force && force.chainAt !== undefined ? force.chainAt : Math.min(1, Math.max(0, (ts - CHAIN0) / (CHAIN1 - CHAIN0)))); useChain(EXTRA);
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  /* one pixel read back now and then: on Windows (Direct3D, through ANGLE) the show's copy of this canvas stayed on an old picture until something
-     made this context resolve its drawing (opening DevTools did; so did one readPixels), and then it followed live. So: once at the start, once
-     when a guest's piece comes on, and every 120 frames after (the PC's Windows test of LoveFromGaia's frozen dome, 2026-11-19) */
-  const gOn = gs.mGuest > 0.001; RES.n++;
-  if (!RES.done || (gOn && !RES.guest) || RES.n % (RES.every || (gOn && RES.win ? 1 : 120)) === 0) { setTimeout(() => gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, RES.px), 0); RES.done = true; if (gOn) RES.guest = true; }   // (in a task of its own, after the frame: read inside the draw it did not count, the PC found)
-  if (!gOn) RES.guest = false;
-  return new Promise((r) => requestAnimationFrame(() => r(m))); };
-const RES = { n: 0, done: false, guest: false, px: new Uint8Array(4), every: (() => { try { const v = +new URLSearchParams(parent.location.search).get("wallread"); return v >= 1 ? Math.round(v) : 0; } catch (e) { return 0; } })(), win: /Windows/.test(navigator.userAgent) };   // 0: the default, every frame on Windows while a guest's piece is on, else every 120 (the PC, 2026-11-19: with a read every 120 frames Chrome and Edge showed his piece's new picture only every 4.2 to 4.4 s; every frame, 9 a second)   // ?wallread=N on the show's address: a pixel read every N frames (a test switch, 2026-11-19: LoveFromGaia's laptop showed a new picture every 4 to 5 s, about 120 frames at its rate)
-window.__modeAt = modeAt;
-/* another song on the same wall (the 3D show's setlist): its map and beats, its score, when its chain draws; the
-   live show never calls this, so Internet Friend's wall is as it was */
-const SCORE0 = SCORE, CHAIN00 = [CHAIN0, CHAIN1];   // Internet Friend's own, for a setlist that comes back to it
-window.__song = (mapUrl, beatsUrl, score, chain, extra) => { if (score) SCORE = score === "default" ? SCORE0 : score; [CHAIN0, CHAIN1] = chain || CHAIN00; EXTRA = extra || null;
-  GW.song((mapUrl.match(/analysis\/([^/]+)\//) || [])[1] || ""); return PERFORM.load(mapUrl, beatsUrl); };
-/* guest artists (dev/guest.js): book pieces for stretches of the song; "film" makes each frame wait for the piece's
-   own frame (__guestSync(t) before __frame(t)); __guestNow(t) is the credit on now, for the show to put on screen */
-window.__guests = (list) => GW.book(list);
-window.__guestMode = (m) => GW.mode(m);
-window.__guestOn = (v) => GW.on(v);
-window.__guestSection = (s) => GW.section(s);
-window.__guestSync = (ts) => GW.sync(ts, levelsAt(ts));
-window.__guestNow = (ts) => GW.now(ts);
-window.__guestLoad = () => GW.load();
-window.__guestDebug = () => GW.debug();   // (a check from the page: what the wall did with a guest's frames)
-</script>
+  o = vec4(pow(max(c, 0.0), vec3(0.95)), 1); }`;function shader(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));return s}const prog=gl.createProgram();gl.attachShader(prog,shader(gl.VERTEX_SHADER,VS));gl.attachShader(prog,shader(gl.FRAGMENT_SHADER,FS));gl.linkProgram(prog);if(!gl.getProgramParameter(prog,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(prog));gl.useProgram(prog);const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);const loc=gl.getAttribLocation(prog,"p");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);const U=n=>gl.getUniformLocation(prog,n);const IDS=Array.from({length:20},(_,i)=>(i*7+3)%91),SW=750,SH=905;const catTex=gl.createTexture();gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D_ARRAY,catTex);gl.texStorage3D(gl.TEXTURE_2D_ARRAY,1,gl.RGBA8,SW,SH,IDS.length);gl.texParameteri(gl.TEXTURE_2D_ARRAY,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D_ARRAY,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D_ARRAY,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D_ARRAY,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);const faceTex=gl.createTexture();gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,faceTex);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([0,0,0,0]));const wordTex=gl.createTexture(),wordC=Object.assign(document.createElement("canvas"),{width:1100,height:130});gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,wordTex);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([0,0,0,0]));function setWord(w){if(w===WORDNOW)return;WORDNOW=w;const x=wordC.getContext("2d");x.clearRect(0,0,1100,130);if(w){x.font="900 104px 'Arial Rounded MT Bold', 'Arial Black', sans-serif";x.textAlign="center";x.textBaseline="middle";x.shadowColor="rgba(255,150,60,0.9)";x.shadowBlur=18;x.fillStyle="#fff4e2";x.fillText(w,550,68,1060)}gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,wordTex);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,wordC)}const titleTex=gl.createTexture();gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,titleTex);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([0,0,0,0]));gl.uniform1i(U("CATS"),0);gl.uniform1i(U("FACE"),1);gl.uniform1i(U("TITLE"),2);gl.uniform1i(U("WORD"),3);gl.uniform1f(U("NCATS"),IDS.length);const GW=window.GUESTWALL(gl,U);const half=document.createElement("canvas");half.width=SW;half.height=SH;const hx=half.getContext("2d");const loadImg=src=>new Promise(res=>{const im=new Image;im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src});const sheetsReady=Promise.all(IDS.map((n,i)=>loadImg(`sprites/150/${n}.webp`).then(im=>{if(!im)return;hx.clearRect(0,0,SW,SH);hx.drawImage(im,0,0,SW,SH);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D_ARRAY,catTex);gl.texSubImage3D(gl.TEXTURE_2D_ARRAY,0,0,0,i,SW,SH,1,gl.RGBA,gl.UNSIGNED_BYTE,half)})));let SCORE=[[0,{dawn:.35}],[8,{dawn:.7}],[15,{dawn:1}],[30,{dawn:.6,face:.9}],[36.5,{dawn:1}],[43,{star:1}],[49,{star:.6,trance:.45}],[54.4,{trance:1}],[64,{trance:.6,face:1}],[70,{trance:1}],[76,{trance:.5,face:1}],[82,{bloom:1,freeze:.25}],[93,{dawn:.5,star:.6}],[100.3,{trance:1,freeze:.5}],[101.6,{trance:1}],[106,{dawn:.5,star:.6,face:1}],[112,{dawn:.5,star:.6}],[119,{bloom:1}],[133,{bloom:.5,face:1}],[147,{trance:.55}],[159.6,{star:1}],[163,{star:1,chain:1}],[172.7,{star:.5,trance:.7,chain:.6}],[178,{star:.3,trance:.9}],[184,{bloom:1}],[197,{bloom:.5,face:1}],[204,{bloom:1}],[208,{bloom:.5,face:1}],[211.5,{trance:1}],[216.8,{bloom:1}],[222,{trance:1}],[227,{bloom:1}],[236,{dawn:.45}],[245.5,{trance:.9}],[252.4,{trance:.6}]];const FADE=.9,MODES=["dawn","trance","face","star","bloom","freeze","dark","chain","garden","cage","net","freq","soul"];let EXTRA=null,WORDNOW="";let CHAIN0=163,CHAIN1=172;const CROWN_LAT=50;const at=(lonDeg,latDeg)=>{const lon=lonDeg*Math.PI/180,lat=latDeg*Math.PI/180;return[Math.cos(lat)*Math.sin(lon),Math.sin(lat),Math.cos(lat)*Math.cos(lon)]};const crown=lat=>[{at:at(0,lat),step:0,prev:-1,prev2:-1,id:0},...Array.from({length:6},(_,j)=>[1,-1].map(s=>({at:at(s*(j+1)*360/14,lat),step:j+1,prev:j?2*j-(s>0?1:0):0,prev2:-1,id:j+1}))).flat(),{at:at(180,lat),step:7,prev:11,prev2:12,id:7}];const SPIRAL=Array.from({length:14},(_,i)=>({at:at(20+i*26,16+14*Math.sin(i*1.3)+i*1.2),step:i,prev:i-1,prev2:-1,id:i}));const CHAINS={spiral:()=>SPIRAL,crown:x=>crown(x.chainLat||CROWN_LAT)};let CHAINNOW="";function useChain(x){const name=Object.hasOwn(CHAINS,x&&x.chain||"")?x.chain:"spiral",key=name+(x&&x.chainLat||"");if(key===CHAINNOW)return;CHAINNOW=key;const L=CHAINS[name](x||{});gl.uniform3fv(U("NODES[0]"),L.flatMap(b=>b.at));gl.uniform1fv(U("CSTEP[0]"),L.map(b=>b.step));gl.uniform1fv(U("CID[0]"),L.map(b=>b.id));gl.uniform1iv(U("CPREV[0]"),L.map(b=>b.prev));gl.uniform1iv(U("CPREV2[0]"),L.map(b=>b.prev2));gl.uniform1f(U("CN"),Math.max(...L.map(b=>b.step))+1)}function modeAt(ts){let i=0;while(i<SCORE.length-1&&SCORE[i+1][0]<=ts)i++;const cur=SCORE[i][1],prev=i?SCORE[i-1][1]:cur,k=Math.min(1,(ts-SCORE[i][0])/FADE),e=k*k*(3-2*k),out={};for(const m of MODES)out[m]=(prev[m]||0)*(1-e)+(cur[m]||0)*e;return out}let FACEIMG=null;window.__ready=Promise.all([PERFORM.load("../data/map.json","../data/beats.json"),sheetsReady]).then(()=>true);window.__face=(src,box)=>loadImg(src).then(im=>{if(!im)return;gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,faceTex);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,im);gl.uniform4f(U("FACEBOX"),...box)});window.__faceEl=(el,box)=>{gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,faceTex);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,el);gl.uniform4f(U("FACEBOX"),...box)};window.__title=src=>loadImg(src).then(im=>{if(!im)return;gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,titleTex);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,im)});const levelsAt=ts=>{const E=k=>PERFORM.env(k,ts),b=PERFORM.beat(ts),lv={};for(const k of["vocals","drums","bass","other","piano","guitar"])lv[k]=Math.min(1,E(k)*1.15);return{beat:b,kick:Math.max(E("hits"),Math.exp(-((b%1+1)%1)*6)*.6),levels:lv,energy:Math.min(1,(lv.drums+lv.bass+lv.vocals+lv.other)/2.2),bands:PERFORM.bands?PERFORM.bands(ts):null,feed:PERFORM.feed?PERFORM.feed(ts):null}};window.__frame=(ts,force)=>{const E=k=>PERFORM.env(k,ts),b=PERFORM.beat(ts),m=force||modeAt(ts),kick=Math.max(E("hits"),Math.exp(-((b%1+1)%1)*6)*.6);gl.viewport(0,0,Wd,Ht);gl.uniform2f(U("R"),Wd,Ht);gl.uniform1f(U("T"),ts);gl.uniform1f(U("BEAT"),b);gl.uniform1f(U("KICK"),kick);for(const[u_,k]of[["VOC","vocals"],["DRM","drums"],["BAS","bass"],["OTH","other"],["PNO","piano"],["GTR","guitar"]])gl.uniform1f(U(u_),Math.min(1,E(k)*1.15));for(const[u_,k]of[["mDawn","dawn"],["mTrance","trance"],["mFace","face"],["mStar","star"],["mBloom","bloom"],["mFreeze","freeze"],["mDark","dark"],["mChain","chain"],["mTitle","title"],["mSym","sym"],["TITLEUP","titleUp"],["mGarden","garden"],["mCage","cage"],["mNet","net"],["mFreq","freq"],["mSoul","soul"]])gl.uniform1f(U(u_),m[k]||0);const span=list=>{let v=0;for(const[a,z]of list||[])if(ts>=a)v=Math.min(1,(ts-a)/(z-a));return v};gl.uniform1f(U("GROW"),EXTRA?span(EXTRA.grow):0);gl.uniform1f(U("CAGEK"),EXTRA?span(EXTRA.cage):0);const w=EXTRA&&(EXTRA.words||[]).find(([a,z])=>ts>=a-.25&&ts<z+.25);if(w)setWord(w[2]);gl.uniform1f(U("mWord"),w?Math.min(1,(ts-w[0]+.25)/.25,(w[1]+.25-ts)/.25):0);const gs=GW.any?GW.frame(ts,levelsAt(ts)):{mGuest:0,mCredit:0,yieldFace:0};gl.uniform1f(U("mGuest"),gs.mGuest);gl.uniform1f(U("mCredit"),gs.mCredit);gl.uniform1f(U("RINGK"),1-(1-(gs.bars??1))*gs.mGuest);if(gs.yieldFace)gl.uniform1f(U("mFace"),(m.face||0)*(1-gs.yieldFace));gl.uniform1f(U("CHAIN"),force&&force.chainAt!==void 0?force.chainAt:Math.min(1,Math.max(0,(ts-CHAIN0)/(CHAIN1-CHAIN0))));useChain(EXTRA);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);const gOn=gs.mGuest>.001;RES.n++;if(!RES.done||gOn&&!RES.guest||RES.n%(RES.every||(gOn&&RES.win?1:120))===0){setTimeout(()=>gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,RES.px),0);RES.done=true;if(gOn)RES.guest=true}if(!gOn)RES.guest=false;return new Promise(r=>requestAnimationFrame(()=>r(m)))};const RES={n:0,done:false,guest:false,px:new Uint8Array(4),every:(()=>{try{const v=+new URLSearchParams(parent.location.search).get("wallread");return v>=1?Math.round(v):0}catch(e){return 0}})(),win:/Windows/.test(navigator.userAgent)};window.__modeAt=modeAt;const SCORE0=SCORE,CHAIN00=[CHAIN0,CHAIN1];window.__song=(mapUrl,beatsUrl,score,chain,extra)=>{if(score)SCORE=score==="default"?SCORE0:score;[CHAIN0,CHAIN1]=chain||CHAIN00;EXTRA=extra||null;GW.song((mapUrl.match(/analysis\/([^/]+)\//)||[])[1]||"");return PERFORM.load(mapUrl,beatsUrl)};window.__guests=list=>GW.book(list);window.__guestMode=m=>GW.mode(m);window.__guestOn=v=>GW.on(v);window.__guestSection=s=>GW.section(s);window.__guestSync=ts=>GW.sync(ts,levelsAt(ts));window.__guestNow=ts=>GW.now(ts);window.__guestLoad=()=>GW.load();window.__guestDebug=()=>GW.debug();</script>
 </body>
 </html>
