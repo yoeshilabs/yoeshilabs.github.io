@@ -1,0 +1,40 @@
+/* Maestro in 3D: the one source of his look, for every place he stands (the Party Pawvilion's bar, the site's lobby).
+   The design Yoeshi approved on 2026-11-11 ("love the beard that Maestro design is approved"; before it: "a more Americanized
+   guru and lose the orange ... better to be neutral"): the grey-brown tabby of his portrait, cream muzzle, pink nose and ears,
+   yellow-green eyes, long fur, at ease; a one-of-a-kind coat ("fluffier hair and perfect markings"), a cream beard shaped "like a
+   wise mans beard slightly", round clear glasses in thin gold rims, a soft sweater. No robe, beads, brow mark, halo or lotus.
+   First written in the launch chat (TrancerEnhanced home/next/cats/cast.js at defbc6f) and moved here, at that chat's ask, so he
+   cannot drift between builds. Still open with Yoeshi: which sweater (cream is the working one).
+
+   He is made by the generator's own builder from genes set by hand; the generator is not changed, and what makes him one of a
+   kind is done to his own materials after he is built. Nothing here touches a page: only three.js and gen/src.
+
+     makeMaestro({ wear: "cream" | "sage" | "lilac", hold: false | true, shells: 13, rand, beard: true })
+       -> what buildCat returns ({ cat, inst, role, laser }), the cat standing at rest and unscaled
+     hold: true puts his coffee in his paw (the lobby); false leaves his paws free (the bartender).
+     MAESTRO, WEAR: his genes and his sweaters, for anyone who needs to read them. */
+import * as THREE from "three";
+import { buildCat, rollSeed } from "../../gen/src/cat.js";
+
+export const MAESTRO = { KIND: "Domestic", GENES: true, NEON: false, GOLD: false, bodyFill: "#958a7b", markC: "#3b322b", patchC: null, pointC: null, muzC: "#f3ece0", noseC: "#f79ab6", earIn: "#f6a6c0", RIM: "#ffffff",
+  EYEC: ["#b9c842", "#b9c842"], PAT: "Mackerel", WHITE: "None", FUR: "Longhair", EARS: "Tufted", TAILK: "Long", BUILD: "Classic", BW: 1.06, CW: 1.14, TEMP: "Chill", JACKET: null, TEE: null, PANTS: null, SHORTSLEEVE: false,
+  SPK: "", HALO: false, HORNS: false, WINGS: false, LASER: "None", EYEWEAR: "Glasses", EARRING: "None", HAT: "None", INSTR: "None", HOLD: "None", LEGEND: "None", MYTH: false, MONK: false, GLAD: false, CIB: false, KNIGHT: false, MANE: "None", NAME: "Maestro", KEY: "Maestro" };
+export const WEAR = { cream: { OUTFIT: "Sweater", C1: "#efe5d0", SLEEVE: "#efe5d0" }, sage: { OUTFIT: "Turtleneck", C1: "#7fae9a", SLEEVE: "#7fae9a" }, lilac: { OUTFIT: "Hoodie", C1: "#b7a2e4", SLEEVE: "#b7a2e4" } };
+/* one of a kind: fuller fur everywhere (most on the tail, least on the face so his markings stay crisp) and markings made even, on his own materials after he is built */
+function legendary(av, fluff = 1.8) { const seen = new Set(); av.root.traverse((o) => { for (const m of [].concat(o.material || [])) { const u = m && m.userData && m.userData.u; if (!u || seen.has(m)) continue; seen.add(m);
+    const part = u.uPart ? u.uPart.value : 0, k = { 1: 1.4, 7: 1.15, 2: 1.25, 6: 2.1 }[part] || fluff; if (u.uFurLen && u.uFurLen.value > 0) { u.uFurLen.value *= k; if (u.uDroop) u.uDroop.value *= 0.7; }
+    const prev = m.onBeforeCompile, key = m.customProgramCacheKey;
+    m.onBeforeCompile = (sh, r) => { if (prev) prev.call(m, sh, r); sh.fragmentShader = sh.fragmentShader.replace("float n = fbm(p * 1.7);", "float n = 0.0;").replace("float ang = atan(p.x, p.z),", "float ang = abs(atan(p.x, p.z)),").replace("v = sin(l.x * 26.0 + n * 1.5);", "v = cos(l.x * 26.0);").replace("v = sin(l.x * 13.0 + n * 2.0) * 0.98;", "v = cos(l.x * 13.0) * 0.98;"); };
+    m.customProgramCacheKey = () => (key ? key.call(m) : "") + "|maestro"; m.needsUpdate = true; } }); }
+/* his beard: the ruff's fur, cream as his muzzle, reshaped from a ball into a beard, wide along the jaw and falling to a soft point over his chest */
+function beard(av) { av.root.updateMatrixWorld(true); const inv = new THREE.Matrix4().copy(av.root.matrixWorld).invert();
+  av.root.traverse((o) => { const u = o.material && o.material.userData && o.material.userData.u; if (!u || !u.uBody || u.uBody.value.getHexString() !== "efe1c4" || o.isInstancedMesh || o.userData.beard) return; o.userData.beard = true;
+    const g = new THREE.SphereGeometry(1, 44, 30), p = g.attributes.position; for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i), d = Math.max(0, -y), taper = 1 - 0.8 * Math.pow(d, 1.5); p.setXYZ(i, x * 0.9 * taper, y > 0 ? y * 0.3 : y * 0.86, z * 0.44 * (1 - 0.4 * d) + 0.1 * d); } g.computeVertexNormals();
+    o.geometry = g; if (o.userData.shells) o.userData.shells.geometry = g; o.position.set(0, -0.6, 0.3); o.scale.set(1, 1, 1); o.updateMatrixWorld(true); u.uBody.value.set("#f1e9db"); u.uFurLen.value = 0.24; if (u.uDroop) u.uDroop.value = 1.1; if (u.uRest) u.uRest.value.multiplyMatrices(inv, o.matrixWorld); }); }
+/* his glasses: clear lenses (the generator's are tinted, and hid his eyes) in thin gold rims */
+function glasses(av) { av.root.traverse((o) => { if (!o.isMesh || !o.geometry) return; const g = o.geometry.type, m = o.material; if (g === "CircleGeometry" && m.transparent && m.opacity > 0.5 && m.opacity < 0.7) { m.color.set("#dff0ff"); m.opacity = 0.12; }
+    if ((g === "TorusGeometry" || g === "TubeGeometry" || g === "CylinderGeometry") && m.color && m.color.getHexString() === "16121c" && m.clearcoat === 1) { m.color.set("#d9b45a"); m.metalness = 1; m.roughness = 0.25; } }); }
+
+export function makeMaestro({ wear = "cream", hold = false, shells = 13, rand, beard: withBeard = true } = {}) {
+  const built = buildCat({ ...rollSeed("find100"), ...MAESTRO, ...(WEAR[wear] || WEAR.cream), ...(hold ? { HOLD: "Coffee" } : {}), ...(withBeard ? { MANE: "Cream" } : {}) }, { shells, instrument: false, rand });
+  legendary(built.cat); if (withBeard) beard(built.cat); glasses(built.cat); return built; }
