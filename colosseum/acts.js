@@ -1,6 +1,6 @@
 
 
-export async function stageActs(name, ctx) {
+export async function stageActs(name, ctx) { let HALF = 0;    
   if (name.includes(",")) { const names = name.split(","), parts = []; for (const n of names) parts.push(await stageActs(n, ctx));    
     return { tick: (t) => parts.forEach((p, i) => { const lt = ctx.schedule ? ctx.schedule(names[i], t) : t; if (lt !== null && lt !== undefined) p.tick(lt); }), focus: parts[0].focus, probe: parts[0].probe, parts: Object.fromEntries(names.map((n, i) => [n, parts[i]])) }; }
   const { THREE, scene, FA, FB, TEAMS, glow, mat } = ctx, P = (x, y, z) => new THREE.Vector3(x, y, z), TAU = Math.PI * 2, S = 0.58;
@@ -168,10 +168,11 @@ export async function stageActs(name, ctx) {
     let lastJ = -1; const reset = () => { broke = false; K[1].tip.visible = true; K[1].shaft.scale.y = 1; K[1].shaft.position.y = 3.3; for (const s2 of SPL) scene.remove(s2.m || s2.flash); SPL.length = 0; };    
     let idle = false;    
     acts.tick = (t) => { if (t === 0 && lastJ === 0 && idle) return; idle = t === 0; if (t < lastJ - 0.01) reset(); lastJ = t; const dt = clock(t), v = 5.6, xs = [-15.5 + v * t, 15.5 - v * t];
-      for (let i = 0; i < 2; i++) { const k = K[i], x = xs[i], dir = i ? -1 : 1, z = ZB + (i ? -2.3 : 2.3);
+      HALF++; for (let i = 0; i < 2; i++) { const k = K[i], x = xs[i], dir = i ? -1 : 1, z = ZB + (i ? -2.3 : 2.3);
+        if (ctx.half && (HALF + i) % 2) { k.mount.position.set(x / S, 0.3 / S, z / S); k.mount.rotation.set(0, dir > 0 ? Math.PI / 2 : -Math.PI / 2, 0); k.root.updateMatrixWorld(true); continue; }    
         k.root.scale.setScalar(1); k.root.position.set(0, 0, 0); k.root.updateMatrixWorld(true);
         k.mount.position.set(x / S, 0.3 / S, z / S); k.mount.rotation.set(0, dir > 0 ? Math.PI / 2 : -Math.PI / 2, 0); k.mount.updateMatrixWorld(true);
-        k.update(t, dt, look); k.root.scale.setScalar(S); k.root.updateMatrixWorld(true); }
+        k.update(t, ctx.half ? dt * 2 : dt, look); k.root.scale.setScalar(S); k.root.updateMatrixWorld(true); }
       if (!broke && xs[1] - xs[0] < 3.4) { broke = true; K[1].hit(); K[1].tip.visible = false; K[1].shaft.scale.y = 0.35; K[1].shaft.position.y = 1.2;
         const at = K[0].tip.getWorldPosition(P(0, 0, 0)); for (let n = 0; n < 26; n++) { const m = box(scene, 0.06, 0.06, 0.4 + Math.random() * 0.5, n % 2 ? RD : WH, at.x, at.y, at.z, Math.random() * 3, Math.random() * 3, 0);
           SPL.push({ m, v: P((Math.random() - 0.3) * 6, 2 + Math.random() * 5, (Math.random() - 0.5) * 7), w: P(Math.random() * 9, Math.random() * 9, 0) }); }
@@ -204,15 +205,16 @@ export async function stageActs(name, ctx) {
     const AIM = [P(-0.3, -0.02, 0.98), P(0.15, 0.95, 0.3)], FIRE = [P(-0.3, 0.06, 0.9), P(0.1, 0.95, 0.5)];
     acts.focus = () => ({ p: P(BEAMS[0].cx, BY + 1, BEAMS[0].z), yaw: 0 });
     acts.tick = (t) => { const dt = clock(t);
-      for (const f of F) { const per = 1.5, ph = f.pair * 0.55, cyc = Math.floor((t + ph) / per), u = ((t + ph) % per) / per, attacking = (cyc % 2 === 0) === (f.side < 0), lunge = attacking ? Math.sin(Math.PI * clamp((u - 0.2) / 0.5, 0, 1)) : -0.6 * Math.sin(Math.PI * clamp((u - 0.35) / 0.45, 0, 1));
+      HALF++; for (const [fi, f] of F.entries()) { const per = 1.5, ph = f.pair * 0.55, cyc = Math.floor((t + ph) / per), u = ((t + ph) % per) / per, attacking = (cyc % 2 === 0) === (f.side < 0), lunge = attacking ? Math.sin(Math.PI * clamp((u - 0.2) / 0.5, 0, 1)) : -0.6 * Math.sin(Math.PI * clamp((u - 0.35) / 0.45, 0, 1));
         const x = f.beam.cx + f.side * (1.9 - 0.6 * lunge) + 0.35 * Math.sin(t * 0.7 + f.pair);
         const H = f.c.holder; H.position.set(x, BY, f.beam.z); H.rotation.order = "YXZ"; H.rotation.set(attacking ? 0.12 * lunge : -0.18 * Math.max(0, -lunge), f.side < 0 ? Math.PI / 2 : -Math.PI / 2, 0.07 * Math.sin(t * 3.1 + f.side + f.pair));
-        f.c.step(dt, ZERO); H.updateMatrixWorld(true); const av = f.c.av, q = H.getWorldQuaternion(new THREE.Quaternion());
+        if (ctx.half && (HALF + fi) % 2) { H.updateMatrixWorld(true); continue; }    
+        const dt2 = ctx.half ? dt * 2 : dt; f.c.step(dt2, ZERO); H.updateMatrixWorld(true); const av = f.c.av, q = H.getWorldQuaternion(new THREE.Quaternion());
         const block = attacking ? 0 : Math.sin(Math.PI * clamp((u - 0.25) / 0.5, 0, 1));
         if (av.shield) av.reach("L", av.b.chest.localToWorld(P(0.62, -0.55, 0.42).lerp(P(0.5, -0.1, 0.75), block)), P(1, -0.6, -0.2).applyQuaternion(q), 0, []);    
         else av.reach("L", av.root.localToWorld(P(0.95, 1.7 + 0.15 * Math.sin(t * 2.6 + f.side), 0.1)), P(1, -0.8, -0.3).applyQuaternion(q), 0, [], { soft: 0.4 });    
         const [hp, dir] = f.kind === "CIB" ? (attacking ? KEY(u, [AIM, AIM, FIRE, AIM]) : KEY(block, [AIM, AIM])) : attacking ? KEY(u, [READY, UP, CUT, READY]) : KEY(block, [READY, GUARD]);
-        wield(av, hp, dir, dt);
+        wield(av, hp, dir, dt2);
         if (f.kind === "CIB" && attacking) { const k = clamp((u - 0.5) / 0.3, 0, 1), m = bolts[0], from = av.held.getWorldPosition(P(0, 0, 0)).add(P(0, 0.1, 0)), foe = F.find((g) => g.pair === f.pair && g !== f).c.av.root.localToWorld(P(0, 1.9, 0.6));
           m.visible = k > 0 && k < 1; m.position.lerpVectors(from, foe, k); m.quaternion.setFromUnitVectors(P(0, 1, 0), foe.clone().sub(from).normalize()); } } };
   }

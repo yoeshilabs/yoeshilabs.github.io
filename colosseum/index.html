@@ -14,7 +14,7 @@ if (q.get("walk") === "1" && (matchMedia("(pointer: coarse)").matches || Math.mi
   document.title = "The Colosseum";
   const c = document.createElement("div"); c.style.cssText = "position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px 16px;box-sizing:border-box;background:#1d1530;color:#f6f2ee;font-family:Helvetica,Arial,sans-serif;text-align:center";
   c.innerHTML = `<div style="font-size:13px;letter-spacing:.2em;text-transform:uppercase;opacity:.75">beta</div><h1 style="margin:0;font-size:clamp(28px,8vw,48px)">Explore the Colosseum</h1>`
-    + `<img alt="The Colosseum's bowl with The Purrancers on the centre stage" style="width:min(92vw,560px);border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.45)">`
+    + `<img alt="The Colosseum's bowl with The Purrancers on the center stage" style="width:min(92vw,560px);border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.45)">`
     + `<p style="margin:0;max-width:26em;line-height:1.45;opacity:.9">Open this on a computer for now. Phones are coming.</p>`;
   c.querySelector("img").src = new URL("./data/colosseum-still.jpg", import.meta.url).href; document.body.appendChild(c);
   await new Promise(() => {});    
@@ -446,7 +446,7 @@ if (FAB) {
   { const bl = FAB.blob(5, 2, 0.5), m = new THREE.InstancedMesh(bl.geometry, bl.material, stalls.length); stalls.forEach((sh, k) => m.setMatrixAt(k, M.copy(sh.g.matrixWorld).multiply(T.makeTranslation(0, 0.025, 1.8)))); m.renderOrder = 1; scene.add(m); }
 }
  
-{ const EV = [["SKY RACE", "#ff5fa8", "flying cars over the bowl"], ["CHARIOTS", "#ffd36e", "round the spina"], ["SPEEDWAY", "#3f8cff", "on the banked oval"], ["UNICYCLES", "#3fcf86", "the figure eight"], ["TOURNAMENT", "#ff4f7a", "the fighters' gates"], ["CONCERT", "#9b7bff", "a stage on the centre lift"]];
+{ const EV = [["SKY RACE", "#ff5fa8", "flying cars over the bowl"], ["CHARIOTS", "#ffd36e", "round the spina"], ["SPEEDWAY", "#3f8cff", "on the banked oval"], ["UNICYCLES", "#3fcf86", "the figure eight"], ["TOURNAMENT", "#ff4f7a", "the fighters' gates"], ["CONCERT", "#9b7bff", "a stage on the center lift"]];
   const stairs = SHOPS.filter((x) => x.kind === "stair").map((x) => x.th), gates = [0, Math.PI / 2, Math.PI, Math.PI * 1.5]; let e = 0;
   for (let k = 0; k < 32; k++) { const t = (k + 0.5) / 32 * Math.PI * 2, d = (a) => Math.abs(Math.atan2(Math.sin(t - a), Math.cos(t - a)));
     if (gates.some((a) => d(a) < 0.16) || stairs.some((a) => (FAB ? t >= a - 0.04 && t <= a + 0.3 : t <= a + 0.04 && t >= a - 0.3))) continue;
@@ -1242,7 +1242,7 @@ BAY.wall = (a, t = BAY.t, y = 0) => { const p = ell(a, a - (A - B), t); return n
 const VENUE = q.get("walk") === "1" ? [...scene.children] : null;    
 const DRESS = q.get("dress") ? (await import("./dress.js")).dressArena(q.get("dress"), { THREE, scene, FAB, A, B, ell, MODE, STATIONS, TOP }) : { tick() {} };
  
-let SHOW = null; const ACT = q.get("act") ? await (await import("./acts.js")).stageActs(q.get("act"), { THREE, scene, MODE, FA, FB, car, seatCat, setJets, TEAMS, glow, mat, cam, follow: q.get("follow"), EUCZ, clock0: +(q.get("clock0") || 0), shells: q.get("walk") === "1" ? 6 : 10, bandTier: q.get("bandtier") || (q.get("walk") === "1" ? "mid" : "high"), viewH: () => renderer.domElement.height, schedule: (n, t) => (SHOW ? SHOW.schedule(n, t) : t), songFile: q.get("walk") === "1" || q.get("bandsong") === "remix" ? "./data/band-song-remix.json" : null }) : { tick() {} };
+let SHOW = null; const ACT = q.get("act") ? await (await import("./acts.js")).stageActs(q.get("act"), { THREE, scene, MODE, FA, FB, car, seatCat, setJets, TEAMS, glow, mat, cam, follow: q.get("follow"), EUCZ, clock0: +(q.get("clock0") || 0), shells: q.get("walk") === "1" ? 6 : 10, bandTier: q.get("bandtier") || (q.get("walk") === "1" ? "mid" : "high"), half: q.get("walk") === "1", viewH: () => renderer.domElement.height, schedule: (n, t) => (SHOW ? SHOW.schedule(n, t) : t), songFile: q.get("walk") === "1" || q.get("bandsong") === "remix" ? "./data/band-song-remix.json" : null }) : { tick() {} };
 
 if (VENUE) { scene.updateMatrixWorld(true); const hasCam = (o) => { let f = false; o.traverse((x) => { if (x.isCamera) f = true; }); return f; };
   for (const c of VENUE) if (!hasCam(c)) { c.traverse((o) => { o.matrixAutoUpdate = false; }); c.matrixWorldAutoUpdate = false; }    
@@ -1312,6 +1312,6 @@ if (q.get("quality") === "film") { const sz = renderer.getDrawingBufferSize(new 
       renderer.copyFramebufferToTexture(grab); renderer.setRenderTarget(acc); const ac = renderer.autoClear; renderer.autoClear = false; renderer.render(ADD.sc, QC); renderer.autoClear = ac; renderer.setRenderTarget(null); }
     sun.position.copy(sun0); renderer.render(OUT.sc, QC); }; }
  
-if (q.get("walk") === "1") SHOW = (await import("./show.js")).startShow({ THREE, arena: window.arena, cam, renderer, song: q.get("song") || "./media/remix.m4a", setCheer: (k) => { CHEER = k; } });
+if (q.get("walk") === "1") SHOW = (await import("./show.js")).startShow({ THREE, arena: window.arena, cam, renderer, song: q.get("song") || "./media/remix.m4a", setCheer: (k) => { CHEER = k; }, walk: import("./walk.js").then((w) => w.makeWalk({ THREE, scene, cam, renderer })) }); window.arena.show = SHOW;
 if (ANIM && typeof RACE_AT === "function") { const t0 = performance.now(); const loop = () => { RACE_AT((performance.now() - t0) / 1000); renderer.render(scene, cam); requestAnimationFrame(loop); }; loop(); }    
 </script></body></html>

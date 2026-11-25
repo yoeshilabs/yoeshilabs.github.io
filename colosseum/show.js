@@ -1,6 +1,7 @@
 
 
-export function startShow({ THREE, arena, cam, renderer, song, setCheer, title = "The Colosseum", beta = "beta" }) {
+export function startShow({ THREE, arena, cam, renderer, song, setCheer, walk = null, title = "The Colosseum", beta = "beta" }) {
+  let WALK = null; if (walk) walk.then((w) => { WALK = w; }).catch((e) => console.error("the walk did not load", e));    
    
   const fit = () => { const w = Math.max(1, innerWidth), h = Math.max(1, innerHeight); renderer.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix(); };
   addEventListener("resize", fit); if (window.visualViewport) visualViewport.addEventListener("resize", fit); fit();
@@ -18,7 +19,7 @@ export function startShow({ THREE, arena, cam, renderer, song, setCheer, title =
     #gate{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);z-index:11}#door[hidden],#gate[hidden]{display:none}`;    
   document.head.appendChild(css);
   const door = document.createElement("div"); door.id = "door";
-  door.innerHTML = `<div class="b">${beta}</div><h1>Explore the Colosseum</h1><p>The Purrancers on the centre stage, a joust on every chorus.</p><p class="s">For now you watch from the stands: drag to look around. Walking the building opens soon. Sound on.</p><button id="enter">Enter</button>`;
+  door.innerHTML = `<div class="b">${beta}</div><h1>Explore the Colosseum</h1><p>The Purrancers on the center stage, a joust on every chorus. You come in as a cat of your own, at the mouth of an aisle.</p><p class="s">W A S D to walk, Shift to run, click and move the mouse to look. Walk down the stair to the ring corridor and out through the South Gate. More of the building opens as it is finished. Sound on.</p><button id="enter">Enter</button>`;
   document.body.appendChild(door);
   const audio = new Audio(song); audio.preload = "auto"; audio.crossOrigin = "anonymous";
   const gate = document.createElement("button"); gate.id = "gate"; gate.textContent = "Tap for sound"; gate.hidden = true; document.body.appendChild(gate);
@@ -30,7 +31,7 @@ export function startShow({ THREE, arena, cam, renderer, song, setCheer, title =
   audio.addEventListener("ended", () => { live = false; door.querySelector("p").textContent = "Thank you for coming. Enter again to hear it from the start."; door.querySelector("p.s").hidden = true; door.querySelector("#enter").textContent = "Enter again"; door.hidden = false; });
    
   const EYE = new THREE.Vector3(0, 15, 53), V = { yaw: Math.PI, pitch: -0.32 }; let drag = null;    
-  addEventListener("pointerdown", (e) => { drag = [e.clientX, e.clientY]; }); addEventListener("pointerup", () => { drag = null; });
+  addEventListener("pointerdown", (e) => { if (!WALK) drag = [e.clientX, e.clientY]; }); addEventListener("pointerup", () => { drag = null; });
   addEventListener("pointermove", (e) => { if (!drag) return; V.yaw -= (e.clientX - drag[0]) * 0.004; V.pitch = Math.max(-0.7, Math.min(0.5, V.pitch - (e.clientY - drag[1]) * 0.004)); drag = [e.clientX, e.clientY]; });
   cam.fov = 55; cam.updateProjectionMatrix();
   
@@ -43,8 +44,8 @@ export function startShow({ THREE, arena, cam, renderer, song, setCheer, title =
   function frame() { const now = performance.now(); govern(now - last); last = now; if (n++ % 3 === 0) renderer.shadowMap.needsUpdate = true;
     const t = live ? audio.currentTime : 0, s = section(t);
     setCheer(live ? s[2] : 0.2);
-    cam.position.copy(EYE); cam.lookAt(EYE.x + Math.sin(V.yaw) * Math.cos(V.pitch), EYE.y + Math.sin(V.pitch), EYE.z + Math.cos(V.yaw) * Math.cos(V.pitch));
+    if (WALK && live) WALK.frame(now); else { cam.position.copy(EYE); cam.lookAt(EYE.x + Math.sin(V.yaw) * Math.cos(V.pitch), EYE.y + Math.sin(V.pitch), EYE.z + Math.cos(V.yaw) * Math.cos(V.pitch)); }
     arena.at(t); requestAnimationFrame(frame); }
   frame();
-  return { schedule, audio, section, gain: () => GAIN };
+  return { schedule, audio, section, gain: () => GAIN, get walk() { return WALK; } };
 }
