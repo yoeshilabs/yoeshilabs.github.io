@@ -11,24 +11,28 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
   const bin = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0)), gunzip = async (s) => new Uint8Array(await new Response(new Blob([bin(s)]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer());    
   const HB = W.heightsGz ? await gunzip(W.heightsGz) : bin(W.heights), H = new Int16Array(HB.buffer, HB.byteOffset, HB.length >> 1), PART = W.partGz ? await gunzip(W.partGz) : bin(W.part);
   const cellOf = (x, z) => { const i = Math.floor((x - W.x0) / W.cell), j = Math.floor((z - W.z0) / W.cell); return i < 0 || j < 0 || i >= W.nx || j >= W.nz ? -1 : j * W.nx + i; };
-  const heightAt = (x, z) => { const c = cellOf(x, z); return c < 0 || !PART[c] ? null : H[c] / 100; };
-  const partAt = (x, z) => { const c = cellOf(x, z); return c < 0 ? 0 : PART[c]; };
+  
+
+  const N = W.nx * W.nz, LV = W.levels || 1; let YREF = 0;
+  const slot = (c, y) => { if (c < 0) return -1; let best = -1, bd = 1e9; for (let L = 0; L < LV; L++) { const k = c + L * N; if (!PART[k]) continue; const d = Math.abs(H[k] / 100 - y); if (d < bd) { bd = d; best = k; } } return best; };
+  const heightAt = (x, z, y = YREF) => { const k = slot(cellOf(x, z), y); return k < 0 ? null : H[k] / 100; };
+  const partAt = (x, z, y = YREF) => { const k = slot(cellOf(x, z), y); return k < 0 ? 0 : PART[k]; };
    
   const floor = (x, z) => { const fx = (x - W.x0) / W.cell - 0.5, fz = (z - W.z0) / W.cell - 0.5, i = Math.floor(fx), j = Math.floor(fz), u = fx - i, v = fz - j; let s = 0, w = 0;
     const own = heightAt(x, z);    
-    for (const [di, dj, k] of [[0, 0, (1 - u) * (1 - v)], [1, 0, u * (1 - v)], [0, 1, (1 - u) * v], [1, 1, u * v]]) { const ii = i + di, jj = j + dj; if (ii < 0 || jj < 0 || ii >= W.nx || jj >= W.nz) continue; const c = jj * W.nx + ii; if (PART[c] && k > 0 && (own === null || Math.abs(H[c] / 100 - own) <= RISE)) { s += H[c] / 100 * k; w += k; } }
+    for (const [di, dj, k] of [[0, 0, (1 - u) * (1 - v)], [1, 0, u * (1 - v)], [0, 1, (1 - u) * v], [1, 1, u * v]]) { const ii = i + di, jj = j + dj; if (ii < 0 || jj < 0 || ii >= W.nx || jj >= W.nz || k <= 0) continue; const c = slot(jj * W.nx + ii, own ?? YREF); if (c >= 0 && (own === null || Math.abs(H[c] / 100 - own) <= RISE)) { s += H[c] / 100 * k; w += k; } }
     return w ? s / w : heightAt(x, z) ?? 0; };
    
   let here = null, cur = null; const near = [], ALL = [], sray = new THREE.Raycaster(), RO = new THREE.Vector3(), RD = new THREE.Vector3();    
-  const may = (mx, mz) => { const x = mx * K, z = mz * K, h = heightAt(x, z); if (h === null) return false;
-    for (const [dx, dz] of [[BODY, 0], [-BODY, 0], [0, BODY], [0, -BODY]]) { const g = heightAt(x + dx, z + dz); if (g === null || Math.abs(g - h) > RISE) return false; }
+  const may = (mx, mz) => { const x = mx * K, z = mz * K, h = heightAt(x, z, here ?? YREF); if (h === null) return false;
+    for (const [dx, dz] of [[BODY, 0], [-BODY, 0], [0, BODY], [0, -BODY]]) { const g = heightAt(x + dx, z + dz, h); if (g === null || Math.abs(g - h) > RISE) return false; }
     if (here !== null && Math.abs(h - here) > RISE) return false;
     if (cur && near.length) { const dx = x - cur.x, dz = z - cur.z, L = Math.hypot(dx, dz); if (L > 1e-5) for (const k of [0.45, 1.3]) { RO.set(cur.x, cur.y + k, cur.z); RD.set(dx / L, 0, dz / L); sray.set(RO, RD); sray.far = L + BODY; if (sray.intersectObjects(near, false).length) return false; } }
     return true; };
 
    
   const { makeCat } = await import("./home/next/cats/cast.js");
-  const gen = await import("./p3d/gen/src/cat.js"), r0 = Math.floor(Math.random() * 1e9); let seed = "guest" + r0;
+  const gen = await import("./p3d/gen/src/cat.js"), r0 = window.__testGuest || Math.floor(Math.random() * 1e9); let seed = "guest" + r0;    
   for (let i = 0; i < 400; i++) { const g = gen.rollSeed("guest" + (r0 + i)); if (g.HAT === "None" && g.LASER === "None" && !g.SPK) { seed = "guest" + (r0 + i); break; } }    
   const me = await makeCat({ seed, shells: 6 }); me.holder.scale.setScalar(0.58); me.holder.traverse((o) => { if (o.isMesh) o.castShadow = true; }); scene.add(me.holder);
   const T4 = (4 + 0.5) / 16 * Math.PI * 2, SA = 70.2, START = { x: SA * Math.cos(T4), z: (SA - 18) * Math.sin(T4) };    
@@ -59,7 +63,7 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
 
    
   const hud = document.createElement("div"); hud.style.cssText = "position:fixed;right:16px;bottom:16px;padding:8px 12px;border-radius:10px;background:rgba(20,14,30,.6);color:#f6f2ee;font:13px/1.45 Helvetica,Arial,sans-serif;pointer-events:none;z-index:2;max-width:46vw";
-  const touch = matchMedia("(pointer: coarse)").matches; hud.textContent = touch ? "Stick to walk, push far to run, drag to look" : "W A S D walk, Shift runs, click and move the mouse to look (Esc lets go), C, V or the wheel for first person, Space jumps on the plaza"; document.body.appendChild(hud);
+  const touch = matchMedia("(pointer: coarse)").matches; hud.textContent = touch ? "Stick to walk, push far to run, drag to look" : "W A S D walk, Shift runs, click and move the mouse to look (Esc lets go), C, V or the wheel for first person, E takes a lift, Space jumps on the plaza"; document.body.appendChild(hud);
   setTimeout(() => { hud.style.transition = "opacity 1.2s"; hud.style.opacity = "0.35"; }, 12000);
   const barriers = (await import("./barriers.js")).placeBarriers({ THREE, scene, closed: W.closed || [] });
 
@@ -96,16 +100,31 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
     aim.set(head.x + fx * 8, head.y + Math.sin(-view.pitch) * 3, head.z + fz * 8);
     if (first || !aimed) { aimed = aim.clone(); first = false; } else aimed.lerp(aim, 1 - Math.exp(-dt * 14)); cam.lookAt(aimed); }
 
+  
+
+  const near1 = (x0, z0, y) => { let best = null, bd = 1e9; for (let dz = -2.5; dz <= 2.5; dz += W.cell) for (let dx = -2.5; dx <= 2.5; dx += W.cell) { const x = x0 + dx, z = z0 + dz, h = heightAt(x, z, y); if (h === null || Math.abs(h - y) > 0.6) continue;
+      if (![[BODY, 0], [-BODY, 0], [0, BODY], [0, -BODY]].every(([ex, ez]) => heightAt(x + ex, z + ez, h) !== null)) continue; const d = Math.hypot(dx, dz); if (d < bd) { bd = d; best = { x, z, y: h }; } } return best; };    
+  const LIFTS = [0, 1, 2, 3].map((k) => { const t = Math.PI / 4 + k * Math.PI / 2, x0 = 85.2 * Math.cos(t), z0 = 67.2 * Math.sin(t), up = near1(x0, z0, 11.7), dn = near1(x0, z0, 0.1);
+    return up && dn ? { k, x: up.x, z: up.z, y: up.y, gx: dn.x, gz: dn.z, ground: dn.y } : null; }).filter(Boolean);    
+  const liftHint = document.createElement("button"); liftHint.style.cssText = "position:fixed;left:50%;bottom:64px;transform:translateX(-50%);padding:10px 18px;border-radius:999px;border:0;background:#ffd36e;color:#1c1622;font:600 15px Helvetica,Arial,sans-serif;cursor:pointer;z-index:3;display:none"; document.body.appendChild(liftHint);
+  const fade = document.createElement("div"); fade.style.cssText = "position:fixed;inset:0;background:#0c0812;opacity:0;pointer-events:none;transition:opacity .3s;z-index:4"; document.body.appendChild(fade);
+  let liftNear = null, riding = false;
+  const ride = () => { if (!liftNear || riding) return; const l = liftNear, up = m.y * K < 6, y = up ? l.y : l.ground; if (y === null || y === undefined) return; riding = true; fade.style.opacity = "1";
+    setTimeout(() => { const face = Math.atan2(-l.x, -l.z), tx = up ? l.x : l.gx, tz = up ? l.z : l.gz; YREF = y; player.stand({ x: tx / K, z: tz / K, face }); here = null; cur = null; m = player.tick({}); YREF = m.y * K; view.yaw = face; first = true; fade.style.opacity = "0"; riding = false; }, 320); };
+  liftHint.onclick = ride; addEventListener("keydown", (e) => { if (e.code === "KeyE" && !e.repeat) ride(); });
+  const liftCheck = () => { const x = m.x * K, z = m.z * K, y = m.y * K; liftNear = LIFTS.find((l) => (y < 6 ? Math.hypot(l.gx - x, l.gz - z) < 3 && Math.abs(y - l.ground) < 1 : Math.hypot(l.x - x, l.z - z) < 3 && Math.abs(y - l.y) < 1)) || null;
+    const want = liftNear ? (y < 6 ? "E  Lift up to the concourse" : "E  Lift down to the corridor") : ""; if (liftHint.textContent !== want) liftHint.textContent = want; liftHint.style.display = want ? "block" : "none"; };
+
    
   let acc = 0, last = null, m = player.tick({}), AUTO = null;    
   function frame(nowMs) { refreshNear(m.x * K, m.z * K);
     const dt = last === null ? TICK : Math.min(0.1, (nowMs - last) / 1000); last = nowMs; acc = Math.min(acc + dt, TICK * 6);
-    while (acc >= TICK) { acc -= TICK; here = m.air ? here : floor(m.x * K, m.z * K); cur = { x: m.x * K, y: m.y * K, z: m.z * K };
+    while (acc >= TICK) { acc -= TICK; YREF = m.y * K; here = m.air ? here : floor(m.x * K, m.z * K); YREF = here ?? YREF; cur = { x: m.x * K, y: m.y * K, z: m.z * K };
       const onPlaza = partAt(m.x * K, m.z * K) === 1, k = onPlaza ? keys : new Set([...keys].filter((c) => c !== "Space"));
       m = player.tick({ keys: k, yaw: view.yaw, move: AUTO ? AUTO(m, view) : stick.input({ x: m.x, z: m.z }, view.yaw), jump: false }); }
     me.holder.position.set(m.x * K, m.y * K, m.z * K); me.holder.rotation.set(0, m.yaw, 0);
     me.step(dt, undefined, { speed: m.speed, phase: m.phase, air: m.air, vy: m.vy, land: m.land, emote: m.emote, emoteT: m.emoteT, emoteLen: m.emoteLen });
-    placeCamera(dt, m); barriers.tick(nowMs / 1000); }
-  function reset() { player.stand({ x: START.x / K, z: START.z / K, face: START.face }); view.yaw = START.face; view.pitch = 0; here = null; first = true; aimed = null; intro0 = null; m = player.tick({}); }
-  return { frame, reset, auto(fn) { AUTO = fn; }, firstPerson(v) { if (v) { FP = true; FPsince = 1; } else if (FP) leaveFP(1); }, get fp() { return FP; }, place(x, z, face = 0) { player.stand({ x: x / K, z: z / K, face }); here = null; cur = null; m = player.tick({}); }, K, map: W, partAt, heightAt, near, get where() { return { x: m.x * K, y: m.y * K, z: m.z * K, part: partAt(m.x * K, m.z * K) }; }, player, view, keys, me };
+    placeCamera(dt, m); liftCheck(); barriers.tick(nowMs / 1000); }
+  function reset() { YREF = W.start ? W.start.y : 4.8; player.stand({ x: START.x / K, z: START.z / K, face: START.face }); view.yaw = START.face; view.pitch = 0; here = null; first = true; aimed = null; intro0 = null; m = player.tick({}); }
+  return { frame, reset, auto(fn) { AUTO = fn; }, firstPerson(v) { if (v) { FP = true; FPsince = 1; } else if (FP) leaveFP(1); }, get fp() { return FP; }, place(x, z, face = 0, y = 0) { YREF = y; player.stand({ x: x / K, z: z / K, face }); here = null; cur = null; m = player.tick({}); YREF = m.y * K; }, K, map: W, partAt, heightAt, near, lifts: LIFTS, ride: () => { liftCheck(); ride(); }, get riding() { return riding; }, get where() { return { x: m.x * K, y: m.y * K, z: m.z * K, part: partAt(m.x * K, m.z * K) }; }, player, view, keys, me };
 }

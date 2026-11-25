@@ -1,15 +1,21 @@
 
 
+
+
+const LODS = []; let lodFrame = 0;
+const lodOf = (root, n) => { const shells = [], mats = new Set(); root.traverse((o) => { const u = o.material && o.material.userData && o.material.userData.u; if (o.isInstancedMesh && u && u.uShells) { shells.push(o); mats.add(u.uShells); } }); LODS.push({ root, shells, mats, n, on: -1 }); };
+function lodUpdate(cam, THREE) { if (lodFrame++ % 15) return; const p = new THREE.Vector3();
+  for (const L of LODS) { L.root.getWorldPosition(p); const d = p.distanceTo(cam.position), n = Math.round(L.n * Math.max(0, Math.min(1, (32 - d) / 8)));     if (n === L.on) continue; L.on = n; for (const s of L.shells) { s.count = n; s.visible = n > 0; } for (const u of L.mats) u.value = Math.max(1, n); } }
 export async function stageActs(name, ctx) { let HALF = 0;    
   if (name.includes(",")) { const names = name.split(","), parts = []; for (const n of names) parts.push(await stageActs(n, ctx));    
-    return { tick: (t) => parts.forEach((p, i) => { const lt = ctx.schedule ? ctx.schedule(names[i], t) : t; if (lt !== null && lt !== undefined) p.tick(lt); }), focus: parts[0].focus, probe: parts[0].probe, parts: Object.fromEntries(names.map((n, i) => [n, parts[i]])) }; }
+    return { tick: (t) => { parts.forEach((p, i) => { const lt = ctx.schedule ? ctx.schedule(names[i], t) : t; if (lt !== null && lt !== undefined) p.tick(lt); }); if (ctx.half && ctx.cam) lodUpdate(ctx.cam, ctx.THREE); }, focus: parts[0].focus, probe: parts[0].probe, parts: Object.fromEntries(names.map((n, i) => [n, parts[i]])) }; }
   const { THREE, scene, FA, FB, TEAMS, glow, mat } = ctx, P = (x, y, z) => new THREE.Vector3(x, y, z), TAU = Math.PI * 2, S = 0.58;
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x)), ease = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }, lerp = (a, b, k) => a + (b - a) * k;
   const { makeCat } = await import("./home/next/cats/cast.js"), ZERO = new THREE.Vector2(0, 0);
   const box = (parent, w, h, d, m, x, y, z, rx = 0, ry = 0, rz = 0) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, z); o.rotation.set(rx, ry, rz); o.castShadow = true; o.receiveShadow = true; parent.add(o); return o; };
   const rodTo = (o, a, b) => { const d = b.clone().sub(a); o.position.copy(a).addScaledVector(d, 0.5); o.scale.set(1, d.length(), 1); o.quaternion.setFromUnitVectors(P(0, 1, 0), d.normalize()); };
   const rod = (parent, r, m) => { const o = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 1, 8), m); o.castShadow = true; parent.add(o); return o; };
-  const cat = async (seed) => { const c = await makeCat({ seed, shells: ctx.shells || 10 }); c.holder.scale.setScalar(S); for (let k = 0; k < 20; k++) c.step(1 / 60, ZERO); c.holder.traverse((o) => { if (o.isMesh) o.castShadow = true; }); return c; };
+  const cat = async (seed) => { const c = await makeCat({ seed, shells: ctx.shells || 10 }); c.holder.scale.setScalar(S); if (ctx.half) lodOf(c.holder, ctx.shells || 10); for (let k = 0; k < 20; k++) c.step(1 / 60, ZERO); c.holder.traverse((o) => { if (o.isMesh) o.castShadow = true; }); return c; };
   const legsTo = (av, side, target, pole) => av.reach(side, target, pole, 0, [], { bones: ["th" + side, "kn" + side, "an" + side], len: [0.46, 0.47], soft: 0.8, lift: 1 });
   let last = null; const clock = (t) => { const dt = last === null || t < last || t - last > 0.5 ? 1 / 24 : t - last; last = t; return dt; };
   const W0 = (o) => o.getWorldPosition(P(0, 0, 0));
@@ -64,7 +70,7 @@ export async function stageActs(name, ctx) { let HALF = 0;
     function sfc32(a, b, c, d) { return function () { a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0; var t = (a + b) | 0; a = b ^ b >>> 9; b = c + (c << 3) | 0; c = c << 21 | c >>> 11; d = d + 1 | 0; t = t + d | 0; c = c + t | 0; return (t >>> 0) / 4294967296; }; }
     const hh = xmur3(seed), R = sfc32(hh(), hh(), hh(), hh()), G = roll(R);
     Object.assign(G, { BW: 0.9, BUILD: "Slim", OUTFIT: "Knight", SLEEVE: "#c9d1dc", JACKET: "#c9d1dc", TEE: "#c9d1dc", PANTS: "#bcc5d1", SHORTSLEEVE: false, HAT: "None", INSTR: "None", HOLD: "None", MYTH: false, EYEWEAR: "None", TEMP: "Curious" });    
-    const av = new Avatar(G, { shells: ctx.shells || 10, rand: R, armK: 1.3 }); av.b.head.scale.setScalar(1.2);
+    const av = new Avatar(G, { shells: ctx.shells || 10, rand: R, armK: 1.3 }); av.b.head.scale.setScalar(1.2); if (ctx.half) lodOf(av.root, ctx.shells || 10);
     const kn = makeKnight(av), pony = makePony(av.L, { coat, mane });
     kn.cape.cols.push((Q) => pony.dist(Q)); pony.seat.add(av.root); av.root.position.set(0, -0.69, 0.04);
     if (cape) kn.cape.mesh.material.color.set(cape);
@@ -279,7 +285,7 @@ export async function stageActs(name, ctx) { let HALF = 0;
     
 
     const B0 = ctx.B || 78, W = [];
-    for (let i = 0; i < 26; i++) { const c = await makeCat({ seed: "plaza" + i, shells: 6 }); c.holder.scale.setScalar(S); scene.add(c.holder);
+    for (let i = 0; i < 26; i++) { const c = await makeCat({ seed: "plaza" + i, shells: 6 }); c.holder.scale.setScalar(S); if (ctx.half) lodOf(c.holder, 6); scene.add(c.holder);
       const across = i % 3 === 0, x0 = across ? -36 : -24 + (i * 7.3) % 48, z0 = across ? B0 + 8 + (i * 5.1) % 24 : B0 + 80, x1 = across ? 36 : (x0 > 0 ? 1 : -1) * (1 + (i % 3)), z1 = across ? z0 + ((i % 2) * 2 - 1) * 4 : B0 - 8;    
       W.push({ c, a: P(x0, 0.05, z0), b: P(x1, 0.05, z1), v: 1.1 + (i % 5) * 0.12, u0: ((i * 0.618) % 1), back: across && i % 2 === 1 }); }
     acts.focus = () => ({ p: P(0, 2, B0 + 20), yaw: 0 });

@@ -400,10 +400,11 @@ function textTex(lines, { w = 512, h = 160, bg = "#fbf8f4", fg = "#1c1622", acce
 const SIGNC = ["#ff4f7a", "#6fd3ff", "#ffd36e", "#3fcf86"], LETTERS = "ABCDEFGHIJKLMNOP";
  
 for (let i = 0; i < 16; i++) { const t = AL(i), p = ell(CA0 + 0.6, CB0 + 0.6, t), g = new THREE.Group(); g.position.set(p.x, CY, p.y); g.lookAt(0, CY, 0); scene.add(g);
-  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 3.2, 8), STONE2); post.position.y = 1.6; g.add(post);
+  const SY = q.get("walk") === "1" ? 1.75 : 3.6, PL = SY === 3.6 ? 3.2 : SY - 0.6;    
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, PL, 8), STONE2); post.position.y = PL / 2; g.add(post);
   const tx = textTex([LETTERS[i], "SECTION"], { w: 256, h: 256, bg: SIGNC[i % 4], fg: "#1c1622", size: 150 }), m = new THREE.MeshStandardMaterial({ map: tx, emissive: "#ffffff", emissiveMap: tx, emissiveIntensity: 0.55, side: THREE.DoubleSide, roughness: 0.5 });
-  if (FAB) { m.side = THREE.FrontSide; for (const ry of [0, Math.PI]) { const sg = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.4), m); sg.position.y = 3.6; sg.rotation.y = ry; g.add(sg); } }    
-  else { const sg = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.4), m); sg.position.y = 3.6; g.add(sg); } }
+  if (FAB) { m.side = THREE.FrontSide; for (const ry of [0, Math.PI]) { const sg = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.4), m); sg.position.y = SY; sg.rotation.y = ry; g.add(sg); } }    
+  else { const sg = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.4), m); sg.position.y = SY; g.add(sg); } }
  
 for (const [t, name] of [[0, "EAST GATE"], [Math.PI / 2, "SOUTH GATE"], [Math.PI, "WEST GATE"], [Math.PI * 1.5, "NORTH GATE"]]) { if (t === Math.PI * 1.5) continue;    
   const rm = (CA0 + CA1) / 2, p = ell(rm, rm - (FA - FB), t), g = new THREE.Group(); g.position.set(p.x, CY + 4.6, p.y); g.lookAt(p.x + Math.cos(t + Math.PI / 2), CY + 4.6, p.y + Math.sin(t + Math.PI / 2)); scene.add(g);
@@ -1244,7 +1245,7 @@ BAY.wall = (a, t = BAY.t, y = 0) => { const p = ell(a, a - (A - B), t); return n
 const VENUE = q.get("walk") === "1" ? [...scene.children] : null;    
 const DRESS = q.get("dress") ? (await import("./dress.js")).dressArena(q.get("dress"), { THREE, scene, FAB, A, B, ell, MODE, STATIONS, TOP }) : { tick() {} };
  
-let SHOW = null; const ACT = q.get("act") ? await (await import("./acts.js")).stageActs(q.get("act"), { THREE, scene, MODE, FA, FB, car, seatCat, setJets, TEAMS, glow, mat, cam, follow: q.get("follow"), EUCZ, clock0: +(q.get("clock0") || 0), shells: q.get("walk") === "1" ? 6 : 10, bandTier: q.get("bandtier") || (q.get("walk") === "1" ? "mid" : "high"), half: q.get("walk") === "1", viewH: () => renderer.domElement.height, schedule: (n, t) => (SHOW ? SHOW.schedule(n, t) : t), songFile: q.get("walk") === "1" || q.get("bandsong") === "remix" ? "./data/band-song-remix.json" : null }) : { tick() {} };
+let SHOW = null; const ACT = q.get("act") ? await (await import("./acts.js")).stageActs(q.get("act"), { THREE, scene, MODE, FA, FB, car, seatCat, setJets, TEAMS, glow, mat, cam, follow: q.get("follow"), EUCZ, clock0: +(q.get("clock0") || 0), shells: q.get("walk") === "1" ? 6 : 10, bandTier: q.get("bandtier") || (q.get("walk") === "1" ? "low" : "high"), half: q.get("walk") === "1", viewH: () => renderer.domElement.height, schedule: (n, t) => (SHOW ? SHOW.schedule(n, t) : t), songFile: q.get("walk") === "1" || q.get("bandsong") === "remix" ? "./data/band-song-remix.json" : null }) : { tick() {} };
 
 if (VENUE) { scene.updateMatrixWorld(true); const hasCam = (o) => { let f = false; o.traverse((x) => { if (x.isCamera) f = true; }); return f; };
   for (const c of VENUE) if (!hasCam(c)) { c.traverse((o) => { o.matrixAutoUpdate = false; }); c.matrixWorldAutoUpdate = false; }    
