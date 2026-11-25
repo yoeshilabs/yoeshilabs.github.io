@@ -1,18 +1,13 @@
-/* Prancer 3D: the coat. One material for every part of the cat, painting the Portraits genes in 3D: the body colour,
-   the pattern (every tabby, the tortie and brindle patches, colourpoints, the wild cats' stripes, spots and rosettes,
-   the spirits' constellations, embers, gilding, circuits, facets and void), white spotting (locket to van), the muzzle,
-   and the finish (lit, neon, gold, chrome). Patterns are worked out in the cat's own rest space, so a stripe runs on
-   from the body down the leg and stays put while the cat moves.
-   Fur is shell texturing: each furry part is drawn again as a stack of thin shells pushed out along its normals, and
-   every shell keeps only the strands that reach that high, so the coat has real depth, darker at the roots. */
+
+
 import * as THREE from "three";
 
 export const PATTERNS = ["Solid", "Mackerel", "Classic", "Spotted", "Ticked", "Marbled", "Shaded", "Rosetted", "Tortie", "Brindle", "Colorpoint", "Lynx Point",
   "Stripes", "Spots", "Rosettes", "Jaguar Rosettes", "Freckles", "Clouds", "Chain", "King", "Plain", "Constellations", "Embers", "Gilded", "Circuits", "Facets", "Void"];
-export const WHITES = ["None", "Locket", "Mitts", "Tuxedo", "Bicolor", "Harlequin", "Van", "Solid White", "Blaze"];   // Blaze: the frontcat persona's inverted tuxedo (never rolled)
+export const WHITES = ["None", "Locket", "Mitts", "Tuxedo", "Bicolor", "Harlequin", "Van", "Solid White", "Blaze"];    
 export const PART = { torso: 0, head: 1, ear: 2, upper: 3, lower: 4, paw: 5, tail: 6, muzzle: 7, lid: 8 };
 
-export const NOISE = /* glsl */`
+export const NOISE =  `
 float h31(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
 vec3 h33(vec3 p) { return vec3(h31(p), h31(p + 17.1), h31(p + 41.7)); }
 float vnoise(vec3 x) { vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
@@ -24,7 +19,7 @@ vec2 worley(vec3 p) { vec3 i = floor(p), f = fract(p); float d1 = 8.0, d2 = 8.0;
     if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) d2 = d; } return vec2(d1, d2); }
 `;
 
-export const COAT = /* glsl */`
+export const COAT =  `
 uniform vec3 uBody, uMark, uPatch, uPoint, uWhite, uMuz, uRim, uEmis, uEar;
 uniform float uMarkO, uHasMark, uHasPatch, uHasPoint, uRimK, uFurLen, uShells, uAlong, uTime, uNeon;
 uniform int uPat, uWhiteMode, uPart;
@@ -113,15 +108,15 @@ vec3 coat(out vec3 emis) {
 }
 `;
 
-/* the fur: which strands reach this shell (a strand per cell of a fine 3D grid, tapering to its tip) */
-const FUR_FRAG = /* glsl */`
+ 
+const FUR_FRAG =  `
 if (vShell > 0.0) {   /* a shell: the vertex shader knows it is instanced, the fragment shader learns it from vShell */
   { vec3 q = vBase * 70.0; vec3 cell = floor(q), o = h33(cell) * 0.6 + 0.2; float d = length((fract(q) - o).xz + (fract(q) - o).y * 0.3);
     float len = 0.55 + 0.45 * h31(cell + 5.0); if (vShell > len || d > 0.55 * (1.0 - vShell / len) + 0.05) discard; }
 }
 `;
 
-/* a coat material for one part of the cat. g: the genes, as colours and switches (see avatar.js) */
+ 
 export function coatMaterial(g, part, opts = {}) {
   const u = {
     uBody: { value: new THREE.Color(g.body) }, uMark: { value: new THREE.Color(g.mark || g.body) }, uPatch: { value: new THREE.Color(g.patch || g.body) },
@@ -131,19 +126,19 @@ export function coatMaterial(g, part, opts = {}) {
     uRimK: { value: g.rimK }, uNeon: { value: g.neon ? 1 : 0 }, uFurLen: { value: opts.fur ?? g.furLen }, uShells: { value: g.shells }, uAlong: { value: opts.along ?? 0 },
     uTime: { value: 0 }, uPat: { value: PATTERNS.indexOf(g.pattern) }, uWhiteMode: { value: WHITES.indexOf(g.whiteMode) }, uPart: { value: part },
     uRest: { value: new THREE.Matrix4() }, uDroop: { value: g.droop },
-    uFade: { value: new THREE.Vector4(1e3, 1e3 + 1, 1e3, 1e3 + 1) },   // a limb's fur fading out toward a joint (avatar limb(): none on the elbow's balls): y from .x to .y at the near end, -y from .z to .w at the far end
+    uFade: { value: new THREE.Vector4(1e3, 1e3 + 1, 1e3, 1e3 + 1) },    
     uCovC: g.cov.c, uCovH: g.cov.h, uCovN: g.cov.n,
-    uCheek: { value: new THREE.Vector4(g.cheeks || 0, 0.6 * (g.cw || 1), -0.2, 0) },   // what the fur lies flat under (avatar.cover), shared by all the cat's coat
-    uGrip: { value: new THREE.Vector4(0, -0.08, 0, 2.3) },   // a paw closing round what it holds (avatar.grip): curvature, where the bend starts, the bend's axis, the most it curls
+    uCheek: { value: new THREE.Vector4(g.cheeks || 0, 0.6 * (g.cw || 1), -0.2, 0) },    
+    uGrip: { value: new THREE.Vector4(0, -0.08, 0, 2.3) },    
   };
   const mat = new THREE.MeshPhysicalMaterial({ roughness: g.rough, metalness: g.metal, sheen: g.metal ? 0 : 0.6, sheenRoughness: 0.6, sheenColor: new THREE.Color(g.body).lerp(new THREE.Color("#ffffff"), 0.5),
     iridescence: g.irid || 0, transparent: !!g.ghost, opacity: g.ghost ? 0.82 : 1, flatShading: !!g.facets });
   mat.userData.u = u;
-  /* opts.batch (bake.js batchCoat): every part of the coat in one skinned mesh, its part, fur, place along the limb and
-     rest position carried by each vertex; "shells" draws its fur, one instance per shell */
+  
+
   const B = !globalThis.PRANCER_GEN && opts.batch;
-  /* a batched coat (bake.js) carries both hands' grips: their uGrip (shared with the hands' own materials, so avatar.grip
-     reaches them) and each paw's rest rotation, to turn its bend from the paw's frame into the coat's */
+  
+
   if (B) Object.assign(u, { uGripL: { value: new THREE.Vector4(0, -0.08, 0, 2.3) }, uGripR: { value: new THREE.Vector4(0, -0.08, 0, 2.3) }, uGripRL: { value: new THREE.Matrix3() }, uGripRR: { value: new THREE.Matrix3() } });
   const cov =`float fl = FUR; for (int i = 0; i < 12; i++) { if (i >= uCovN) break; vec3 q = abs(vCat - uCovC[i].xyz) - uCovH[i]; fl = min(fl, length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0) - uCovC[i].w); }
       fl = max(fl, 0.004);   /* under a hat, round an eye: the fur lies pressed flat, as thick as the gap */`;
@@ -196,7 +191,7 @@ export function coatMaterial(g, part, opts = {}) {
   return mat;
 }
 
-/* a furry part: the mesh itself, and (if the cat has fur) its shells as one instanced draw */
+ 
 export function furry(geo, mat, shells) {
   const m = new THREE.Mesh(geo, mat); m.castShadow = true; m.receiveShadow = true;
   if (shells > 0 && mat.userData.u.uFurLen.value > 0) {

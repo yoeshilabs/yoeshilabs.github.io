@@ -1,10 +1,5 @@
-/* Prancer 3D: fewer draws. A cat and its instrument are built from many small pieces (a guitar's frets and pegs, a
-   paw's beans, the catchlights), each its own draw; an ordinary computer pays for every draw, every frame. bakeStatic
-   finds which pieces never move against their bone, by playing the cat through a run of real moments (probe) and
-   watching every node, then merges the still pieces that share a material into one mesh on that bone.
-   The originals stay in place, hidden, so anything that measures from them (an instrument's collision shapes) still
-   works; anything that moved, changed its visibility or wears the coat's own shader is left exactly as it was.
-     bakeStatic(root, probe(i), runs) -> { before, after (meshes drawn), flip (nodes the cat shows and hides itself) } */
+
+
 import * as THREE from "three";
 import { mergeGeometries } from "../lib/jsm/utils/BufferGeometryUtils.js";
 
@@ -18,17 +13,17 @@ export function bakeStatic(root, probe, runs = 48) {
   root.traverse((o) => { nodes.push(o); o.updateMatrix(); start.set(o, sig(o)); vis.set(o, o.visible); for (const m of [].concat(o.material || [])) mats.set(m, matKey(m)); });
   for (let i = 0; i < runs; i++) { probe(i); for (const o of nodes) { o.updateMatrix(); if (sig(o) !== start.get(o)) moved.add(o); if (o.visible !== vis.get(o)) flip.add(o); } }
   const matMoved = new Set([...mats].filter(([m, k]) => matKey(m) !== k).map(([m]) => m));
-  /* the piece's anchor: the nearest node above it that moves (or is a bone, or the root); everything between is still */
+   
   const anchorOf = (o) => { let p = o.parent; while (p && p !== root && !p.isBone && !moved.has(p)) p = p.parent; return p || root; };
   const ok = (o) => o.isMesh && !o.isInstancedMesh && !o.isSkinnedMesh && o.visible && !moved.has(o) && !Array.isArray(o.material) && !o.children.some((c) => c.isMesh)
     && !(o.material.userData && o.material.userData.u) && o.material.onBeforeCompile === THREE.Material.prototype.onBeforeCompile && !o.morphTargetInfluences && o.geometry.attributes.position;
-  /* look-alike materials count as one, if neither ever changes. Plain ones (a colour and a finish, no texture, no glow)
-     go further: one material per finish (rough, satin, metal, lacquered), the colour carried by each vertex */
+  
+
   const same = new Map(), fin = new Map(), plain = (m) => (m.isMeshStandardMaterial) && !m.map && !m.transparent && !m.vertexColors && m.toneMapped && m.blending === THREE.NormalBlending && !(m.emissive && m.emissive.getHex() && m.emissiveIntensity > 0) && !m.transmission && !m.iridescence && !m.sheen;
   const canon = (m) => { if (matMoved.has(m) || m.isShaderMaterial) return m;
     if (plain(m)) { const k = [Math.round(m.roughness * 4), Math.round(m.metalness * 2), m.clearcoat > 0.3 ? 1 : 0, m.side, m.flatShading ? 1 : 0].join("|");
       if (!fin.has(k)) { const o = { vertexColors: true, roughness: Math.round(m.roughness * 4) / 4, metalness: Math.round(m.metalness * 2) / 2, side: m.side, flatShading: m.flatShading, envMapIntensity: m.envMapIntensity ?? 1 },
-        f = m.clearcoat > 0.3 ? new THREE.MeshPhysicalMaterial({ ...o, clearcoat: 1, clearcoatRoughness: 0.1 }) : new THREE.MeshStandardMaterial(o);   // lacquer only where there was lacquer
+        f = m.clearcoat > 0.3 ? new THREE.MeshPhysicalMaterial({ ...o, clearcoat: 1, clearcoatRoughness: 0.1 }) : new THREE.MeshStandardMaterial(o);    
         f.userData.finish = true; fin.set(k, f); } return fin.get(k); }
     const k = mats.get(m); if (!same.has(k)) same.set(k, m); return same.get(k); };
   const groups = new Map(); let before = 0;
@@ -49,14 +44,11 @@ export function bakeStatic(root, probe, runs = 48) {
     a.add(mesh); for (const o of list) o.visible = false; geos.forEach((g) => g.dispose());
   }
   let after = 0; root.traverse((o) => { if (o.isMesh && o.visible) after++; });
-  return { before, after, flip };   // flip: what the cat shows and hides itself (a tongue), never to be touched
+  return { before, after, flip };    
 }
 
-/* The coat as one skinned mesh (and its fur as one instanced draw), in place of a mesh and a shell stack per part: each
-   coat part becomes a "bone" of the new mesh (the hidden original still moves with the cat, and its vertices follow
-   it), and what the part's material knew (which part it is, its fur, its place along a limb, its rest position) is
-   written into its vertices. One material per look of coat (a mane can differ from the body).
-     batchCoat(avatar, coatMaterial, shells) -> { body: [SkinnedMesh], fur: [SkinnedMesh], mats, wear(n) } */
+
+
 export function batchCoat(av, coatMaterial, shells) {
   const root = av.root; root.updateMatrixWorld(true);
   const parts = []; root.traverse((o) => { if (o.isMesh && !o.isInstancedMesh && o.visible && o.material && o.material.userData && o.material.userData.u && o.material.userData.u.uRest) parts.push(o); });
@@ -72,7 +64,7 @@ export function batchCoat(av, coatMaterial, shells) {
     list.forEach((o, bi) => { const g = o.geometry, pos = g.attributes.position, nor = g.attributes.normal, u = o.material.userData.u, cnt = pos.count;
       Mb.multiplyMatrices(inv, o.matrixWorld); N3.getNormalMatrix(Mb); R3.setFromMatrix4(Mb);
       bones.push(o); inverses.push(o.matrixWorld.clone().invert()); spans.push([o, vo, pos.count]);
-      const gp = o.parent && o.parent.parent, gi = gp === av.b.wrL ? 1 : gp === av.b.wrR ? 2 : 0;   // a hand paw: its vertices bend with the grip (coat.js), in the paw's frame carried by this rotation
+      const gp = o.parent && o.parent.parent, gi = gp === av.b.wrL ? 1 : gp === av.b.wrR ? 2 : 0;    
       if (gi) { GR[gi === 1 ? "L" : "R"].setFromMatrix4(Mb); Gr.fill(gi, vo, vo + cnt); }
       for (let i = 0; i < cnt; i++) { const j = (vo + i) * 3; v.fromBufferAttribute(pos, i); Lc.set([v.x, v.y, v.z], j);
         n.fromBufferAttribute(nor, i); const off = n.clone().applyMatrix3(R3); Of.set([off.x, off.y, off.z], j);
@@ -80,15 +72,15 @@ export function batchCoat(av, coatMaterial, shells) {
         v.applyMatrix4(Mb); P.set([v.x, v.y, v.z], j); n.applyMatrix3(N3).normalize(); Nn.set([n.x, n.y, n.z], j);
         Fu[vo + i] = u.uFurLen.value; Al[vo + i] = u.uAlong.value; Pa[vo + i] = u.uPart.value; SI[(vo + i) * 4] = bi; SW[(vo + i) * 4] = 1; }
       const idx = g.index, m = idx ? idx.count : cnt, i0 = io; for (let i = 0; i < m; i++) I[io++] = vo + (idx ? idx.getX(i) : i);
-      if (o.userData.shells) shellTris.push([i0, io]);   // only the parts that wear fur grow shells
+      if (o.userData.shells) shellTris.push([i0, io]);    
       vo += cnt; });
     const geo = new THREE.BufferGeometry(), A = (a, k) => new THREE.BufferAttribute(a, k);
     geo.setAttribute("position", A(P, 3)); geo.setAttribute("normal", A(Nn, 3)); geo.setAttribute("aRest", A(Rr, 3)); geo.setAttribute("aLoc", A(Lc, 3)); geo.setAttribute("aOff", A(Of, 3));
     geo.setAttribute("aFur", A(Fu, 1)); geo.setAttribute("aAlong", A(Al, 1)); geo.setAttribute("aPart", A(Pa, 1)); geo.setAttribute("aGrip", A(Gr, 1)); geo.setAttribute("skinIndex", A(SI, 4)); geo.setAttribute("skinWeight", A(SW, 4)); geo.setIndex(A(I, 1));
     const skel = new THREE.Skeleton(bones, inverses), first = list[0].material.userData.u;
-    const mk = (mode) => { const m = coatMaterial(av.L, 0, { batch: mode }); const u = m.userData.u;   // the cat's own uniforms, shared, so the clock and the covers reach it
+    const mk = (mode) => { const m = coatMaterial(av.L, 0, { batch: mode }); const u = m.userData.u;    
       for (const k of Object.keys(first)) if (!["uFurLen", "uAlong", "uPart", "uRest", "uShells", "uGrip"].includes(k)) u[k] = first[k];
-      if (av.pawMat) { u.uGripL = av.pawMat.L.userData.u.uGrip; u.uGripR = av.pawMat.R.userData.u.uGrip; }   // the hands' own grip uniforms, so avatar.grip reaches the batched coat
+      if (av.pawMat) { u.uGripL = av.pawMat.L.userData.u.uGrip; u.uGripR = av.pawMat.R.userData.u.uGrip; }    
       u.uGripRL.value.copy(GR.L); u.uGripRR.value.copy(GR.R);
       for (const p of ["roughness", "metalness", "sheen", "sheenRoughness", "iridescence", "transparent", "opacity", "flatShading"]) m[p] = list[0].material[p]; m.sheenColor.copy(list[0].material.sheenColor);
       out.mats.push(m); av.mats.push(m); return m; };

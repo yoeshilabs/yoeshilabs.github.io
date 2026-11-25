@@ -1,9 +1,5 @@
-/* Whiskers, evolved (Yoeshi, 2026-11-15: "We need to give a similar refinement to the whiskers"; on the live Maestro the next day the
-   whiskers were still the flat white rods). The avatar (src/avatar.js) draws each whisker as an even tube in an unlit white that glows
-   the same in any light. Here each becomes a whisker: thick at the root, tapering to a fine tip, a little glossy and lit by the room
-   (with a faint glow of its own so it still reads in the dark), and each gains a companion, fanned a little and a little shorter,
-   riding on it so it twitches with it. The avatar's own wiggle still moves them. A room-side change: src stays as minted.
-     whiskers(root)   once, after the cats are built; again does nothing to what it already did */
+
+
 import * as THREE from "three";
 
 const done = new WeakSet();
@@ -18,7 +14,7 @@ export function whiskers(target) {
   const root = target && (target.root || target); if (!root || !root.traverse) return 0; const list = []; root.traverse((o) => { if (isWhisker(o)) list.push(o); });
   const mat = list.length ? MAT() : null; let n = 0;
   for (const w of list) { done.add(w); const P = w.geometry.parameters; w.geometry = taper(new THREE.TubeGeometry(P.path, P.tubularSegments, P.radius, Math.max(P.radialSegments, 6))); w.material = mat;
-    /* its companion: the same whisker, turned a little about the root and a little shorter */
+     
     const r0 = P.path.getPointAt(0), k = 0.86, side = Math.sign(P.path.getPointAt(1).x - r0.x) || 1, g = taper(new THREE.TubeGeometry(P.path, P.tubularSegments, P.radius * 0.85, Math.max(P.radialSegments, 6)));
-    g.translate(-r0.x, -r0.y, -r0.z); const m = new THREE.Mesh(g, mat); m.scale.setScalar(k); m.position.copy(r0); m.rotation.set(0.1 * ((n % 3) - 1) + 0.05, -0.16 * side * (n % 2 ? 1 : -0.7), 0.12 * side);   /* fanned clear of it, each its own way */ w.add(m); done.add(m); n++; }
+    g.translate(-r0.x, -r0.y, -r0.z); const m = new THREE.Mesh(g, mat); m.scale.setScalar(k); m.position.copy(r0); m.rotation.set(0.1 * ((n % 3) - 1) + 0.05, -0.16 * side * (n % 2 ? 1 : -0.7), 0.12 * side);     w.add(m); done.add(m); n++; }
   return n; }

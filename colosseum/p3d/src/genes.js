@@ -1,30 +1,17 @@
-/* Prancer 3D: the Prancer Portraits genes, from the minted generator (made by tools/genes.mjs; do not edit by hand).
-   genesFor(seed) runs the real gene code for that seed and returns every gene as data. */
+
+
 function xmur3(s) { for (var i = 0, h = 1779033703 ^ s.length; i < s.length; i++) { h = Math.imul(h ^ s.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; }
   return function () { h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); return (h ^= h >>> 16) >>> 0; }; }
 function sfc32(a, b, c, d) { return function () { a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0; var t = (a + b) | 0;
   a = b ^ (b >>> 9); b = (c + (c << 3)) | 0; c = (c << 21) | (c >>> 11); d = (d + 1) | 0; t = (t + d) | 0; c = (c + t) | 0; return (t >>> 0) / 4294967296; }; }
 function run() {
-/**
- * Prancer PFP — a Prancer sits for its portrait, and looks right back at you.
- *
- *  1. Three kinds of cat. Domestic cats carry the original Prancers' coat
- *     genetics, gene for gene (a seed draws the same coat it drew in Prancers).
- *     Wild cats are the twelve species of Wild Ride with their rare morphs.
- *     Supernatural cats are the fantastical ones: Ghost, Nekomata, Cosmic,
- *     Infernal, Celestial, Cyber, Crystal and Shadow.
- *  2. Dressed: human clothes, hats, eyewear and neckwear, all rolled.
- *  3. Alive: it breathes, blinks, twitches an ear, flicks its tail and has a
- *     signature moment, all periodic in one loop, so frame 0 (the captured
- *     cover) is deterministic. Live, it follows your pointer, purrs when you
- *     pet it and reacts in character when you tap. Laser eyes aim where you point.
- *  4. One temperament system (the Feline Five, as in Prancers) drives it all.
- */
+
+
 (function () {
 "use strict";
 const A = window.$alea, R = A.random, NS = "http://www.w3.org/2000/svg";
 
-/* ------------------------------------------------------------------ helpers */
+ 
 const rr = (a, b) => a + R() * (b - a);
 const ch = (p) => R() < p;
 const ri = (a, b) => a + Math.floor(R() * (b - a + 1));
@@ -54,7 +41,7 @@ const BLK = "#000000";
 const cl = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), lerp = (a, b, m) => a + (b - a) * m;
 const smooth = (u) => u * u * (3 - 2 * u);
 const env = (x, a, d, at, rl) => x < a || x > a + d ? 0 : Math.min(1, (x - a) / at, (a + d - x) / rl);
-/* a smooth closed curve through points (Catmull-Rom as cubic Béziers) */
+ 
 function cr(pts) {
   const n = pts.length; let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
   for (let i = 0; i < n; i++) {
@@ -63,20 +50,19 @@ function cr(pts) {
   return d + "Z";
 }
 
-/* ------------------------------------------------------------ behaviour data */
-/* the Feline Five temperaments, stress levels and signature moments: the same data as Prancers */
-/* @data */const DATA = {"keys":["ear","earH","tail","sway","lid","pupil","whisk","crouch","head","puff"],"levels":[[-5,1,0,0.8,0.6,0.11,0,0,-2,1],[-3,1,0,0.9,0.82,0.12,2,0,0,1],[6,1,-8,1.2,1,0.13,3,4,2,1],[8,1,-22,1.6,1,0.19,8,10,-4,1.05],[-18,0.82,-45,0.5,1,0.25,8,18,-12,1.25],[-32,0.66,-70,0.15,1,0.31,-12,26,-18,1.4]],"valence":{"pos":[3,0,22,0,0,0,2,-2,3,0],"neg":[-14,-0.08,-12,0.6,-0.25,0.02,-4,2,-2,0]},"arch":[["Confident",[0.2,0.75,0.65,0.4,0.6],"slowBlink","chinUp","Boldly",-0.01],["Shy",[0.85,0.3,0.2,0.4,0.5],"glance","startle","Shyly",-0.058],["Playful",[0.3,0.8,0.4,0.85,0.7],"frenzy","perk","Playfully",0.015],["Grumpy",[0.5,0.35,0.75,0.5,0.15],"glare","glare","Grumpily",-0.143],["Chill",[0.15,0.3,0.3,0.15,0.8],"yawn","melt","Lazily",0.167],["Curious",[0.4,0.8,0.35,0.55,0.5],"doubleTake","headTilt","Curiously",-0.046],["Sassy",[0.3,0.7,0.75,0.65,0.35],"chinUp","chinUp","Sassily",-0.087],["Sweet",[0.3,0.55,0.2,0.35,0.9],"catKiss","melt","Sweetly",0.114],["Regal",[0.1,0.55,0.95,0.2,0.55],"nod","chinUp","Regally",0.005]],"moments":{"slowBlink":[9,3],"glance":[9.5,2.5],"frenzy":[9,3.5],"glare":[9,3],"yawn":[9,3],"doubleTake":[9.5,2.5],"chinUp":[9,3],"catKiss":[9,3],"nod":[9.5,2.5]}};/* @enddata */
+ 
+ 
+ const DATA = {"keys":["ear","earH","tail","sway","lid","pupil","whisk","crouch","head","puff"],"levels":[[-5,1,0,0.8,0.6,0.11,0,0,-2,1],[-3,1,0,0.9,0.82,0.12,2,0,0,1],[6,1,-8,1.2,1,0.13,3,4,2,1],[8,1,-22,1.6,1,0.19,8,10,-4,1.05],[-18,0.82,-45,0.5,1,0.25,8,18,-12,1.25],[-32,0.66,-70,0.15,1,0.31,-12,26,-18,1.4]],"valence":{"pos":[3,0,22,0,0,0,2,-2,3,0],"neg":[-14,-0.08,-12,0.6,-0.25,0.02,-4,2,-2,0]},"arch":[["Confident",[0.2,0.75,0.65,0.4,0.6],"slowBlink","chinUp","Boldly",-0.01],["Shy",[0.85,0.3,0.2,0.4,0.5],"glance","startle","Shyly",-0.058],["Playful",[0.3,0.8,0.4,0.85,0.7],"frenzy","perk","Playfully",0.015],["Grumpy",[0.5,0.35,0.75,0.5,0.15],"glare","glare","Grumpily",-0.143],["Chill",[0.15,0.3,0.3,0.15,0.8],"yawn","melt","Lazily",0.167],["Curious",[0.4,0.8,0.35,0.55,0.5],"doubleTake","headTilt","Curiously",-0.046],["Sassy",[0.3,0.7,0.75,0.65,0.35],"chinUp","chinUp","Sassily",-0.087],["Sweet",[0.3,0.55,0.2,0.35,0.9],"catKiss","melt","Sweetly",0.114],["Regal",[0.1,0.55,0.95,0.2,0.55],"nod","chinUp","Regally",0.005]],"moments":{"slowBlink":[9,3],"glance":[9.5,2.5],"frenzy":[9,3.5],"glare":[9,3],"yawn":[9,3],"doubleTake":[9.5,2.5],"chinUp":[9,3],"catKiss":[9,3],"nod":[9.5,2.5]}}; 
 
-/* ------------------------------------------------------------------ rhythm */
-/* No walk here, but the same clock: a portrait breathes on a slow beat, and
-   every sign of life is periodic in LOOP beats, so the loop is seamless. The
-   gait and tempo rolls are kept from Prancers, so domestic coats match. */
+ 
+
+
 const LOOP = 16;
 const GAIT = wp([["Prance", 55], ["Strut", 30], ["Sneak", 15]]);
 wp([[96, 2], [108, 3], [120, 4], [128, 3], [140, 2]]);
 const BUILD = wp([["Slim", 30], ["Classic", 50], ["Chonk", 20]]);
 
-/* ------------------------------------------------- coat genetics (Prancers) */
+ 
 const MALE = ch(0.5);
 let ORANGE = false, TORTIE = false, XXY = false;
 if (MALE) { if (ch(1 / 3000)) TORTIE = XXY = true; else ORANGE = ch(0.25); }
@@ -116,19 +102,19 @@ else if (ch(0.015)) ODD = true;
 if (GOLD0) { EYEN0 = "Green"; ODD = false; }
 const EARS0 = wp([["Pointed", 70], ["Tufted", FUR0 === "Longhair" ? 45 : 10], ["Folded", FUR0 === "Hairless" ? 0 : 12]]);
 const TAIL0 = wp([["Long", 55], ["Question", 20], ["Bob", 12]]);
-wp([["None", 45], ["Collar", 18], ["Headphones", 16], ["Crown", 10]]);                 // Prancers' accessory roll, kept for the coat match
+wp([["None", 45], ["Collar", 18], ["Headphones", 16], ["Crown", 10]]);                  
 const WALLT = wp([["Paint", 20], ["Wainscot", 11], ["Stripes", 10], ["Damask", 9], ["Retro Dots", 9], ["Floral", 9], ["Brick", 6], ["Tezos Paper", 8],
   ["Subway Tile", 6], ["Wood Panel", 6], ["Chevron", 6], ["Starry", 5]]);
 R(); wp([["Window", 22], ["Neon Tez", 16], ["Frames", 16], ["Sconces", 11], ["Bookshelf", 9], ["Monstera", 9], ["Disco Ball", 6], ["Clock", 6], ["None", 5]]);
 
-/* ------------------------------------------------------------- what it is */
-/* MYTHIC: the CIB Agent (Cats in Black, ~1 in 150): a black cat in a black suit and shades with a
-   tiny, absurdly powerful blaster; live, it shoots "pew pew" at your pointer */
-/* one roll decides the mythics: 1 in 100 cats is one, the four equally likely (1 in 400 each) */
+ 
+
+
+ 
 const MYR = R(), MYK = MYR < 0.01 ? ["cib", "knight", "glad", "monk"][Math.floor(MYR / 0.0025)] : null;
 const CIB = MYK === "cib" || (!!A._dev && /[?&]mythic=cib/.test(""));
 const KIND = CIB ? (wp([["Domestic", 55], ["Wild", 28], ["Supernatural", 17]]), "Domestic") : wp([["Domestic", 55], ["Wild", 28], ["Supernatural", 17]]);
-/* wild: [weight, coat hsl, pattern, ears, eyes, extras] (the Wild Ride table) */
+ 
 const WILD = {
   Lion: [13, [40, 92, 60], "Plain", "Round", "Amber", { mane: 1, muzzle: 1, heavy: 1 }],
   Tiger: [13, [24, 100, 56], "Stripes", "Round", "Amber", { muzzle: 1, heavy: 1 }],
@@ -151,25 +137,25 @@ if (MORPH === "Golden") WHSL = [42, 70, 74];
 if (MORPH === "Black") WEYES = ch(0.5) ? "Green" : "Gold";
 if (MORPH === "King") WPAT = "King";
 const MANE = KIND === "Wild" && WX.mane && (MALE || ch(0.5)) ? (MORPH === "White" ? "Cream" : wp([["Blond", 40], ["Tawny", 40], ["Dark", 17], ["Black", 3]])) : "None";
-/* supernatural */
+ 
 const SPIRIT = wp([["Ghost", 16], ["Nekomata", 14], ["Cosmic", 14], ["Infernal", 13], ["Celestial", 12], ["Cyber", 12], ["Crystal", 10], ["Shadow", 9]]);
 
 const DOM = KIND === "Domestic", WLD = KIND === "Wild", SUP = KIND === "Supernatural";
 const SPK = SUP ? SPIRIT : "";
-/* Ghosts and Nekomata keep a domestic coat underneath; the rest bring their own */
+ 
 const GENES = DOM || SPK === "Ghost" || SPK === "Nekomata";
 const GOLD = DOM && GOLD0 && !CIB, POINT = GENES && POINT0 && !CIB, WHITE = GENES && !CIB ? WHITE0 : "None";
 const FUR = GENES ? FUR0 : WLD ? (WX.ruff ? "Longhair" : "Shorthair") : SPK === "Shadow" || SPK === "Celestial" ? "Longhair" : "Shorthair";
 const HAIRLESS = FUR === "Hairless";
-const FINISH = SUP ? SPK : GOLD ? "Gold" : FIN0 === "Gold" ? "Neon" : FIN0;   // the gold gene only gilds domestic cats
+const FINISH = SUP ? SPK : GOLD ? "Gold" : FIN0 === "Gold" ? "Neon" : FIN0;    
 const NEON = FINISH === "Neon", SW = WHITE === "Solid White" && !GOLD;
 const TABBY = GENES && AGOUTI && !POINT && !SW && !GOLD && !CIB, SHADED = TABBY && TPAT === "Shaded";
 const VANISH = WHITE === "Van" || WHITE === "Harlequin";
 if (WLD) { bgH = (WHSL[0] + 190) % 360; accH = WHSL[0] + 20; }
-if (CIB) { bgH = 212; accH = 196; }                                              // the agency's cool blue
+if (CIB) { bgH = 212; accH = 196; }                                               
 if (SUP) { bgH = { Ghost: 200, Nekomata: 265, Cosmic: 250, Infernal: 8, Celestial: 222, Cyber: 190, Crystal: 185, Shadow: 270 }[SPK]; accH = SPK === "Celestial" ? 46 : bgH + 150; }
 
-/* ------------------------------------------------------------------ palette */
+ 
 const ACCC = hsl(accH, 95, 62);
 const INKB = hex(bgH, 35, 11);
 const WHITEC = "#f4f6fb", PINK = "#ff8fb3";
@@ -196,7 +182,7 @@ if (GENES) {
   PAT = GOLD || SW ? "Solid" : POINT ? (LYNX ? "Lynx Point" : "Colorpoint") : TABBY ? TPAT : TORTIE ? (BRINDLE ? "Brindle" : "Tortie") : "Solid";
   muzC = pointC ? pointC : WHITE !== "None" && !SW ? WHITEC : bodyFill;
   EYEC = [ODD ? EYES.Blue : EYES[EYEN], ODD ? EYES.Copper : EYES[EYEN]];
-  if (CIB) { bodyFill = NEON ? INKB : "#17151d"; patchC = pointC = markC = null; muzC = bodyFill; PAT = "Solid"; RIM = NEON ? "#9fd8ff" : hex(accH, 100, 72); }   // solid black
+  if (CIB) { bodyFill = NEON ? INKB : "#17151d"; patchC = pointC = markC = null; muzC = bodyFill; PAT = "Solid"; RIM = NEON ? "#9fd8ff" : hex(accH, 100, 72); }    
 } else if (WLD) {
   const C = hex(...WHSL), pale = WX.pale, black = MORPH === "Black";
   bodyFill = NEON ? (black ? hex(WHSL[0], 30, 6) : pale ? hex(210, 22, 15) : hex(WHSL[0], 45, 12)) : black ? hex(WHSL[0], 22, 10) : C;
@@ -208,7 +194,7 @@ if (GENES) {
   PAT = WPAT; EYEN = WEYES; EARS = WEARS; TAILK = SPECIES === "Lynx" || SPECIES === "Caracal" ? "Bob" : "Long";
   EYEC = [EYES[EYEN], EYES[EYEN]];
 }
-/* the spirits: palettes of their own (Ghost and Nekomata are tinted over their coat) */
+ 
 const SPAL = {
   Ghost: { rim: "#bff6ff", eye: "#9ff0ff" }, Nekomata: { rim: "#b48cff", eye: "#f6c52e" },
   Cosmic: { body: "url(#cosmos)", mark: "#ffffff", rim: "#b48cff", eye: "#ffffff", muz: "#2a1d5c", nose: "#b48cff" },
@@ -227,23 +213,21 @@ if (SUP) {
   if (SPK === "Ghost") { EYEN = "Ghost Glow"; bodyFill = "#d6f3ff"; muzC = "#f2fbff"; noseC = "#9fd8f0"; earIn = "#a9e2f7";
     if (markC) markC = "#6fb9da"; if (patchC) patchC = "#a9dcef"; if (pointC) pointC = "#8fc6df"; }
 }
-/* MYTHIC: the Sword Knight (~1 in 150), a nod to Empress Trash's Sword Cat: celestial armour,
-   a starry cape, a ribbon bow, an enchanted blade, a meadow; live, it duels your pointer */
+
+
 const KNIGHT = !CIB && (MYK === "knight" || (!!A._dev && /[?&]mythic=knight/.test("")));
-/* MYTHIC: Marcus Purrileous (~1 in 150), the gladiator: crested helm, bronze cuirass, red cape,
-   gladius and scutum, in the arena; live, he thrusts, blocks with his shield, and on a tap
-   raises his sword to the roar of the crowd */
+
+
 const GLAD = !CIB && !KNIGHT && (MYK === "glad" || (!!A._dev && /[?&]mythic=gladiator/.test("")));
-/* MYTHIC: the Star Monk (~1 in 200): a hooded robe and a plasma blade in one of seven colours; live, it
-   hums, cuts at your pointer with a coloured trail, crackles when it parries, and on a tap pushes you
-   back with a ripple from its paw */
+
+
 const MONK = !CIB && !KNIGHT && !GLAD && (MYK === "monk" || (!!A._dev && /[?&]mythic=monk/.test(""))), MYTH = KNIGHT || GLAD || CIB || MONK;
 const PLASMA = MONK ? wp([["Blue", 30], ["Green", 30], ["Purple", 12], ["Yellow", 10], ["Red", 10], ["Orange", 5], ["White", 3]]) : "None";
 const PLC = { Blue: "#3fa0ff", Green: "#3fff6a", Purple: "#b45cff", Yellow: "#ffe23f", Red: "#ff2a3c", Orange: "#ff8a1f", White: "#e8f4ff", None: "#ffffff" }[PLASMA];
 const LASER = ch(0.1) && !MYTH, LASERC = LASER ? wp([["Blue", 35], ["Red", 35], ["Green", 15], ["Gold", 15]]) : "None";
 const LZC = { Blue: ["#1e7bff", "#3fa9ff"], Red: ["#ff1e3c", "#ff5a6e"], Green: ["#1eff6a", "#7dffad"], Gold: ["#ffb21e", "#ffd76a"] }[LASERC];
 
-/* ------------------------------------------------------------ the wardrobe */
+ 
 const OUTFIT0 = wp([["None", 21], ["Hoodie", 7], ["Turtleneck", 5], ["Suit & Tie", 5], ["Leather Jacket", 4.5], ["Denim Jacket", 4.5], ["Hawaiian Shirt", 4.5],
   ["Sweater", 5], ["Kimono", 3], ["Varsity Jacket", 4], ["Overalls", 3.5], ["Astronaut", 1.6], ["Royal Robe", 1.3],
   ["Puffer Jacket", 5], ["Flannel", 5], ["Raincoat", 4], ["Lab Coat", 3], ["Tracksuit", 4], ["Band Tee", 6]]);
@@ -258,12 +242,12 @@ const SPECS = CIB ? "Agent Shades" : MYTH ? "None" : SPECS0;
 const OPENNECK = ["None", "Hawaiian Shirt", "Leather Jacket", "Denim Jacket", "Hoodie", "Overalls", "Band Tee", "Flannel"].includes(OUTFIT);
 const NECK = !OPENNECK ? "None" : OUTFIT === "None" ? wp([["None", 38], ["Collar", 16], ["Gold Chain", 10], ["Bow Tie", 8], ["Pearls", 5], ["Scarf", 5], ["Bandana", 8], ["Flower Lei", 4], ["Gold Medal", 3]]) :
   wp([["None", 62], ["Gold Chain", 20], ["Bandana", 8], ["Gold Medal", 5], ["Flower Lei", 5]]);
-/* something in the free paw, a little blush, an earring */
+ 
 const HOLD0 = wp([["None", 44], ["Boba Tea", 6], ["Coffee", 6], ["Fish", 6], ["Ice Cream", 5], ["Balloon", 5], ["Rose", 4], ["Yarn Ball", 5], ["Donut", 4], ["Pizza", 4], ["Lollipop", 3.5], ["Tez Coin", 2.5], ["Magic Wand", 2]]);
 const HOLD = MYTH ? "None" : HOLD0;
 const CHEEKS = wp([["None", 68], ["Blush", 24], ["Freckles", 8]]);
 const EARRING = wp([["None", 78], ["Gold Hoop", 10], ["Pearl", 6], ["Tez Stud", 4], ["Diamond", 2]]);
-/* clothes take their colours from a tailor's palette, picked against the backdrop */
+ 
 const CLOTH = [["#1d2a44", "Navy"], ["#111114", "Black"], ["#7a1c2b", "Burgundy"], ["#2f5d3a", "Forest"], ["#d6b25e", "Mustard"], ["#e9e4d8", "Cream"],
   ["#ff6f61", "Coral"], ["#3a7bd5", "Cobalt"], ["#8e5cc7", "Violet"], ["#f2a541", "Tangerine"], ["#4ab3a4", "Teal"], ["#ff8fb3", "Bubblegum"]];
 const clothHue = (c) => { const [r, g, b] = [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16) / 255), M = Math.max(r, g, b), m = Math.min(r, g, b);
@@ -271,19 +255,19 @@ const clothHue = (c) => { const [r, g, b] = [1, 3, 5].map((i) => parseInt(c.slic
 const pickCloth = () => { const ok = CLOTH.filter(([c]) => { const h = clothHue(c); return h === null || hd(h, bgH) > 40; }); return pk(ok)[0]; };
 const C1 = pickCloth(), C2 = pickCloth();
 
-/* ------------------------------------------------------------- the backdrop */
+ 
 const BACK0 = wp([["Plain", 20], ["Dots", 8], ["Stripes", 7], ["Tezos Paper", 7], ["Chevron", 5], ["Starry", 6], ["Hearts", 7], ["Checker", 6], ["Clouds", 8], ["Vaporwave", 5], ["Bubbles", 6]]);
 const BACKDROP = MONK ? "Twin Suns" : CIB ? "Agency" : KNIGHT ? "Meadow" : GLAD ? "Colosseum" : SUP ? { Ghost: "Mist", Nekomata: "Spirit Lanterns", Cosmic: "Nebula", Infernal: "Embers", Celestial: "Heavenly", Cyber: "Grid", Crystal: "Prism", Shadow: "Void" }[SPK] :
   WLD ? (ch(0.6) ? { "Snow Leopard": "Snowfall", Lynx: "Snowfall", Jaguar: "Jungle", "Clouded Leopard": "Jungle", Ocelot: "Jungle", Leopard: ch(0.5) ? "Jungle" : "Sunset" }[SPECIES] || "Sunset" : BACK0) :
   BACK0;
 
-/* -------------------------------------------------------------- the face */
+ 
 const B = { Slim: [180, 0.95, 0.88], Classic: [186, 1.03, 1.0], Chonk: [192, 1.16, 1.28] }[BUILD];
 const K = B[0], CW = B[1] + (MALE && !SUP ? 0.05 : 0) + (WX.heavy && WLD ? 0.06 : 0), BW = B[2];
 const HX = 500, HY = 372;
 const U = (v) => f1(v * K);
 
-/* ===================================================================== defs */
+ 
 const defs = E("defs");
 const grad = (id, stops, o = {}) => { const g = E("linearGradient", { id, x1: 0, y1: 0, x2: 0, y2: 1, ...o }, defs);
   stops.forEach(([of, c, op = 1]) => E("stop", { offset: of, "stop-color": c, "stop-opacity": op }, g)); return g; };
@@ -297,12 +281,12 @@ const BG0 = SUP ? hex(bgH, 50, SPK === "Celestial" ? 34 : SPK === "Shadow" ? 4 :
 const BG1 = SUP ? hex(bgH, 60, SPK === "Celestial" ? 9 : 3) : WLD ? hex(bgH, 50, 8) : hex(bgH, WS, WL * 0.5);
 rgrad("bg", [[0, BG0], [1, BG1]], { cx: 0.5, cy: 0.42, r: 0.75 });
 rgrad("halo", [[0, hsl(accH, 95, 62), NEON || SUP ? 0.5 : 0.3], [1, hsl(accH, 95, 62), 0]], { r: 0.5 });
-/* cosmos: deep space with stars, for Cosmic cats' fur */
+ 
 { const p = E("pattern", { id: "cosmos", width: 260, height: 260, patternUnits: "userSpaceOnUse" }, defs);
   E("rect", { width: 260, height: 260, fill: "#120a2e" }, p);
   E("circle", { cx: 70, cy: 90, r: 110, fill: "#5b2a9e", opacity: 0.35 }, p); E("circle", { cx: 200, cy: 200, r: 90, fill: "#1f6fb2", opacity: 0.3 }, p);
   for (let i = 0; i < 26; i++) E("circle", { cx: f1(rr(0, 260)), cy: f1(rr(0, 260)), r: f1(rr(0.8, 2.6)), fill: "#fff", opacity: f1(rr(0.5, 1) * 100) / 100 }, p); }
-/* rim: the neon-sign edge, as in Prancers, scaled to a portrait */
+ 
 const fr = E("filter", { id: "rim", x: "-30%", y: "-30%", width: "160%", height: "160%" }, defs);
 E("feMorphology", { in: "SourceAlpha", operator: "dilate", radius: NEON || SUP ? 4 : 2.2, result: "d" }, fr);
 E("feFlood", { "flood-color": RIM }, fr); E("feComposite", { in2: "d", operator: "in", result: "o" }, fr);
@@ -318,9 +302,9 @@ if (FURX) { const ff = E("filter", { id: "fur", x: "-15%", y: "-15%", width: "13
 const FURF = FURX ? { filter: "url(#fur)" } : {};
 const MARKF = NEON || SUP ? { filter: "url(#eg)" } : {};
 
-/* ================================================================= backdrop */
+ 
 E("rect", { width: 1000, height: 1000, fill: "url(#bg)" });
-const BGA = [];                                                    // backdrop animations: fn(lb)
+const BGA = [];                                                     
 const TZD = "M18 14L34 8V64Q34 78 48 78Q56 78 60 72M8 28H90L56 62Q94 66 94 94Q94 120 66 120Q46 120 42 108M44 99a7 7 0 1 0 .1 0";
 const INK = hex(bgH, 30, NEON ? 60 : 80), BGO = NEON ? 0.16 : 0.22;
 const BGG = E("g", { opacity: BGO });
@@ -347,11 +331,11 @@ else if (BACKDROP === "Snowfall" || BACKDROP === "Embers" || BACKDROP === "Spiri
     const x0 = rr(0, 1000), y0 = rr(0, 1000), sp = ri(1, 2), wob = rr(10, 30), r = BACKDROP === "Spirit Lanterns" ? rr(10, 18) : rr(2, 6);
     const col = { Snowfall: "#ffffff", Embers: pk(["#ff7a1f", "#ffb21e", "#ff3b1f"]), "Spirit Lanterns": "#a77bff", Prism: pk(["#ff7ad9", "#7fe8ff", "#fff38a"]), Heavenly: "#fff3b0" }[BACKDROP];
     const e = E("circle", { r: f1(r), fill: col, opacity: 0.8, ...(up ? { filter: "url(#eg)" } : {}) }, BGG);
-    /* falls (or rises) through the frame a whole number of times per loop: seamless */
+     
     BGA.push((lb) => { const u = frac(lb / LOOP * sp + y0 / 1000), y = up ? 1040 - u * 1080 : -40 + u * 1080;
       set(e, { cx: f1(x0 + wob * Math.sin(TAU * (lb / LOOP * 2 + i / 7))), cy: f1(y) }); }); } }
 else if (BACKDROP === "Twin Suns") { set(BGG, { opacity: 1 });
-  /* dusk over the dunes, two suns going down */
+   
   const sk = E("linearGradient", { id: "dusk", x1: 0, x2: 0, y1: 0, y2: 1 }, defs);
   for (const [o, c] of [[0, "#2a1d4f"], [0.45, "#b8507a"], [0.75, "#f2a14a"], [1, "#f6d07a"]]) E("stop", { offset: o, "stop-color": c }, sk);
   E("rect", { width: 1000, height: 700, fill: "url(#dusk)" }, BGG);
@@ -359,9 +343,9 @@ else if (BACKDROP === "Twin Suns") { set(BGG, { opacity: 1 });
   for (let i = 0; i < 30; i++) E("circle", { cx: f1(rr(0, 1000)), cy: f1(rr(0, 300)), r: f1(rr(1, 2.4)), fill: "#ffffff", opacity: f1(rr(0.3, 0.8) * 100) / 100 }, BGG);
   for (const [y, c, a] of [[600, "#c98a54", 50], [660, "#b4753f", 40], [720, "#9c6232", 60]]) E("path", { d: `M0 ${y}Q250 ${y - a} 500 ${y}T1000 ${y}V1000H0Z`, fill: c }, BGG);
   E("rect", { y: 760, width: 1000, height: 240, fill: "#8a5530" }, BGG);
-  const hz = E("rect", { y: 590, width: 1000, height: 20, fill: "#fff3c4", opacity: 0.12 }, BGG); BGA.push((lb) => set(hz, { opacity: f1((0.08 + 0.06 * Math.sin(TAU * lb / 4)) * 100) / 100 })); }   // heat shimmer
+  const hz = E("rect", { y: 590, width: 1000, height: 20, fill: "#fff3c4", opacity: 0.12 }, BGG); BGA.push((lb) => set(hz, { opacity: f1((0.08 + 0.06 * Math.sin(TAU * lb / 4)) * 100) / 100 })); }    
 else if (BACKDROP === "Agency") { set(BGG, { opacity: 1 });
-  /* a sleek, retro-futurist headquarters: slate walls of round lights, a polished floor, a saucer drifting by */
+   
   rgrad("lamp", [[0, "#ffffff", 0.95], [0.5, "#bfe6ff", 0.6], [1, "#7fb8e0", 0]]);
   E("rect", { width: 1000, height: 1000, fill: "#1b2330" }, BGG);
   for (let r = 0; r < 4; r++) for (let c = 0; c < 7; c++) E("circle", { cx: 70 + c * 145 + (r % 2) * 72, cy: 110 + r * 140, r: 46, fill: "url(#lamp)", opacity: 0.7 }, BGG);
@@ -371,20 +355,20 @@ else if (BACKDROP === "Agency") { set(BGG, { opacity: 1 });
   for (const x of [-26, 0, 26]) E("circle", { cx: x, cy: 4, r: 3.5, fill: "#ffe36e" }, ufo);
   BGA.push((lb) => { const u = frac(lb / LOOP); set(ufo, { transform: `translate(${f1(-120 + u * 1240)} ${f1(70 + 14 * Math.sin(TAU * u * 3))}) rotate(${f1(4 * Math.sin(TAU * u * 3))})` }); }); }
 else if (BACKDROP === "Colosseum") { set(BGG, { opacity: 1 });
-  /* a hot afternoon in the arena: a peach sky, two tiers of sandstone arches with the crowd in shadow, banners, raked sand */
+   
   E("rect", { width: 1000, height: 640, fill: "#f6c58f" }, BGG); E("circle", { cx: 780, cy: 150, r: 90, fill: "#fff1c9", opacity: 0.9 }, BGG);
   E("path", { d: "M-20 640V330Q500 250 1020 330V640Z", fill: "#d9a66b" }, BGG);
   for (const [y0, h, n, c] of [[350, 120, 12, "#8a5a34"], [490, 130, 10, "#7a4c2a"]]) for (let i = 0; i < n; i++) { const x = (i + 0.5) * 1000 / n - 34, yy = y0 - 40 * Math.cos((i + 0.5) / n * Math.PI - Math.PI / 2) * 0.5;
     E("path", { d: `M${f1(x)} ${f1(yy + h)}V${f1(yy + 30)}A34 34 0 0 1 ${f1(x + 68)} ${f1(yy + 30)}V${f1(yy + h)}Z`, fill: c }, BGG);
     for (let k = 0; k < 3; k++) { const hd_ = E("circle", { cx: f1(x + 14 + k * 20), cy: f1(yy + h - 22), r: 8, fill: pk(["#5a3a26", "#6d4a32", "#4a2f1e"]) }, BGG), ph = rr(0, 1);
-      BGA.push((lb) => set(hd_, { cy: f1(yy + h - 22 - 5 * Math.max(0, Math.sin(TAU * (lb / 2 + ph)))) })); } }   // the crowd, bobbing
+      BGA.push((lb) => set(hd_, { cy: f1(yy + h - 22 - 5 * Math.max(0, Math.sin(TAU * (lb / 2 + ph)))) })); } }    
   for (const x of [120, 380, 620, 880]) { E("path", { d: `M${x} 230V340`, stroke: "#5a3418", "stroke-width": 5 }, BGG); const fl = E("path", { fill: "#b3202c" }, BGG);
     BGA.push((lb) => { const w = 8 * Math.sin(TAU * (lb / 4 + x / 1000)); set(fl, { d: `M${x} 232Q${x + 30} ${232 + w} ${x + 62} ${238 + w}L${x + 60} ${268 + w}Q${x + 30} ${262 + w} ${x} ${266}Z` }); }); }
   E("rect", { y: 630, width: 1000, height: 40, fill: "#a8743f" }, BGG);
   E("rect", { y: 670, width: 1000, height: 330, fill: "#e8c38a" }, BGG);
   for (let i = 0; i < 12; i++) E("path", { d: `M0 ${700 + i * 26}Q500 ${690 + i * 26} 1000 ${700 + i * 26}`, fill: "none", stroke: "#d9ad6f", "stroke-width": 3, opacity: 0.6 }, BGG); }
 else if (BACKDROP === "Meadow") { set(BGG, { opacity: 1 });
-  /* a pastel sky with long brushy cloud bands, lavender hills, and a field of grass that sways */
+   
   E("rect", { width: 1000, height: 640, fill: "#9fdbe8" }, BGG);
   for (let i = 0; i < 9; i++) E("rect", { x: f1(rr(-200, 600)), y: f1(60 + i * 58 + rr(-10, 10)), width: f1(rr(300, 700)), height: f1(rr(10, 22)), rx: 10, fill: pk(["#f6d6ea", "#d9c9f2", "#fff2c9", "#c8e9f6"]), opacity: 0.7 }, BGG);
   E("path", { d: "M0 600Q160 540 330 585T680 560T1000 590V700H0Z", fill: "#b8b6e6" }, BGG); E("path", { d: "M0 640Q220 590 450 630T1000 620V720H0Z", fill: "#9aa6d8" }, BGG);
@@ -415,7 +399,7 @@ else if (BACKDROP === "Grid") { set(BGG, { opacity: 0.35 });
   BGA.push((lb) => gl.forEach((l, i) => { const u = frac(i / 6 + lb / LOOP * 2), y = 600 + 400 * u * u; set(l, { y1: f1(y), y2: f1(y), opacity: f1(u * 100) / 100 }); })); }
 E("circle", { cx: HX, cy: HY + 40, r: 520, fill: "url(#halo)" });
 
-/* ===================================================================== rig */
+ 
 const AURA = E("ellipse", { cx: HX, rx: f1(1.45 * K), ry: f1(1.55 * K), fill: "none", stroke: hsl(accH, 95, 70), "stroke-width": 10, opacity: 0, filter: "url(#eg)" });
 const CAT = E("g", { filter: "url(#rim)" });
 const TAILG = E("g", {}, CAT), WINGG = E("g", {}, CAT), BODYG = E("g", {}, CAT), HEADG = E("g", {}, CAT), PAWG = E("g", {}, CAT);
@@ -423,8 +407,8 @@ const dark = (c) => c.startsWith("url") ? c : mix(c, BLK, 0.3);
 const headC = VANISH ? WHITEC : bodyFill, earC = pointC ? pointC : VANISH ? (patchC || (NEON ? RIM : bodyFill === WHITEC ? "#6b5a4a" : bodyFill)) : headC;
 const vanC = patchC ? patchC : NEON ? RIM : GENES && !VANISH ? bodyFill : TORTIE ? patchC : ORANGE ? pig(REDN) : pig(EUN);
 
-/* ------------------------------------------------------------------ tail */
-/* it peeks up beside the shoulder and never sits still; a Nekomata has two */
+ 
+ 
 const TAILN = SPK === "Nekomata" ? 2 : 1, tails = [];
 const tailC = pointC ? pointC : VANISH ? vanC : bodyFill;
 for (let k = 0; k < TAILN; k++) {
@@ -432,10 +416,10 @@ for (let k = 0; k < TAILN; k++) {
   for (let i = 0; i < n; i++) segs.push(E("line", { stroke: tailC, "stroke-linecap": "round", "stroke-width": f1(w0 * (1 - 0.45 * i / n)) }, g));
   let ring = null; if (markC && (PAT === "Mackerel" || PAT === "Classic" || PAT === "Stripes" || PAT === "Spotted" || PAT === "Spots" || PAT === "Rosettes")) ring = segs.filter((_, i) => i % 2).map((s) => E("line", { stroke: markC, "stroke-linecap": "round", "stroke-width": f1(w0 * 0.5), opacity: MARKO, ...MARKF }, g));
   const flame = SPK === "Nekomata" ? E("path", { fill: "#a77bff", filter: "url(#eg)", opacity: 0.9 }, CAT) : null;
-  tails.push({ segs, ring, n, side: 1, fork: TAILN > 1 ? (k ? -34 : 10) : 0, dx: k ? -0.12 : 0, curl: TAILN > 1 ? 2.5 : 7, flame, ph: k * 0.37 });   // a Nekomata's tail forks: two strands from one root
+  tails.push({ segs, ring, n, side: 1, fork: TAILN > 1 ? (k ? -34 : 10) : 0, dx: k ? -0.12 : 0, curl: TAILN > 1 ? 2.5 : 7, flame, ph: k * 0.37 });    
 }
 
-/* ----------------------------------------------------------------- wings */
+ 
 const wings = [];
 if (WINGS) for (const s of [-1, 1]) {
   const g = E("g", {}, WINGG), bat = SPK === "Infernal", col = bat ? "#2a0a0a" : "#ffffff", vein = bat ? "#ff5a1f" : "#e8b84a";
@@ -444,29 +428,27 @@ if (WINGS) for (const s of [-1, 1]) {
     E("path", { d: d + `L0 ${U(0.4)}Z`, fill: col, stroke: vein, "stroke-width": 3, "stroke-linejoin": "round" }, g);
     for (const [x, y] of tips) E("path", { d: `M0 ${U(-0.1)}L${f1(x)} ${f1(y)}`, stroke: vein, "stroke-width": 3, opacity: 0.8 }, g); }
   else for (let i = 6; i >= 0; i--) { const a = (-112 + i * 15) * DEG, L = (1.95 - Math.abs(i - 2) * 0.17) * K, w = 0.2 * K;
-    const tx = s * Math.abs(Math.cos(a)) * L, ty = Math.sin(a) * L, nx = -Math.sin(a) * w * s, ny = Math.cos(a) * w * 0.4;   // feathers fan from straight up to out
+    const tx = s * Math.abs(Math.cos(a)) * L, ty = Math.sin(a) * L, nx = -Math.sin(a) * w * s, ny = Math.cos(a) * w * 0.4;    
     E("path", { d: `M0 0Q${f1(tx * 0.5 + nx)} ${f1(ty * 0.5 - Math.abs(ny) - w * 0.4)} ${f1(tx)} ${f1(ty)}Q${f1(tx * 0.55 - nx)} ${f1(ty * 0.55 + w * 0.5)} 0 ${f1(w * 0.3)}Z`, fill: i % 2 ? "#ffffff" : "#f6efdc", stroke: vein, "stroke-width": 2 }, g); }
   wings.push({ g, s });
 }
 
-/* ------------------------------------------------------------------ body */
-/* A cat standing up on its hind legs: sloped shoulders, a pear-shaped torso with
-   a round belly, haunches and hind feet at the bottom of the frame, forelegs at
-   its sides. Still a cat, just upright (and sometimes dressed). Units: K, from
-   the head's centre. */
+ 
+
+
 const BX = (x) => x * BW, shade = (c, k) => mix(c, k > 0 ? "#ffffff" : BLK, Math.abs(k));
 const TORSOP = cr([[0, 0.7], [0.3, 0.73], [BX(0.42), 0.95], [BX(0.52), 1.25], [BX(0.62), 1.7], [BX(0.74), 2.15], [BX(0.72), 2.55], [BX(0.55), 2.82], [BX(0.25), 2.93], [0, 2.95],
   [BX(-0.25), 2.93], [BX(-0.55), 2.82], [BX(-0.72), 2.55], [BX(-0.74), 2.15], [BX(-0.62), 1.7], [BX(-0.52), 1.25], [BX(-0.42), 0.95], [-0.3, 0.73]].map(([x, y]) => [x * K, y * K]));
 const bcp = E("clipPath", { id: "bc" }, defs); E("path", { d: TORSOP }, bcp);
-/* clothes have their own cut: a little looser than the body, hemmed at the hip (jackets a
-   little lower), or down to the floor for robes and suits that cover the legs */
+
+
 const HEM = { "Hooded Robe": 2.9, "Knight's Armor": 2.8, "Gladiator's Armor": 2.48, "Puffer Jacket": 2.6, Flannel: 2.5, Raincoat: 2.76, "Lab Coat": 2.86, Tracksuit: 2.5, "Band Tee": 2.45, None: 2.9, Hoodie: 2.58, Turtleneck: 2.46, Sweater: 2.5, "Hawaiian Shirt": 2.46, "Varsity Jacket": 2.56, "Suit & Tie": 2.74, "Leather Jacket": 2.56, "Denim Jacket": 2.5,
   Overalls: 2.9, Astronaut: 2.9, Kimono: 2.9, "Royal Robe": 2.9 }[OUTFIT];
 const GARMP = cr([[0, 0.69], [0.33, 0.71], [BX(0.47), 0.93], [BX(0.58), 1.24], [BX(0.68), 1.7], [BX(0.79), 2.15], [BX(0.81), Math.min(HEM, 2.55)], [BX(0.74), HEM], [BX(0.35), HEM + 0.035], [0, HEM + 0.045],
   [BX(-0.35), HEM + 0.035], [BX(-0.74), HEM], [BX(-0.81), Math.min(HEM, 2.55)], [BX(-0.79), 2.15], [BX(-0.68), 1.7], [BX(-0.58), 1.24], [BX(-0.47), 0.93], [-0.33, 0.71]].map(([x, y]) => [x * K, y * K]));
 { const gcp = E("clipPath", { id: "gc" }, defs); E("path", { d: GARMP }, gcp); }
 const bodyC = VANISH ? WHITEC : bodyFill;
-/* what the cat is wearing decides a few colours up front: sleeves, trousers, a long robe */
+ 
 const JACKET = OUTFIT === "Leather Jacket" ? "#16151a" : OUTFIT === "Denim Jacket" ? "#3d6aa8" : OUTFIT === "Suit & Tie" ? (CIB ? (pk([0]), "#0d0d11") : pk(["#1d2a44", "#111114", "#2b2b33", "#3b2a4a", C1])) : C1;
 const TEE = OUTFIT === "Overalls" ? pk(["#f6f6f2", C2]) : OUTFIT === "Band Tee" ? pk(["#111114", "#111114", C1]) : OUTFIT === "Flannel" || OUTFIT === "Lab Coat" ? pk(["#f6f6f2", "#111114", C2]) : null;
 const SLEEVE = { None: null, Hoodie: C1, Turtleneck: C1, "Suit & Tie": JACKET, "Leather Jacket": JACKET, "Denim Jacket": JACKET, "Hawaiian Shirt": C1, Sweater: C1, Kimono: C1,
@@ -479,9 +461,9 @@ const WHITEPAW = WHITE === "Mitts" || WHITE === "Tuxedo" || WHITE === "Bicolor" 
 const pawC = WHITEPAW ? WHITEC : pointC ? pointC : bodyFill;
 const limbC = pointC ? pointC : VANISH ? WHITEC : bodyFill;
 
-/* hind legs and feet (they don't breathe, so they stand still) */
+ 
 const LEGG = E("g", {}, CAT); CAT.insertBefore(LEGG, BODYG);
-/* the knight's cape: deep blue, full of stars, trimmed in gold; it billows (see draw) */
+ 
 let KCAPE = null;
 if (GLAD) { const CG = E("g", {}, CAT); CAT.insertBefore(CG, LEGG); KCAPE = [E("path", { fill: "#8f1a24" }, CG), E("path", { fill: "none", stroke: "#e2b44a", "stroke-width": f1(0.04 * K), "stroke-linejoin": "round" }, CG)]; }
 if (KNIGHT) { const CG = E("g", {}, CAT); CAT.insertBefore(CG, LEGG);
@@ -489,48 +471,48 @@ if (KNIGHT) { const CG = E("g", {}, CAT); CAT.insertBefore(CG, LEGG);
   E("rect", { width: 180, height: 180, fill: "#232a78" }, pt); E("circle", { cx: 60, cy: 70, r: 70, fill: "#5b3fbf", opacity: 0.35 }, pt);
   for (let i = 0; i < 16; i++) E("circle", { cx: f1(rr(0, 180)), cy: f1(rr(0, 180)), r: f1(rr(1, 3)), fill: i % 4 ? "#ffffff" : "#ffd76a", opacity: 0.9 }, pt);
   KCAPE = [E("path", { fill: "url(#kstars)" }, CG), E("path", { fill: "none", stroke: "#f0c75e", "stroke-width": f1(0.05 * K), "stroke-linejoin": "round" }, CG)]; }
-/* a royal's cape falls behind everything, shoulders to floor, trimmed in ermine */
+ 
 if (OUTFIT === "Royal Robe") { const CAPE = E("g", {}, CAT); CAT.insertBefore(CAPE, LEGG); CAPE.setAttribute("transform", `translate(${HX} ${HY})`);
   const cd = `M${U(-0.36)} ${U(0.82)}Q${U(BX(-0.9))} ${U(1.2)} ${U(BX(-1.08))} ${U(3.3)}L${U(BX(1.08))} ${U(3.3)}Q${U(BX(0.9))} ${U(1.2)} ${U(0.36)} ${U(0.82)}Z`;
   E("path", { d: cd, fill: "#6e1222" }, CAPE); E("path", { d: cd, fill: "none", stroke: "#f8f6f0", "stroke-width": f1(0.07 * K) }, CAPE);
   for (let i = 0; i < 14; i++) { const u = i / 13, x = BX(-1.02) + BX(2.04) * u; E("path", { d: `M${U(x)} ${U(3.24)}l-3 8l3 3l3 -3z`, fill: "#111" }, CAPE); } }
 { const LF = E("g", FURF, LEGG), legC = limbC;
   for (const s of [-1, 1]) {
-    E("ellipse", { cx: U(s * BX(0.5)), cy: U(2.62), rx: U(BX(0.3)), ry: U(0.38), fill: bodyC }, LF);             // haunch
+    E("ellipse", { cx: U(s * BX(0.5)), cy: U(2.62), rx: U(BX(0.3)), ry: U(0.38), fill: bodyC }, LF);              
     E("path", { d: `M${U(s * BX(0.44))} ${U(2.7)}L${U(s * BX(0.44))} ${U(3.18)}`, stroke: legC, "stroke-width": U(0.3), "stroke-linecap": "round" }, LF);
     if (markC && !PANTS && !ROBE && !SHADED && PAT !== "Plain") for (let k = 0; k < 2; k++) E("path", { d: `M${U(s * BX(0.44) - 0.12)} ${U(2.82 + k * 0.14)}h${U(0.24)}`, stroke: markC, "stroke-width": U(0.035), "stroke-linecap": "round", opacity: MARKO, ...MARKF }, LEGG); }
-  /* trousers: a waistband, two legs with a gap between, creases, turned-up cuffs */
+   
   if (PANTS) { const o = shade(PANTS, -0.4), ax = BX(0.44), lw = 0.17;
     const pd = `M${U(BX(-0.76))} ${U(2.3)}L${U(BX(0.76))} ${U(2.3)}Q${U(BX(0.86))} ${U(2.62)} ${U(ax + lw)} ${U(3.15)}L${U(ax - lw)} ${U(3.15)}Q${U(ax - lw - 0.02)} ${U(2.95)} ${U(0.04)} ${U(2.86)}L${U(-0.04)} ${U(2.86)}Q${U(-ax + lw + 0.02)} ${U(2.95)} ${U(-ax + lw)} ${U(3.15)}L${U(-ax - lw)} ${U(3.15)}Q${U(BX(-0.86))} ${U(2.62)} ${U(BX(-0.76))} ${U(2.3)}Z`;
     E("path", { d: pd, fill: PANTS, stroke: o, "stroke-width": 3, "stroke-linejoin": "round" }, LEGG);
     for (const s of [-1, 1]) { E("path", { d: `M${U(s * ax)} ${U(2.72)}L${U(s * ax)} ${U(3.1)}`, stroke: o, "stroke-width": 2, opacity: 0.5 }, LEGG);
       E("rect", { x: U(s * ax - lw - 0.005), y: U(3.07), width: U(2 * lw + 0.01), height: U(0.08), fill: shade(PANTS, OUTFIT === "Astronaut" ? -0.15 : -0.2), stroke: o, "stroke-width": 2 }, LEGG);
-      if (OUTFIT === "Astronaut") E("ellipse", { cx: U(s * ax), cy: U(2.86), rx: U(0.11), ry: U(0.08), fill: "#c9ced6", stroke: "#9aa3ad", "stroke-width": 2 }, LEGG);   // knee pads
+      if (OUTFIT === "Astronaut") E("ellipse", { cx: U(s * ax), cy: U(2.86), rx: U(0.11), ry: U(0.08), fill: "#c9ced6", stroke: "#9aa3ad", "stroke-width": 2 }, LEGG);    
       if (OUTFIT === "Tracksuit") for (const k of [0.03, 0.08]) E("path", { d: `M${U(s * (ax + lw - k) )} ${U(2.5)}L${U(s * (ax + lw - k))} ${U(3.08)}`, stroke: "#ffffff", "stroke-width": 3 }, LEGG);
-      if (KNIGHT) { E("path", { d: `M${U(s * ax - 0.12)} ${U(2.86)}Q${U(s * ax)} ${U(2.74)} ${U(s * ax + 0.12)} ${U(2.86)}Q${U(s * ax)} ${U(2.98)} ${U(s * ax - 0.12)} ${U(2.86)}Z`, fill: "#e3e8ef", stroke: "#d4a93c", "stroke-width": 2.5 }, LEGG);   // knee cops
+      if (KNIGHT) { E("path", { d: `M${U(s * ax - 0.12)} ${U(2.86)}Q${U(s * ax)} ${U(2.74)} ${U(s * ax + 0.12)} ${U(2.86)}Q${U(s * ax)} ${U(2.98)} ${U(s * ax - 0.12)} ${U(2.86)}Z`, fill: "#e3e8ef", stroke: "#d4a93c", "stroke-width": 2.5 }, LEGG);    
         for (const y of [2.98, 3.06]) E("path", { d: `M${U(s * ax - lw)} ${U(y)}h${U(2 * lw)}`, stroke: "#8f9aa8", "stroke-width": 2 }, LEGG); } }
     E("path", { d: `M0 ${U(2.35)}V${U(2.8)}`, stroke: o, "stroke-width": 2, opacity: 0.55 }, LEGG); }
   if (ROBE) { E("path", { d: `M${U(BX(-0.72))} ${U(2.3)}L${U(BX(0.72))} ${U(2.3)}L${U(BX(0.88))} ${U(3.22)}Q0 ${U(3.28)} ${U(BX(-0.88))} ${U(3.22)}Z`, fill: ROBE, stroke: shade(ROBE, -0.4), "stroke-width": 3 }, LEGG);
-    for (const k of [-1, 1]) E("path", { d: `M${U(k * BX(0.3))} ${U(2.5)}Q${U(k * BX(0.36))} ${U(2.9)} ${U(k * BX(0.4))} ${U(3.22)}`, fill: "none", stroke: shade(ROBE, -0.3), "stroke-width": 2.5, opacity: 0.6 }, LEGG);   // folds
+    for (const k of [-1, 1]) E("path", { d: `M${U(k * BX(0.3))} ${U(2.5)}Q${U(k * BX(0.36))} ${U(2.9)} ${U(k * BX(0.4))} ${U(3.22)}`, fill: "none", stroke: shade(ROBE, -0.3), "stroke-width": 2.5, opacity: 0.6 }, LEGG);    
     if (OUTFIT === "Royal Robe") E("path", { d: `M${U(BX(-0.88))} ${U(3.14)}Q0 ${U(3.2)} ${U(BX(0.88))} ${U(3.14)}L${U(BX(0.89))} ${U(3.24)}Q0 ${U(3.3)} ${U(BX(-0.89))} ${U(3.24)}Z`, fill: "#f8f6f0" }, LEGG);
     else for (let i = 0; i < 8; i++) E("path", { d: `M${U(BX(-0.7) + i * 0.2)} ${U(2.6 + (i % 2) * 0.25)}a${U(0.08)} ${U(0.08)} 0 0 1 ${U(0.16)} 0`, fill: "none", stroke: shade(ROBE, 0.35), "stroke-width": 2.5 }, LEGG); }
   if (TUNIC) { E("path", { d: `M${U(BX(-0.74))} ${U(2.3)}L${U(BX(0.74))} ${U(2.3)}L${U(BX(0.84))} ${U(2.98)}Q0 ${U(3.05)} ${U(BX(-0.84))} ${U(2.98)}Z`, fill: TUNIC, stroke: shade(TUNIC, -0.4), "stroke-width": 3 }, LEGG);
     for (const k of [-0.4, 0, 0.4]) E("path", { d: `M${U(BX(k))} ${U(2.5)}Q${U(BX(k * 1.1))} ${U(2.8)} ${U(BX(k * 1.15))} ${U(3.0)}`, fill: "none", stroke: shade(TUNIC, -0.3), "stroke-width": 2.5, opacity: 0.6 }, LEGG);
-    for (const s of [-1, 1]) for (let k = 0; k < 3; k++) E("path", { d: `M${U(s * BX(0.44) - 0.15)} ${U(3.02 + k * 0.06)}L${U(s * BX(0.44) + 0.15)} ${U(3.06 + k * 0.06)}`, stroke: "#7a4a24", "stroke-width": 4, "stroke-linecap": "round" }, LEGG); }   // sandal laces
-  /* the feet, on top */
-  for (const s of [-1, 1]) { const boot = OUTFIT === "Astronaut" ? "#c9ced6" : KNIGHT ? "#d9dfe7" : pawC; if (GLAD) E("ellipse", { cx: U(s * BX(0.46)), cy: U(3.29), rx: U(0.24), ry: U(0.08), fill: "#7a4a24" }, LEGG);   // sandal sole
+    for (const s of [-1, 1]) for (let k = 0; k < 3; k++) E("path", { d: `M${U(s * BX(0.44) - 0.15)} ${U(3.02 + k * 0.06)}L${U(s * BX(0.44) + 0.15)} ${U(3.06 + k * 0.06)}`, stroke: "#7a4a24", "stroke-width": 4, "stroke-linecap": "round" }, LEGG); }    
+   
+  for (const s of [-1, 1]) { const boot = OUTFIT === "Astronaut" ? "#c9ced6" : KNIGHT ? "#d9dfe7" : pawC; if (GLAD) E("ellipse", { cx: U(s * BX(0.46)), cy: U(3.29), rx: U(0.24), ry: U(0.08), fill: "#7a4a24" }, LEGG);    
     { const fx = ROBE ? s * 0.26 : s * BX(0.46);
     E("ellipse", { cx: U(fx), cy: U(3.24), rx: U(0.22), ry: U(0.12), fill: boot, stroke: mix(boot.startsWith("#") ? boot : "#c89b3c", BLK, 0.3), "stroke-width": 2 }, LEGG);
     for (const k of [-1, 1]) E("path", { d: `M${U(fx + k * 0.07)} ${U(3.2)}v${U(0.1)}`, stroke: mix(boot.startsWith("#") ? boot : "#c89b3c", BLK, 0.35), "stroke-width": 3, "stroke-linecap": "round" }, LEGG);
     if (GLAD) E("path", { d: `M${U(fx - 0.2)} ${U(3.22)}L${U(fx + 0.2)} ${U(3.22)}`, stroke: "#7a4a24", "stroke-width": 5, "stroke-linecap": "round" }, LEGG); } } }
 
-const BFUR = E("g", OUTFIT === "None" ? FURF : {}, BODYG);                            // under clothes the torso keeps a clean edge (no fluff poking past the garment)
+const BFUR = E("g", OUTFIT === "None" ? FURF : {}, BODYG);                             
 E("path", { d: TORSOP, fill: bodyC }, BFUR);
 const bpat = E("g", { "clip-path": "url(#bc)" }, BODYG), bpg = E("g", { ...MARKF, opacity: MARKO }, bpat);
-/* a round, lighter belly */
-if (OUTFIT === "None") E("ellipse", { cx: 0, cy: U(2.0), rx: U(BX(0.46)), ry: U(0.72), fill: "#ffffff", opacity: NEON || SUP ? 0.05 : 0.14 }, bpat);   // only an undressed belly catches the light
+ 
+if (OUTFIT === "None") E("ellipse", { cx: 0, cy: U(2.0), rx: U(BX(0.46)), ry: U(0.72), fill: "#ffffff", opacity: NEON || SUP ? 0.05 : 0.14 }, bpat);    
 
-/* markings: one vocabulary for coats, big cats and spirits, sized to the torso */
+ 
 const mk = (t, a, g = bpg) => E(t, a, g);
 const stroke = (w) => ({ fill: "none", stroke: markC, "stroke-width": f1(w * K), "stroke-linecap": "round", "stroke-linejoin": "round" });
 function bodyMarks() {
@@ -540,7 +522,7 @@ function bodyMarks() {
     const y = 1.05 + i * 0.36, x0 = s * BX(0.9), x1 = s * rr(0.18, 0.34) * BW, w = P === "Stripes" ? 0.05 : P === "King" ? 0.08 : P === "Marbled" ? 0.06 : 0.035;
     mk("path", { d: `M${U(x0)} ${U(y + 0.1)}Q${U((x0 + x1) / 2)} ${U(y - 0.12)} ${U(x1)} ${U(y + rr(-0.03, 0.08))}`, ...stroke(w) }); }
   if (P === "Classic") for (const s of sides) for (const r of [0.1, 0.2]) mk("ellipse", { cx: U(s * BX(0.52)), cy: U(1.85), rx: U(r * 1.1), ry: U(r), ...stroke(0.035) });
-  if (P === "Mackerel" || P === "Classic" || P === "Ticked") for (const y of [0.9, 1.02]) mk("path", { d: `M${U(-0.32)} ${U(y)}Q0 ${U(y + 0.1)} ${U(0.32)} ${U(y)}`, ...stroke(0.03) });   // the necklace
+  if (P === "Mackerel" || P === "Classic" || P === "Ticked") for (const y of [0.9, 1.02]) mk("path", { d: `M${U(-0.32)} ${U(y)}Q0 ${U(y + 0.1)} ${U(0.32)} ${U(y)}`, ...stroke(0.03) });    
   const spots = (n, f) => { for (let i = 0; i < n; i++) { const s = ch(0.5) ? 1 : -1, x = s * rr(0.12, 0.76) * BW, y = rr(0.95, 2.85); f(x, y); } };
   if (P === "Spotted" || P === "Spots") spots(30, (x, y) => mk("ellipse", { cx: U(x), cy: U(y), rx: U(rr(0.035, 0.05)), ry: U(rr(0.028, 0.042)), fill: markC }));
   if (P === "Freckles") spots(36, (x, y) => mk("circle", { cx: U(x), cy: U(y), r: U(0.018), fill: markC }));
@@ -564,7 +546,7 @@ function bodyMarks() {
     mk("path", { d: `M${U(x)} ${U(y)}l${U(r * Math.cos(a))} ${U(r * Math.sin(a))}l${U(r * Math.cos(a + 2.1))} ${U(r * Math.sin(a + 2.1))}Z`, fill: pk(["#ffffff", "#bff6ff", "#3fc6e0", "#a6f0ff"]), opacity: f1(rr(0.25, 0.6) * 100) / 100 }); }
 }
 bodyMarks();
-/* tortie patches, Van caps and the white spotting gene */
+ 
 if (patchC) for (let i = 0; i < (BRINDLE ? 30 : 5); i++) mk("ellipse", { cx: U(rr(-0.75, 0.75) * BW), cy: U(rr(0.85, 2.9)), rx: U(BRINDLE ? rr(0.02, 0.05) : rr(0.12, 0.25)), ry: U(BRINDLE ? rr(0.015, 0.04) : rr(0.1, 0.2)), fill: patchC });
 if (WHITE === "Harlequin") for (let i = 0; i < 3; i++) mk("ellipse", { cx: U(rr(-0.6, 0.6) * BW), cy: U(rr(1.3, 2.7)), rx: U(rr(0.12, 0.2)), ry: U(rr(0.1, 0.16)), fill: vanC });
 const bib = WHITE === "Locket" ? `M0 ${U(0.98)}C${U(0.12)} ${U(1.0)} ${U(0.1)} ${U(1.24)} 0 ${U(1.3)}C${U(-0.1)} ${U(1.24)} ${U(-0.12)} ${U(1.0)} 0 ${U(0.98)}Z` :
@@ -574,11 +556,11 @@ if (bib && !SW) mk("path", { d: bib, fill: WHITEC }, bpat);
 if (OUTFIT === "None" && !HAIRLESS && SPK !== "Cyber" && SPK !== "Crystal") for (const [x, y] of [[0, 0.98], [-0.1, 1.12], [0.1, 1.12], [0, 1.26], [-0.2, 1.3], [0.2, 1.3]])
   E("path", { d: `M${U(x - 0.04)} ${U(y)}l${U(0.04)} ${U(0.07)}l${U(0.04)} ${U(-0.07)}`, fill: "none", stroke: mix(bib ? WHITEC : bodyC.startsWith("#") ? bodyC : "#c89b3c", "#ffffff", 0.35), "stroke-width": 3, "stroke-linecap": "round", opacity: NEON || SUP ? 0.16 : 0.35 }, bpat);
 
-/* --------------------------------------------------------------- wardrobe */
+ 
 if (OUTFIT !== "None" && HEM < 2.85 && !PANTS) E("ellipse", { cx: 0, cy: U(HEM + 0.05), rx: U(BX(0.7)), ry: U(0.045), fill: BLK, opacity: 0.12 }, bpat);
-/* in trousers, the torso below the waist is trousers: a waistband, a fly, the top tucked over it */
+ 
 if (PANTS) { E("rect", { x: -1000, y: U(2.3), width: 2000, height: 1000, fill: PANTS }, bpat); E("rect", { x: -1000, y: U(2.28), width: 2000, height: U(0.08), fill: shade(PANTS, -0.28) }, bpat);
-  E("path", { d: `M${U(0.05)} ${U(2.36)}Q${U(0.07)} ${U(2.62)} 0 ${U(2.86)}`, fill: "none", stroke: shade(PANTS, -0.35), "stroke-width": 2.5 }, bpat); }   // the hem's shadow on the belly
+  E("path", { d: `M${U(0.05)} ${U(2.36)}Q${U(0.07)} ${U(2.62)} 0 ${U(2.86)}`, fill: "none", stroke: shade(PANTS, -0.35), "stroke-width": 2.5 }, bpat); }    
 const OUT = E("g", { "clip-path": "url(#gc)" }, BODYG);
 function cloth(fill, kind = "crew") {
   const nl = { crew: [[0.3, 0.8], [0, 1.02, "Q"], [-0.3, 0.8]], V: [[0.3, 0.8], [0, 1.4], [-0.3, 0.8]], deep: [[0.32, 0.8], [0.06, 2.0], [-0.06, 2.0], [-0.32, 0.8]], high: [[0.32, 0.7], [-0.32, 0.7]] }[kind];
@@ -592,7 +574,7 @@ const OANIM = [];
 if (OUTFIT === "Hoodie") {
   cloth(C1, "crew");
   for (const s of [-1, 1]) { line(`M${U(s * 0.08)} ${U(1.0)}Q${U(s * 0.1)} ${U(1.2)} ${U(s * 0.07)} ${U(1.38)}`, shade(C1, 0.6), 5); E("rect", { x: U(s * 0.07 - 0.02), y: U(1.36), width: U(0.04), height: U(0.09), rx: 2, fill: "#d8dde6" }, OUT); }
-  E("path", { d: `M${U(BX(-0.4))} ${U(2.05)}L${U(BX(0.4))} ${U(2.05)}L${U(BX(0.5))} ${U(2.6)}L${U(BX(-0.5))} ${U(2.6)}Z`, fill: shade(C1, -0.1), stroke: shade(C1, -0.3), "stroke-width": 2.5 }, OUT);   // kangaroo pocket
+  E("path", { d: `M${U(BX(-0.4))} ${U(2.05)}L${U(BX(0.4))} ${U(2.05)}L${U(BX(0.5))} ${U(2.6)}L${U(BX(-0.5))} ${U(2.6)}Z`, fill: shade(C1, -0.1), stroke: shade(C1, -0.3), "stroke-width": 2.5 }, OUT);    
   tez(U(BX(-0.28)), U(1.45), 0.34, shade(C1, 0.55));
 } else if (OUTFIT === "Turtleneck") {
   cloth(C1, "high");
@@ -614,7 +596,7 @@ if (OUTFIT === "Hoodie") {
       E("path", { d: `M${U(-0.04)} ${U(0.93)}L${U(0.04)} ${U(0.93)}L${U(0.08)} ${U(1.68)}L0 ${U(1.78)}L${U(-0.08)} ${U(1.68)}Z`, fill: T }, OUT);
       for (let i = 0; i < 3; i++) line(`M${U(-0.05)} ${U(1.05 + i * 0.2)}l${U(0.11)} ${U(0.06)}`, shade(T, -0.3), 3);
       for (const y of [2.15, 2.45]) E("circle", { cx: 0, cy: U(y), r: 6, fill: shade(J, -0.45) }, OUT);
-      if (!CIB) E("path", { d: `M${U(BX(-0.5))} ${U(1.32)}l${U(0.1)} ${U(-0.1)}l${U(0.08)} ${U(0.1)}Z`, fill: C2 }, OUT); }                       // pocket square
+      if (!CIB) E("path", { d: `M${U(BX(-0.5))} ${U(1.32)}l${U(0.1)} ${U(-0.1)}l${U(0.08)} ${U(0.1)}Z`, fill: C2 }, OUT); }                        
     if (OUTFIT === "Leather Jacket") { line(`M${U(0.05)} ${U(1.95)}L${U(0.05)} ${U(3.0)}`, "#c9ced6", 4); for (const s of [-1, 1]) E("ellipse", { cx: U(s * BX(0.45)), cy: U(1.5), rx: U(0.16), ry: U(0.05), fill: "#ffffff", opacity: 0.12 }, OUT); }
     if (OUTFIT === "Denim Jacket") for (const s of [-1, 1]) { E("rect", { x: U(s * BX(0.36) - 0.1), y: U(1.3), width: U(0.2), height: U(0.15), rx: 4, fill: shade(J, -0.12), stroke: "#e2a24a", "stroke-width": 2, "stroke-dasharray": "5 4" }, OUT);
       E("circle", { cx: U(s * BX(0.36)), cy: U(1.4), r: 5, fill: "#c9ced6" }, OUT); line(`M${U(s * 0.26)} ${U(0.74)}L${U(s * 0.05)} ${U(1.95)}`, "#e2a24a", 2, { "stroke-dasharray": "5 4" }); }
@@ -653,9 +635,9 @@ if (OUTFIT === "Hoodie") {
   cloth("#6b4a2e", "high");
   E("path", { d: `M${U(0.34)} ${U(0.7)}L${U(0.16)} ${U(0.7)}L${U(-0.08)} ${U(1.25)}L${U(0.05)} ${U(1.36)}Z`, fill: "#d9c9a6" }, OUT);
   E("path", { d: `M${U(-0.34)} ${U(0.7)}L${U(-0.16)} ${U(0.7)}L${U(0.24)} ${U(1.6)}L${U(0.24)} ${U(3.1)}L${U(0.1)} ${U(3.1)}L${U(0.1)} ${U(1.66)}Z`, fill: "#e6d8b8", stroke: "#a8916a", "stroke-width": 2 }, OUT);
-  for (const s_ of [-1, 1]) line(`M${U(s_ * 0.4)} ${U(0.74)}L${U(s_ * BX(0.62))} ${U(2.9)}`, "#4e341f", 3, { opacity: 0.7 });          // the robe's open front
+  for (const s_ of [-1, 1]) line(`M${U(s_ * 0.4)} ${U(0.74)}L${U(s_ * BX(0.62))} ${U(2.9)}`, "#4e341f", 3, { opacity: 0.7 });           
   E("rect", { x: U(-1.6), y: U(1.9), width: U(3.2), height: U(0.14), fill: "#3a2616" }, OUT); E("rect", { x: U(-0.08), y: U(1.88), width: U(0.16), height: U(0.18), rx: 3, fill: "#8f9aa8" }, OUT);
-  for (const x of [-0.42, -0.3, 0.34]) E("rect", { x: U(BX(x)), y: U(1.95), width: U(0.08), height: U(0.14), rx: 2, fill: "#4e341f" }, OUT);   // pouches
+  for (const x of [-0.42, -0.3, 0.34]) E("rect", { x: U(BX(x)), y: U(1.95), width: U(0.08), height: U(0.14), rx: 2, fill: "#4e341f" }, OUT);    
 } else if (OUTFIT === "Puffer Jacket") {
   cloth(C1, "high");
   for (let y = 0.95; y < 2.6; y += 0.24) { line(`M${U(-1.6)} ${U(y)}Q0 ${U(y + 0.05)} ${U(1.6)} ${U(y)}`, shade(C1, -0.3), 3); line(`M${U(-1.6)} ${U(y - 0.09)}Q0 ${U(y - 0.04)} ${U(1.6)} ${U(y - 0.09)}`, shade(C1, 0.25), 6, { opacity: 0.6 }); }
@@ -664,7 +646,7 @@ if (OUTFIT === "Hoodie") {
   cloth(TEE, "crew"); const fl = cloth(C1, "deep"); fl.setAttribute("id", "flannel");
   for (let k = -8; k <= 8; k++) { E("rect", { x: U(k * 0.2 - 0.04), y: U(0.7), width: U(0.08), height: U(2.4), fill: C2, opacity: 0.45 }, OUT); E("rect", { x: U(-1.6), y: U(0.8 + (k + 8) * 0.2), width: U(3.2), height: U(0.08), fill: C2, opacity: 0.45 }, OUT);
     E("rect", { x: U(k * 0.2 - 0.008), y: U(0.7), width: U(0.016), height: U(2.4), fill: BLK, opacity: 0.25 }, OUT); }
-  E("path", { d: `M${U(-0.06)} ${U(2.0)}L${U(-0.33)} ${U(0.79)}L${U(-1.6)} ${U(0.79)}L${U(-1.6)} ${U(0.6)}L${U(1.6)} ${U(0.6)}L${U(1.6)} ${U(0.79)}L${U(0.33)} ${U(0.79)}L${U(0.06)} ${U(2.0)}Z`, fill: TEE }, OUT);   // the tee shows in the V
+  E("path", { d: `M${U(-0.06)} ${U(2.0)}L${U(-0.33)} ${U(0.79)}L${U(-1.6)} ${U(0.79)}L${U(-1.6)} ${U(0.6)}L${U(1.6)} ${U(0.6)}L${U(1.6)} ${U(0.79)}L${U(0.33)} ${U(0.79)}L${U(0.06)} ${U(2.0)}Z`, fill: TEE }, OUT);    
   for (const s_ of [-1, 1]) E("path", { d: `M${U(s_ * 0.32)} ${U(0.8)}L${U(s_ * 0.5)} ${U(0.9)}L${U(s_ * 0.22)} ${U(1.2)}Z`, fill: shade(C1, -0.15) }, OUT);
 } else if (OUTFIT === "Raincoat") {
   cloth("#f6c431", "high"); line(`M0 ${U(0.75)}V${U(2.76)}`, "#c99a1a", 3);
@@ -689,27 +671,27 @@ if (OUTFIT === "Hoodie") {
   const br_ = E("linearGradient", { id: "bronze", x1: 0, x2: 1, y1: 0, y2: 0 }, defs);
   for (const [o, c] of [[0, "#7a4a1c"], [0.3, "#d99a3e"], [0.5, "#f4c66a"], [0.7, "#d19034"], [1, "#7a4a1c"]]) E("stop", { offset: o, "stop-color": c }, br_);
   cloth("url(#bronze)", "high");
-  for (const s of [-1, 1]) { line(`M${U(s * 0.04)} ${U(1.12)}Q${U(s * 0.28)} ${U(1.0)} ${U(s * BX(0.44))} ${U(1.32)}`, "#8a5420", 3);                           // the sculpted chest
-    for (const y of [1.6, 1.85, 2.08]) line(`M${U(s * 0.05)} ${U(y)}q${U(s * 0.12)} ${U(-0.03)} ${U(s * 0.2)} ${U(0.04)}`, "#8a5420", 2.5); }                     // and abs
+  for (const s of [-1, 1]) { line(`M${U(s * 0.04)} ${U(1.12)}Q${U(s * 0.28)} ${U(1.0)} ${U(s * BX(0.44))} ${U(1.32)}`, "#8a5420", 3);                            
+    for (const y of [1.6, 1.85, 2.08]) line(`M${U(s * 0.05)} ${U(y)}q${U(s * 0.12)} ${U(-0.03)} ${U(s * 0.2)} ${U(0.04)}`, "#8a5420", 2.5); }                      
   line(`M0 ${U(1.15)}V${U(2.2)}`, "#8a5420", 2.5);
-  E("path", { d: `M${U(-1.6)} ${U(2.22)}H${U(1.6)}V${U(2.33)}H${U(-1.6)}Z`, fill: "#5a3418" }, OUT);                                                      // cingulum
+  E("path", { d: `M${U(-1.6)} ${U(2.22)}H${U(1.6)}V${U(2.33)}H${U(-1.6)}Z`, fill: "#5a3418" }, OUT);                                                       
   for (let i = -6; i <= 6; i++) E("circle", { cx: U(i * 0.12), cy: U(2.275), r: 3.5, fill: "#f4c66a" }, OUT);
-  for (let i = -7; i <= 7; i++) E("rect", { x: U(i * 0.105 - 0.045), y: U(2.33), width: U(0.09), height: U(0.2), rx: 3, fill: i % 2 ? "#6b3f1c" : "#7d4b22", stroke: "#3e2410", "stroke-width": 1.5 }, OUT);   // pteruges
-  E("path", { d: `M${U(BX(-0.45))} ${U(0.95)}L${U(BX(0.5))} ${U(2.2)}`, stroke: "#5a3418", "stroke-width": f1(0.07 * K) }, OUT);                    // the baldric across the chest
+  for (let i = -7; i <= 7; i++) E("rect", { x: U(i * 0.105 - 0.045), y: U(2.33), width: U(0.09), height: U(0.2), rx: 3, fill: i % 2 ? "#6b3f1c" : "#7d4b22", stroke: "#3e2410", "stroke-width": 1.5 }, OUT);    
+  E("path", { d: `M${U(BX(-0.45))} ${U(0.95)}L${U(BX(0.5))} ${U(2.2)}`, stroke: "#5a3418", "stroke-width": f1(0.07 * K) }, OUT);                     
 } else if (KNIGHT) {
-  /* celestial plate: a ridged breastplate with gold filigree, lames over the belly, a belt, tassets */
+   
   const pl = E("linearGradient", { id: "plate", x1: 0, x2: 1, y1: 0, y2: 0 }, defs);
   for (const [o, c] of [[0, "#8f9aa8"], [0.3, "#e9eef4"], [0.5, "#ffffff"], [0.7, "#dfe5ec"], [1, "#8f9aa8"]]) E("stop", { offset: o, "stop-color": c }, pl);
   cloth("url(#plate)", "high");
-  line(`M0 ${U(0.78)}L0 ${U(1.95)}`, "#9aa5b4", 3);                                                            // the ridge
+  line(`M0 ${U(0.78)}L0 ${U(1.95)}`, "#9aa5b4", 3);                                                             
   for (const s of [-1, 1]) { line(`M${U(s * 0.06)} ${U(0.95)}c${U(s * 0.18)} ${U(0.02)} ${U(s * 0.28)} ${U(0.18)} ${U(s * 0.18)} ${U(0.32)}c${U(-s * 0.08)} ${U(0.1)} ${U(-s * 0.16)} ${U(0)} ${U(-s * 0.08)} ${U(-0.08)}`, "#d4a93c", 3.5);
     line(`M${U(s * 0.06)} ${U(1.55)}c${U(s * 0.2)} ${U(-0.05)} ${U(s * 0.34)} ${U(0.1)} ${U(s * 0.26)} ${U(0.26)}`, "#d4a93c", 3);
     E("circle", { cx: U(s * BX(0.48)), cy: U(1.0), r: 4, fill: "#d4a93c" }, OUT); }
-  E("path", { d: `M0 ${U(1.18)}l${U(0.06)} ${U(0.08)}l${U(-0.06)} ${U(0.08)}l${U(-0.06)} ${U(-0.08)}Z`, fill: "#7fd3ff", filter: "url(#eg)" }, OUT);   // a gem at the heart
+  E("path", { d: `M0 ${U(1.18)}l${U(0.06)} ${U(0.08)}l${U(-0.06)} ${U(0.08)}l${U(-0.06)} ${U(-0.08)}Z`, fill: "#7fd3ff", filter: "url(#eg)" }, OUT);    
   for (let i = 0; i < 3; i++) line(`M${U(-1.6)} ${U(1.98 + i * 0.13)}Q0 ${U(2.06 + i * 0.13)} ${U(1.6)} ${U(1.98 + i * 0.13)}`, "#8f9aa8", 2.5);
-  E("rect", { x: U(-1.6), y: U(2.36), width: U(3.2), height: U(0.1), fill: "#c76b9a" }, OUT);                   // the belt (pink, for the original)
+  E("rect", { x: U(-1.6), y: U(2.36), width: U(3.2), height: U(0.1), fill: "#c76b9a" }, OUT);                    
   E("rect", { x: U(-0.07), y: U(2.34), width: U(0.14), height: U(0.14), rx: 3, fill: "none", stroke: "#f0c75e", "stroke-width": 3 }, OUT);
-  for (const s of [-1, 1]) E("path", { d: `M${U(s * 0.04)} ${U(2.46)}L${U(s * BX(0.78))} ${U(2.46)}L${U(s * BX(0.8))} ${U(2.8)}L${U(s * 0.06)} ${U(2.8)}Z`, fill: "#dfe5ec", stroke: "#d4a93c", "stroke-width": 2.5 }, OUT);   // tassets
+  for (const s of [-1, 1]) E("path", { d: `M${U(s * 0.04)} ${U(2.46)}L${U(s * BX(0.78))} ${U(2.46)}L${U(s * BX(0.8))} ${U(2.8)}L${U(s * 0.06)} ${U(2.8)}Z`, fill: "#dfe5ec", stroke: "#d4a93c", "stroke-width": 2.5 }, OUT);    
   E("path", { d: `M0 ${U(2.5)}l${U(0.05)} ${U(0.12)}l${U(-0.05)} ${U(0.12)}l${U(-0.05)} ${U(-0.12)}Z`, fill: "#d4a93c" }, OUT);
 } else if (OUTFIT === "Royal Robe") {
   cloth("#8c1c2e", "crew");
@@ -718,13 +700,13 @@ if (OUTFIT === "Hoodie") {
 if (OUTFIT !== "None") { const cg = E("linearGradient", { id: "cfold", x1: 0, x2: 1, y1: 0, y2: 0 }, defs);
   for (const [o, op] of [[0, 0.4], [0.32, 0], [0.68, 0], [1, 0.4]]) E("stop", { offset: o, "stop-color": BLK, "stop-opacity": op }, cg);
   E("rect", { x: U(BX(-0.85)), y: U(0.7), width: U(BX(1.7)), height: U(2.4), fill: "url(#cfold)" }, OUT);
-  /* knits and sweats get a ribbed hem; everything gets a stitched edge */
+   
   if (["Hoodie", "Sweater", "Turtleneck", "Varsity Jacket"].includes(OUTFIT)) { const rc = OUTFIT === "Varsity Jacket" ? "#f1e9d6" : shade(C1, -0.14);
     E("rect", { x: U(-1.6), y: U(HEM - 0.13), width: U(3.2), height: U(0.2), fill: rc }, OUT);
     for (let i = -16; i <= 16; i++) E("path", { d: `M${U(i * 0.05)} ${U(HEM - 0.11)}v${U(0.14)}`, stroke: shade(rc, -0.2), "stroke-width": 2 }, OUT); }
   const main = OUTFIT === "Overalls" ? TEE : ["Suit & Tie", "Leather Jacket", "Denim Jacket"].includes(OUTFIT) ? JACKET : OUTFIT === "Astronaut" ? "#f2f2ee" : OUTFIT === "Royal Robe" ? "#8c1c2e" : C1;
   E("path", { d: GARMP, fill: "none", stroke: shade(main, -0.45), "stroke-width": 3, opacity: 0.85 }, BODYG); }
-/* neckwear (and the Royal Robe's ermine cape, which sits over the shoulders) */
+ 
 const NK = E("g", {}, BODYG);
 if (OUTFIT === "Royal Robe") { E("path", { d: `M${U(BX(-0.7))} ${U(1.15)}Q${U(-0.5)} ${U(0.72)} ${U(-0.3)} ${U(0.76)}Q0 ${U(1.02)} ${U(0.3)} ${U(0.76)}Q${U(0.5)} ${U(0.72)} ${U(BX(0.7))} ${U(1.15)}Q0 ${U(1.6)} ${U(BX(-0.7))} ${U(1.15)}Z`, fill: "#f8f6f0" }, NK);
   for (let i = 0; i < 10; i++) { const x = rr(-0.55, 0.55) * BW, y = 0.98 + rr(0, 0.25); E("path", { d: `M${U(x)} ${U(y)}l-4 10l4 4l4 -4z`, fill: "#111" }, NK); } }
@@ -753,23 +735,23 @@ else if (NECK === "Scarf") { const c = C2; E("path", { d: `M${U(-0.4)} ${U(0.74)
   E("path", { d: `M${U(0.14)} ${U(0.98)}L${U(0.3)} ${U(1.7)}L${U(0.14)} ${U(1.74)}L${U(0.04)} ${U(1.02)}Z`, fill: shade(c, -0.12) }, NK);
   for (let i = 0; i < 3; i++) E("path", { d: `M${U(0.1 + i * 0.03)} ${U(1.15 + i * 0.2)}l${U(0.16)} 0`, stroke: "#ffffff", "stroke-width": 3, opacity: 0.6 }, NK); }
 
-/* longhair ruff, lynx beard, lion mane: fluff that frames the face */
+ 
 const shag = (cx, cy, rx, ry, n, j, fill, g, o = {}) => E("path", { d: cr(Array.from({ length: n }, (_, i) => { const a = i / n * TAU, r = i % 2 ? 1 : 1 + j; return [(cx + rx * r * Math.cos(a)) * K, (cy + ry * r * Math.sin(a)) * K]; })), fill, ...o }, g);
 if (FUR === "Longhair" && !WX.mane && OUTFIT === "None") shag(0, 0.86, 0.5 * BW, 0.26, 26, 0.14, bib ? WHITEC : bodyC, BFUR);
 
-/* =================================================================== head */
+ 
 const MANEG = E("g", {}, HEADG);
-if (MONK) { rgrad("hoodin", [[0.6, "#2a1a0e"], [1, "#0e0805"]]); E("ellipse", { cx: 0, cy: U(0.04), rx: U(0.97 * CW), ry: U(0.94), fill: "url(#hoodin)" }, MANEG); }   // the hood's dark lining, behind the head
+if (MONK) { rgrad("hoodin", [[0.6, "#2a1a0e"], [1, "#0e0805"]]); E("ellipse", { cx: 0, cy: U(0.04), rx: U(0.97 * CW), ry: U(0.94), fill: "url(#hoodin)" }, MANEG); }    
 const MANEC = { Blond: hex(38, 75, 55), Tawny: hex(28, 70, 40), Dark: hex(22, 55, 22), Black: hex(20, 25, 9), Cream: "#f3ead6" }[MANE];
 if (MANE !== "None" && !MONK) { shag(0, 0.2, 1.55, 1.48, 34, 0.16, NEON ? mix(MANEC, BLK, 0.75) : MANEC, MANEG, { filter: "url(#fur)" });
   shag(0, 0.25, 1.32, 1.25, 30, 0.12, NEON ? mix(MANEC, BLK, 0.55) : mix(MANEC, "#ffffff", 0.12), MANEG); }
 if (WX.ruff && WLD && !MONK) shag(0, 0.55, 1.18 * CW, 0.62, 28, 0.2, SPECIES === "Lynx" && !NEON ? mix(bodyFill, "#ffffff", 0.55) : bodyFill, MANEG, FURF);
-/* horns, behind the ears */
+ 
 const HORNG = E("g", {}, HEADG);
 if (HORNS) for (const s of [-1, 1]) { E("path", { d: `M${U(s * 0.35)} ${U(-0.7)}C${U(s * 0.2)} ${U(-1.3)} ${U(s * 0.55)} ${U(-1.75)} ${U(s * 0.95)} ${U(-1.85)}C${U(s * 0.7)} ${U(-1.55)} ${U(s * 0.62)} ${U(-1.15)} ${U(s * 0.72)} ${U(-0.66)}Z`, fill: "#1a0a0a", stroke: "#ff5a1f", "stroke-width": 3 }, HORNG);
   E("circle", { cx: U(s * 0.93), cy: U(-1.83), r: 7, fill: "#ffb21e", filter: "url(#eg)" }, HORNG); }
 
-/* ears */
+ 
 const EARG = [];
 const ES = HAIRLESS ? 1.22 : 1;
 function ear(s) {
@@ -793,24 +775,24 @@ function ear(s) {
   if (!HAIRLESS && GENES | WLD | SPK === "Shadow") for (let i = 0; i < (EARS === "Tufted" || FUR === "Longhair" ? 4 : 3); i++) E("path", { d: `M${U(c[0] + s * 0.02)} ${U(-0.62 + i * 0.05)}q${U(-s * 0.05)} ${U(-0.15)} ${U(-s * 0.02 + s * i * 0.06)} ${U(-0.3)}`, fill: "none", stroke: "#ffffff", "stroke-width": 2.5, opacity: 0.55 }, g);
   if (SPECIES === "Serval" && WLD || SPECIES === "Tiger" && WLD) E("ellipse", { cx: U(c[0]), cy: U(c[1] + 0.05), rx: U(0.06), ry: U(0.09), fill: "#ffffff", opacity: 0.8 }, g);
 }
-if (EARS !== "Folded" && !MONK) { ear(-1); ear(1); }                                  // a Star Monk's ears live inside its hood
+if (EARS !== "Folded" && !MONK) { ear(-1); ear(1); }                                   
 function earring() { if (EARRING === "None") return; const E_ = EARG.find((e) => e.s < 0), g = E_ ? E_.g : HEADG, x = U(EARS === "Round" || EARS === "Small" ? -0.86 : -0.9), y = U(EARS === "Round" || EARS === "Small" ? -0.72 : -0.42);
   if (EARRING === "Gold Hoop") E("circle", { cx: x, cy: f1(+y + 12), r: 11, fill: "none", stroke: "#f0bd3a", "stroke-width": 4 }, g);
   else if (EARRING === "Pearl") E("circle", { cx: x, cy: f1(+y + 6), r: 7, fill: "#fbf7ef", stroke: "#d8cfbf", "stroke-width": 1.5 }, g);
   else if (EARRING === "Tez Stud") tez(+x, +y + 6, 0.16, "#3a7bd5", g);
   else E("path", { d: `M${x} ${f1(+y)}l7 8l-7 8l-7 -8Z`, fill: "#dff6ff", stroke: "#7fd3ff", "stroke-width": 2, filter: "url(#eg)" }, g); }
 
-/* the head itself */
+ 
 const HEADP = cr([[0, -0.93], [0.5, -0.86], [0.84, -0.55], [1.0 * CW, -0.12], [1.04 * CW, 0.24], [0.8 * CW, 0.6], [0.4, 0.82], [0, 0.88], [-0.4, 0.82], [-0.8 * CW, 0.6], [-1.04 * CW, 0.24], [-1.0 * CW, -0.12], [-0.84, -0.55], [-0.5, -0.86]].map(([x, y]) => [x * K, y * K]));
 const hcp = E("clipPath", { id: "hc" }, defs); E("path", { d: HEADP }, hcp);
 const HFUR = E("g", FURF, HEADG);
 if (WX.beard && WLD) for (const s of [-1, 1]) E("path", { d: `M${U(s * 0.6)} ${U(0.3)}L${U(s * 1.25 * CW)} ${U(0.85)}L${U(s * 0.9)} ${U(0.75)}L${U(s * 1.1)} ${U(1.0)}L${U(s * 0.4)} ${U(0.8)}Z`, fill: NEON ? bodyFill : mix(bodyFill, "#ffffff", 0.6) }, HFUR);
-/* cheek fluff: little tufts where the fur juts past the jaw (longer on longhairs) */
+ 
 if (!HAIRLESS && SPK !== "Cyber" && SPK !== "Crystal") for (const s of [-1, 1]) for (let i = 0; i < (FUR === "Longhair" ? 4 : 2); i++) { const y = 0.22 + i * 0.12, x = s * (1.02 * CW - i * 0.04 * CW), l = FUR === "Longhair" ? 0.17 : 0.1;
   E("path", { d: `M${U(x - s * 0.06)} ${U(y - 0.09)}L${U(x + s * l)} ${U(y + 0.02)}L${U(x - s * 0.08)} ${U(y + 0.08)}Z`, fill: headC }, HFUR); }
 E("path", { d: HEADP, fill: headC }, HFUR);
 const hclip = E("g", { "clip-path": "url(#hc)" }, HEADG), FACEM = E("g", {}, hclip), hpg = E("g", { ...MARKF, opacity: MARKO }, FACEM);
-/* head markings */
+ 
 if (VANISH) E("ellipse", { cx: 0, cy: U(-0.8), rx: U(0.95), ry: U(0.42), fill: vanC }, hpg);
 if (patchC) for (let i = 0; i < (BRINDLE ? 16 : 2); i++) E("ellipse", { cx: U(rr(-0.9, 0.9)), cy: U(rr(-0.85, 0.2)), rx: U(BRINDLE ? rr(0.04, 0.09) : rr(0.3, 0.55)), ry: U(BRINDLE ? rr(0.03, 0.07) : rr(0.25, 0.45)), fill: patchC }, hpg);
 if (pointC) { rgrad("mask", [[0, pointC, 0.95], [0.6, pointC, 0.75], [1, pointC, 0]]); E("ellipse", { cx: 0, cy: U(0.22), rx: U(0.75), ry: U(0.7), fill: "url(#mask)" }, hpg); }
@@ -826,7 +808,7 @@ if (markC && !SHADED) {
     for (const s of [-1, 1]) { E("path", { d: `M${U(s * 0.7)} ${U(0.1)}Q${U(s * 0.86)} ${U(0.08)} ${U(s * 1.02 * CW)} ${U(0.16)}`, ...st(0.04) }, hpg);
       E("path", { d: `M${U(s * 0.58)} ${U(0.2)}Q${U(s * 0.8)} ${U(0.22)} ${U(s * 0.98 * CW)} ${U(0.36)}`, ...st(0.035) }, hpg); }
   } else if (["Spots", "Rosettes", "Jaguar Rosettes", "Clouds", "Chain", "Freckles"].includes(PAT)) {
-    for (let i = 0; i < 9; i++) { const x = rr(0.04, 0.5), y = rr(-0.9, -0.45), r = U(rr(0.02, 0.04)); for (const s_ of [-1, 1]) E("circle", { cx: U(s_ * x), cy: U(y), r, fill: markC }, hpg); }   // mirrored
+    for (let i = 0; i < 9; i++) { const x = rr(0.04, 0.5), y = rr(-0.9, -0.45), r = U(rr(0.02, 0.04)); for (const s_ of [-1, 1]) E("circle", { cx: U(s_ * x), cy: U(y), r, fill: markC }, hpg); }    
     for (let i = 0; i < 7; i++) { const x = rr(0.6, 0.95), y = rr(0.05, 0.45); for (const s of [-1, 1]) E("circle", { cx: U(s * x), cy: U(y), r: U(0.025), fill: markC }, hpg); }
     for (const s of [-1, 1]) E("path", { d: `M${U(s * 0.16)} ${U(-0.32)}Q${U(s * 0.35)} ${U(-0.48)} ${U(s * 0.55)} ${U(-0.35)}`, ...st(0.03) }, hpg);
   } else if (PAT === "Constellations") for (let i = 0; i < 9; i++) E("circle", { cx: U(rr(-0.8, 0.8)), cy: U(rr(-0.85, -0.35)), r: 4, fill: markC }, hpg);
@@ -836,27 +818,27 @@ if (markC && !SHADED) {
   else if (PAT === "Facets") for (let i = 0; i < 10; i++) { const x = rr(-0.9, 0.9), y = rr(-0.9, 0.7), r = rr(0.15, 0.3), a = rr(0, TAU);
     E("path", { d: `M${U(x)} ${U(y)}l${U(r * Math.cos(a))} ${U(r * Math.sin(a))}l${U(r * Math.cos(a + 2.1))} ${U(r * Math.sin(a + 2.1))}Z`, fill: pk(["#ffffff", "#bff6ff", "#3fc6e0"]), opacity: 0.4 }, FACEM); }
 }
-/* light on the brow, shadow under the cheeks: the face gets volume */
+ 
 E("ellipse", { cx: 0, cy: U(-0.55), rx: U(0.55), ry: U(0.28), fill: "#ffffff", opacity: NEON || SUP ? 0.04 : 0.1 }, FACEM);
 E("ellipse", { cx: 0, cy: U(0.85), rx: U(1.1), ry: U(0.35), fill: BLK, opacity: 0.12 }, FACEM);
 if (HAIRLESS) for (let i = 0; i < 3; i++) E("path", { d: `M${U(-0.25)} ${U(-0.78 + i * 0.1)}q${U(0.25)} ${U(-0.06)} ${U(0.5)} 0`, fill: "none", stroke: NEON ? RIM : mix(bodyFill.startsWith("#") ? bodyFill : "#c89b3c", BLK, 0.35), "stroke-width": 3, opacity: 0.55 }, FACEM);
-/* big cats: pale brows, cheeks and muzzle */
+ 
 if (WLD && (WX.muzzle || PAT === "Stripes") && !NEON && MORPH !== "Black") {
   for (const s of [-1, 1]) { E("ellipse", { cx: U(s * 0.36), cy: U(-0.34), rx: U(0.13), ry: U(0.05), fill: "#ffffff", opacity: 0.7 }, FACEM);
     E("ellipse", { cx: U(s * 0.55), cy: U(0.4), rx: U(0.26), ry: U(0.17), fill: "#ffffff", opacity: 0.35 }, FACEM); } }
-if (EARS === "Folded" && !MONK) {                                                // folds lie forward over the crown
+if (EARS === "Folded" && !MONK) {                                                 
   for (const s of [-1, 1]) { const g = E("g", {}, HEADG), out = NEON ? RIM : mix(earC.startsWith("#") ? earC : "#c89b3c", BLK, 0.45); EARG.push({ g, s, pv: [s * 0.55 * K, -0.7 * K], fold: 1 });
     E("path", { d: `M${U(s * 0.26)} ${U(-0.82)}Q${U(s * 0.42)} ${U(-1.2)} ${U(s * 0.72)} ${U(-1.02)}Q${U(s * 0.88)} ${U(-0.8)} ${U(s * 0.86)} ${U(-0.58)}Q${U(s * 0.6)} ${U(-0.66)} ${U(s * 0.26)} ${U(-0.82)}Z`, fill: earC, stroke: out, "stroke-width": 3.5, "stroke-linejoin": "round" }, g);
     E("path", { d: `M${U(s * 0.38)} ${U(-0.86)}Q${U(s * 0.6)} ${U(-0.95)} ${U(s * 0.8)} ${U(-0.72)}`, fill: "none", stroke: out, "stroke-width": 2.5, opacity: 0.7 }, g); } }
 
 earring();
-/* the face: moves a little with the head's turn, so the portrait has depth */
+ 
 const FACE = E("g", {}, HEADG);
-const EW = 0.5 * (HAIRLESS ? 1.06 : 1) * (SPK === "Shadow" ? 1.08 : 1), EH = 0.37 * (SPK === "Shadow" ? 1.1 : 1);   // big eyes: the cuteness lives here
+const EW = 0.5 * (HAIRLESS ? 1.06 : 1) * (SPK === "Shadow" ? 1.08 : 1), EH = 0.37 * (SPK === "Shadow" ? 1.1 : 1);    
 const EX = 0.42, EY = -0.04;
 const eyes = [-1, 1].map((s, i) => {
   const g = E("g", { transform: `translate(${U(s * EX)} ${U(EY)}) rotate(${s * -7})` }, FACE), w = EW * K, h = EH * K, col = EYEC[i];
-  /* the iris: lit from the centre, darker at the limbal ring, with fine fibres */
+   
   rgrad("iris" + i, [[0, mix(col, "#ffffff", 0.5)], [0.5, col], [0.86, mix(col, BLK, 0.25)], [1, mix(col, BLK, 0.55)]], { r: 0.62 });
   const glowE = E("ellipse", { rx: f1(w * 0.72), ry: f1(h * 0.95), fill: col, opacity: 0, filter: "url(#eg)" }, g);
   const lid = E("g", {}, g), al = `M${f1(-w / 2)} 0Q0 ${f1(-h * 1.05)} ${f1(w / 2)} 0Q0 ${f1(h * 1.05)} ${f1(-w / 2)} 0Z`;
@@ -867,13 +849,13 @@ const eyes = [-1, 1].map((s, i) => {
   for (let k = 0; k < 18; k++) { const a = k / 18 * TAU; E("path", { d: `M${f1(Math.cos(a) * w * 0.12)} ${f1(Math.sin(a) * h * 0.18)}L${f1(Math.cos(a) * w * 0.42)} ${f1(Math.sin(a) * h * 0.62)}`, stroke: k % 2 ? mix(col, BLK, 0.35) : mix(col, "#ffffff", 0.4), "stroke-width": 1.6 }, fib); }
   E("path", { d: al, fill: "none", stroke: mix(col, BLK, 0.6), "stroke-width": 3.5 }, lid);
   const cyber = SPK === "Cyber", pup = E(cyber ? "rect" : "ellipse", cyber ? { y: f1(-h * 0.12), height: f1(h * 0.24), fill: "#07141a" } : { cy: 0, ry: f1(h * 0.46), fill: SPK === "Shadow" || SPK === "Ghost" ? mix(col, "#ffffff", 0.6) : "#07060a" }, lid);
-  pup.setAttribute("clip-path", `url(#ec${i})`);                                          // the pupil stays inside the lids
+  pup.setAttribute("clip-path", `url(#ec${i})`);                                           
   const hl = [E("ellipse", { cx: f1(-w * 0.13), cy: f1(-h * 0.2), rx: f1(h * 0.17), ry: f1(h * 0.15), fill: "#fff", opacity: 0.95 }, lid), E("circle", { cx: f1(w * 0.13), cy: f1(h * 0.2), r: f1(h * 0.07), fill: "#fff", opacity: 0.75 }, lid),
     E("path", { d: `M${f1(-w * 0.36)} ${f1(h * 0.16)}Q0 ${f1(h * 0.62)} ${f1(w * 0.36)} ${f1(h * 0.16)}`, fill: "none", stroke: "#ffffff", "stroke-width": 2, opacity: 0.25 }, lid)];
   const spiral = E("path", { d: Array.from({ length: 40 }, (_, k) => { const a = k * 0.5, r = h * 0.04 + k * h * 0.011; return `${k ? "L" : "M"}${f1(r * Math.cos(a))} ${f1(r * Math.sin(a))}`; }).join(""), fill: "none", stroke: "#1a1424", "stroke-width": 3.5, opacity: 0 }, g);
   return { g, lid, pup, w, h, s, cyber, hl, glowE, spiral, cx: s * EX * K, cy: EY * K };
 });
-/* tear lines (cheetah), nose, muzzle, mouth */
+ 
 if (WX.tears && WLD) for (const s of [-1, 1]) E("path", { d: `M${U(s * 0.22)} ${U(0.0)}Q${U(s * 0.28)} ${U(0.3)} ${U(s * 0.2)} ${U(0.48)}`, fill: "none", stroke: "#1a120c", "stroke-width": f1(0.05 * K), "stroke-linecap": "round" }, FACE);
 for (const s of [-1, 1]) E("ellipse", { cx: U(s * 0.16), cy: U(0.4), rx: U(0.2), ry: U(0.15), fill: muzC }, FACE);
 E("ellipse", { cx: 0, cy: U(0.58), rx: U(0.14), ry: U(0.08), fill: muzC }, FACE);
@@ -896,7 +878,7 @@ const lip = NEON || SUP ? RIM : mix((muzC.startsWith("#") ? muzC : "#c89b3c"), B
 E("path", { d: `M0 ${U(0.31)}V${U(0.38)}M0 ${U(0.38)}Q${U(-0.04)} ${U(0.45)} ${U(-0.12)} ${U(0.42)}M0 ${U(0.38)}Q${U(0.04)} ${U(0.45)} ${U(0.12)} ${U(0.42)}`, fill: "none", stroke: lip, "stroke-width": 3, "stroke-linecap": "round" }, FACE);
 for (const s of [-1, 1]) for (const [dx, dy] of [[0.1, 0.36], [0.16, 0.42], [0.22, 0.37]]) E("circle", { cx: U(s * dx), cy: U(dy), r: 2.4, fill: NEON || SUP ? RIM : "rgba(0,0,0,.35)" }, FACE);
 
-/* eyewear */
+ 
 const SPECG = E("g", {}, FACE);
 { const L = [-1, 1].map((s) => [s * EX * K, EY * K]), r = 0.31 * K;
   const frame = (c, w = 6) => ({ fill: "none", stroke: c, "stroke-width": w });
@@ -925,7 +907,7 @@ const SPECG = E("g", {}, FACE);
     for (const s_ of [-1, 1]) E("path", { d: `M${f1(s_ * 0.66 * K)} ${f1(-0.14 * K)}l${f1(s_ * -0.16 * K)} ${f1(0.2 * K)}`, stroke: "#ffffff", "stroke-width": 6, opacity: 0.35, "stroke-linecap": "round" }, SPECG); }
   else if (SPECS === "Star Glasses") { bridge(r * 1.15, "#ff8f1f"); for (const [x, y] of L) E("path", { d: Array.from({ length: 10 }, (_, i) => { const a = -Math.PI / 2 + i * Math.PI / 5, q = i % 2 ? r * 0.6 : r * 1.35; return `${i ? "L" : "M"}${f1(x + q * Math.cos(a))} ${f1(y + q * Math.sin(a))}`; }).join("") + "Z", fill: "#ffd23f", opacity: 0.55, stroke: "#ff8f1f", "stroke-width": 5, "stroke-linejoin": "round" }, SPECG); } }
 
-/* headwear */
+ 
 const HATG = E("g", {}, HEADG), HATA = [];
 if (HAT === "Beret") { const c = pk(["#c8102e", "#111114", C2]), g = E("g", { transform: `rotate(-10 0 ${U(-0.9)})` }, HATG);
   E("ellipse", { cx: U(0.12), cy: U(-0.9), rx: U(0.66), ry: U(0.2), fill: c, stroke: shade(c, -0.35), "stroke-width": 3 }, g); E("path", { d: `M${U(0.12)} ${U(-1.1)}l${U(0.02)} ${U(-0.09)}`, stroke: shade(c, -0.35), "stroke-width": 5, "stroke-linecap": "round" }, g); }
@@ -935,10 +917,10 @@ else if (HAT === "Party Hat") { const g = E("g", { transform: `rotate(12 0 ${U(-
   E("circle", { cy: U(-1.82), r: U(0.08), fill: "#ffffff" }, g); }
 else if (HAT === "Propeller Cap") { const segs = ["#ff3b3b", "#ffd23f", "#3fa9ff", "#3fe07a"], dome = `M${U(-0.8)} ${U(-0.62)}Q0 ${U(-1.36)} ${U(0.8)} ${U(-0.62)}Z`;
   const pc = E("clipPath", { id: "propdome" }, defs); E("path", { d: dome }, pc);
-  const dg = E("g", { "clip-path": "url(#propdome)" }, HATG); segs.forEach((c, i) => E("rect", { x: U(-0.8 + i * 0.4), y: U(-1.4), width: U(0.41), height: U(0.8), fill: c }, dg));   // four solid panels
+  const dg = E("g", { "clip-path": "url(#propdome)" }, HATG); segs.forEach((c, i) => E("rect", { x: U(-0.8 + i * 0.4), y: U(-1.4), width: U(0.41), height: U(0.8), fill: c }, dg));    
   E("path", { d: `M${U(-0.8)} ${U(-0.62)}Q0 ${U(-1.36)} ${U(0.8)} ${U(-0.62)}Z`, fill: "none", stroke: "#2a2a33", "stroke-width": 3 }, HATG); E("rect", { x: U(-0.02), y: U(-1.22), width: U(0.04), height: U(0.2), fill: "#8f9aa8" }, HATG);
   const pr = E("g", { transform: `translate(0 ${U(-1.22)})` }, HATG); E("ellipse", { rx: U(0.34), ry: U(0.05), fill: "#ff3b3b" }, pr);
-  HATA.push((b) => set(pr, { transform: `translate(0 ${U(-1.22)}) scale(${f1(Math.cos(b * TAU * 2) * 100) / 100} 1)` })); }   // the propeller spins
+  HATA.push((b) => set(pr, { transform: `translate(0 ${U(-1.22)}) scale(${f1(Math.cos(b * TAU * 2) * 100) / 100} 1)` })); }    
 else if (HAT === "Pirate Hat") { E("path", { d: `M${U(-1.05)} ${U(-0.72)}Q${U(-0.6)} ${U(-1.5)} 0 ${U(-1.2)}Q${U(0.6)} ${U(-1.5)} ${U(1.05)} ${U(-0.72)}Q0 ${U(-0.92)} ${U(-1.05)} ${U(-0.72)}Z`, fill: "#16151a", stroke: "#d4a93c", "stroke-width": 4 }, HATG);
   E("circle", { cx: 0, cy: U(-1.0), r: U(0.09), fill: "#ffffff" }, HATG); E("path", { d: `M${U(-0.14)} ${U(-0.86)}L${U(0.14)} ${U(-1.14)}M${U(0.14)} ${U(-0.86)}L${U(-0.14)} ${U(-1.14)}`, stroke: "#ffffff", "stroke-width": 5, "stroke-linecap": "round" }, HATG); }
 else if (HAT === "Viking Helmet") { for (const s_ of [-1, 1]) E("path", { d: `M${U(s_ * 0.6)} ${U(-0.8)}Q${U(s_ * 1.15)} ${U(-0.95)} ${U(s_ * 1.05)} ${U(-1.55)}Q${U(s_ * 0.95)} ${U(-1.05)} ${U(s_ * 0.5)} ${U(-0.98)}Z`, fill: "#f3ead6", stroke: "#b8a888", "stroke-width": 3 }, HATG);
@@ -975,16 +957,16 @@ else if (HAT === "Bucket Hat") { const c = pk([C2, "#e9e4d8", "#2f5d3a"]); E("pa
   E("path", { d: `M${U(-0.62)} ${U(-0.74)}L${U(-1.05)} ${U(-0.48)}Q0 ${U(-0.6)} ${U(1.05)} ${U(-0.48)}L${U(0.62)} ${U(-0.74)}Z`, fill: shade(c, -0.15) }, HATG); }
 else if (HAT === "Gladiator's Helm") {
   for (let i = 0; i <= 26; i++) { const a = Math.PI * (1.05 + i / 26 * 0.9), r0 = 0.9, r1 = 1.38 + 0.05 * (i % 2);
-    E("path", { d: `M${U(Math.cos(a) * r0 * 0.85)} ${U(-0.62 + Math.sin(a) * r0 * 0.6)}L${U(Math.cos(a) * r1 * 0.85)} ${U(-0.62 + Math.sin(a) * r1 * 0.65)}`, stroke: i % 3 ? "#c4222f" : "#e0424e", "stroke-width": f1(0.075 * K), "stroke-linecap": "round" }, HATG); }   // the crest
+    E("path", { d: `M${U(Math.cos(a) * r0 * 0.85)} ${U(-0.62 + Math.sin(a) * r0 * 0.6)}L${U(Math.cos(a) * r1 * 0.85)} ${U(-0.62 + Math.sin(a) * r1 * 0.65)}`, stroke: i % 3 ? "#c4222f" : "#e0424e", "stroke-width": f1(0.075 * K), "stroke-linecap": "round" }, HATG); }    
   E("path", { d: `M${U(-0.86)} ${U(-0.42)}Q${U(-0.88)} ${U(-1.12)} 0 ${U(-1.14)}Q${U(0.88)} ${U(-1.12)} ${U(0.86)} ${U(-0.42)}Z`, fill: "url(#bronze)", stroke: "#6b3f12", "stroke-width": 3 }, HATG);
-  E("path", { d: `M${U(-0.9)} ${U(-0.44)}Q0 ${U(-0.62)} ${U(0.9)} ${U(-0.44)}L${U(0.92)} ${U(-0.33)}Q0 ${U(-0.5)} ${U(-0.92)} ${U(-0.33)}Z`, fill: "#b07228", stroke: "#6b3f12", "stroke-width": 2.5 }, HATG);   // brow band
+  E("path", { d: `M${U(-0.9)} ${U(-0.44)}Q0 ${U(-0.62)} ${U(0.9)} ${U(-0.44)}L${U(0.92)} ${U(-0.33)}Q0 ${U(-0.5)} ${U(-0.92)} ${U(-0.33)}Z`, fill: "#b07228", stroke: "#6b3f12", "stroke-width": 2.5 }, HATG);    
   for (const x of [-0.6, -0.3, 0, 0.3, 0.6]) E("circle", { cx: U(x), cy: U(-0.43 - 0.08 * Math.cos(x)), r: 4, fill: "#f4c66a" }, HATG);
   E("path", { d: `M0 ${U(-1.12)}V${U(-0.6)}`, stroke: "#8a5420", "stroke-width": 4 }, HATG); }
 else if (HAT === "Hood") {
   const out = cr([[0, -1.12], [0.32, -1.2], [0.62, -1.46], [0.84, -1.12], [1.14 * CW, -0.55], [1.24 * CW, 0.12], [1.18 * CW, 0.62], [0.92, 0.98], [0, 1.06], [-0.92, 0.98], [-1.18 * CW, 0.62], [-1.24 * CW, 0.12], [-1.14 * CW, -0.55], [-0.84, -1.12], [-0.62, -1.46], [-0.32, -1.2]].map(([x, y]) => [x * K, y * K]));
-  const hole = `M${U(-0.95 * CW)} ${U(0.03)}a${U(0.95 * CW)} ${U(0.9)} 0 1 0 ${U(1.9 * CW)} 0a${U(0.95 * CW)} ${U(0.9)} 0 1 0 ${U(-1.9 * CW)} 0Z`;   // its bottom sits just under the chin
+  const hole = `M${U(-0.95 * CW)} ${U(0.03)}a${U(0.95 * CW)} ${U(0.9)} 0 1 0 ${U(1.9 * CW)} 0a${U(0.95 * CW)} ${U(0.9)} 0 1 0 ${U(-1.9 * CW)} 0Z`;    
   E("path", { d: out + hole, "fill-rule": "evenodd", fill: "#5a3d25", stroke: "#3a2616", "stroke-width": 3 }, HATG);
-  E("path", { d: hole, fill: "none", stroke: "#2a1a0e", "stroke-width": f1(0.07 * K), opacity: 0.55 }, HATG);                  // the shadow inside the hood's rim
+  E("path", { d: hole, fill: "none", stroke: "#2a1a0e", "stroke-width": f1(0.07 * K), opacity: 0.55 }, HATG);                   
   for (const s_ of [-1, 1]) E("path", { d: `M${U(s_ * 0.5)} ${U(-1.3)}Q${U(s_ * 0.62)} ${U(-1.22)} ${U(s_ * 0.74)} ${U(-1.1)}`, fill: "none", stroke: "#3a2616", "stroke-width": 2.5, opacity: 0.6 }, HATG); }
 else if (HAT === "Ribbon Bow") { const g = E("g", { transform: `translate(${U(-0.62)} ${U(-0.98)}) rotate(-18)` }, HATG), c = "#ff8fc0";
   E("path", { d: `M0 0C${U(-0.12)} ${U(-0.2)} ${U(-0.32)} ${U(-0.12)} ${U(-0.3)} 0C${U(-0.32)} ${U(0.12)} ${U(-0.12)} ${U(0.2)} 0 0ZM0 0C${U(0.12)} ${U(-0.2)} ${U(0.32)} ${U(-0.12)} ${U(0.3)} 0C${U(0.32)} ${U(0.12)} ${U(0.12)} ${U(0.2)} 0 0Z`, fill: c, stroke: "#d4588f", "stroke-width": 3 }, g);
@@ -993,22 +975,22 @@ else if (HAT === "Ribbon Bow") { const g = E("g", { transform: `translate(${U(-0
 else if (HAT === "Cowboy Hat") { const c = pk(["#8a5a2b", "#3a2a1f", "#e9dcc0"]); E("path", { d: `M${U(-1.25)} ${U(-0.8)}Q${U(-1.1)} ${U(-0.6)} 0 ${U(-0.66)}Q${U(1.1)} ${U(-0.6)} ${U(1.25)} ${U(-0.8)}Q${U(1.0)} ${U(-0.86)} ${U(0.62)} ${U(-0.86)}Q0 ${U(-0.8)} ${U(-0.62)} ${U(-0.86)}Q${U(-1.0)} ${U(-0.86)} ${U(-1.25)} ${U(-0.8)}Z`, fill: shade(c, -0.1) }, HATG);
   E("path", { d: `M${U(-0.55)} ${U(-0.82)}Q${U(-0.6)} ${U(-1.45)} ${U(-0.2)} ${U(-1.42)}Q0 ${U(-1.3)} ${U(0.2)} ${U(-1.42)}Q${U(0.6)} ${U(-1.45)} ${U(0.55)} ${U(-0.82)}Z`, fill: c }, HATG);
   E("rect", { x: U(-0.56), y: U(-0.98), width: U(1.12), height: U(0.12), fill: "#2a1a10" }, HATG); }
-/* halo */
+ 
 const HALOG = HALO ? E("ellipse", { rx: U(0.62), ry: U(0.14), fill: "none", stroke: "#ffe28a", "stroke-width": f1(0.07 * K), filter: "url(#eg)" }, HEADG) : null;
 
-/* whiskers: outside the rim glow, following the head */
+ 
 const WHG = E("g"), whisk = [];
 const WHL = HAIRLESS ? 0.4 : 1, DROOP = FUR === "Rex" ? 0.3 : 0.08;
 const WHS = { fill: "none", stroke: SPK === "Shadow" ? "#8a6cff" : "#fff", "stroke-width": 2.4, opacity: 0.85, "stroke-linecap": "round", filter: "url(#eg)" };
 for (const s of [-1, 1]) [-12, 2, 16].forEach((a, i) => whisk.push({ e: E("path", WHS, WHG), s, a, i: i + (s > 0 ? 3 : 0) }));
 
-/* laser eyes: beams from both eyes, outside the rim (they stay their own colour) */
+ 
 const LZ = LASER ? E("g", { "pointer-events": "none" }) : null, beams = [];
 if (LZ) for (const e of eyes) { const g = E("g", {}, LZ);
   for (const [c, w, o] of [[LZC[0], 0.2, 0.35], [LZC[1], 0.08, 1], ["#ffffff", 0.03, 1]]) beams.push({ e: E("path", { stroke: c, "stroke-width": f1(K * w), opacity: o, "stroke-linecap": "round", filter: "url(#eg)" }, g), eye: e });
   beams.push({ flare: E("circle", { r: f1(0.16 * K), fill: "#ffffff", filter: "url(#eg)", opacity: 0.9 }, g), eye: e }); }
 
-/* the emote bubble (a tap reaction) and hearts (petting) */
+ 
 const ZZZ = [0, 1, 2].map(() => E("path", { d: "M-12 -12h24l-24 24h24", fill: "none", stroke: "#ffffff", "stroke-width": 6, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: 0, "pointer-events": "none" }));
 const STARS = [0, 1, 2].map(() => E("path", { d: "M0 -14Q0 0 14 0Q0 0 0 14Q0 0 -14 0Q0 0 0 -14Z", fill: "#ffe36e", opacity: 0, "pointer-events": "none" }));
 const EMO = E("g", { opacity: 0, "pointer-events": "none" });
@@ -1018,12 +1000,11 @@ const SPIRITS = SPK === "Nekomata" || SPK === "Ghost" ? [0, 1].map(() => E("path
 const SPARK = SPK === "Crystal" || SPK === "Celestial" || GOLD ? [0, 1, 2].map(() => E("path", { d: "M0 -16Q0 0 16 0Q0 0 0 16Q0 0 -16 0Q0 0 0 -16Z", fill: "#ffffff", opacity: 0, "pointer-events": "none" })) : [];
 E("rect", { width: 1000, height: 1000, fill: "url(#vig)", "pointer-events": "none" });
 
-/* =============================================================== forelegs */
-/* A standing cat's forelegs hang at its sides: shoulder, elbow, paw (two-bone IK).
-   In a sleeve when it's dressed (short sleeves stop at the elbow). Grabby ones reach
-   for your pointer, the paw turning palm-out so the toe beans show; claws if fierce. */
+ 
+
+
 const arms = [];
-/* things a cat might hold: drawn standing up out of the paw */
+ 
 function holdItem(armG, hd) {
   const root = E("g", {}), g = E("g", { transform: `translate(0 ${f1(-0.12 * K)})` }, root), u = K / 186; armG.insertBefore(root, hd); const P_ = (d, a) => E("path", { d, ...a }, g);
   const it = { g: root, sparks: [] };
@@ -1046,7 +1027,7 @@ function holdItem(armG, hd) {
   else if (HOLD === "Donut") { E("circle", { cy: f1(-30 * u), r: f1(26 * u), fill: "#d9a066" }, g); E("circle", { cy: f1(-32 * u), r: f1(23 * u), fill: "#ff8fc0" }, g); E("circle", { cy: f1(-30 * u), r: f1(8 * u), fill: "#d9a066" }, g);
     for (let k = 0; k < 8; k++) { const a = k / 8 * TAU; P_(`M${f1(Math.cos(a) * 15 * u)} ${f1(-32 * u + Math.sin(a) * 15 * u)}l${f1(4 * u)} ${f1(2 * u)}`, { stroke: ["#3fa9ff", "#ffe36e", "#ffffff"][k % 3], "stroke-width": 3, "stroke-linecap": "round" }); } }
   else if (HOLD === "Pizza") { P_(`M${-26 * u} ${-8 * u}Q0 ${4 * u} ${26 * u} ${-8 * u}L0 ${-84 * u}Z`, { fill: "#ffd25e", stroke: "#e0a85a", "stroke-width": 3 }); P_(`M${-26 * u} ${-8 * u}Q0 ${4 * u} ${26 * u} ${-8 * u}`, { fill: "none", stroke: "#d99a4e", "stroke-width": f1(9 * u), "stroke-linecap": "round" });
-    for (const [x, y] of [[-8, -26], [8, -34], [0, -56]]) E("circle", { cx: f1(x * u), cy: f1(y * u), r: f1(5 * u), fill: "#c8102e" }, g); }   // tip up, crust in the paw
+    for (const [x, y] of [[-8, -26], [8, -34], [0, -56]]) E("circle", { cx: f1(x * u), cy: f1(y * u), r: f1(5 * u), fill: "#c8102e" }, g); }    
   else if (HOLD === "Lollipop") { P_(`M0 0V${-60 * u}`, { stroke: "#ffffff", "stroke-width": 4 }); E("circle", { cy: f1(-78 * u), r: f1(22 * u), fill: "#ff5fa2" }, g);
     P_(`M0 ${-78 * u}m${-14 * u} 0a${14 * u} ${14 * u} 0 1 1 ${14 * u} ${14 * u}a${9 * u} ${9 * u} 0 1 1 ${-9 * u} ${-9 * u}`, { fill: "none", stroke: "#ffffff", "stroke-width": 3 }); }
   else if (HOLD === "Tez Coin") { E("circle", { cy: f1(-30 * u), r: f1(26 * u), fill: "url(#gold)", stroke: "#8a5a14", "stroke-width": 3 }, g); tez(0, -30 * u, 0.36 * u, "#8a5a14", g); }
@@ -1055,10 +1036,10 @@ function holdItem(armG, hd) {
     for (let k = 0; k < 6; k++) it.sparks.push(P_("M0 -9Q0 0 9 0Q0 0 0 9Q0 0 -9 0Q0 0 0 -9Z", { fill: ["#ffe36e", "#ffffff", "#b48cff"][k % 3], opacity: 0, transform: `translate(${f1(8 * u)} ${f1(-88 * u)})` })); }
   return it;
 }
-/* what each held thing invites: [action, how far the bit that meets the mouth sits above the paw (K)] */
+ 
 const ACTN = { "Boba Tea": "sip", Coffee: "sip", Donut: "bite", Pizza: "bite", Fish: "bite", "Ice Cream": "lick", Lollipop: "lick", Rose: "sniff", Balloon: "bop", "Yarn Ball": "toss", "Tez Coin": "flip", "Magic Wand": "spell" }[HOLD] || null;
 const MOUTHOFF = { "Boba Tea": 0.66, Coffee: 0.42, Donut: 0.3, Pizza: 0.5, Fish: 0.3, "Ice Cream": 0.5, Lollipop: 0.52, Rose: 0.36 }[HOLD] || 0;
-const groomU = (b) => { const u = (frac(b / (2 * LOOP)) * 2 * LOOP - LOOP - GROOM) / 3.2; return MYTH || u <= 0 || u >= 1 ? -1 : u; };   // second loop of every two
+const groomU = (b) => { const u = (frac(b / (2 * LOOP)) * 2 * LOOP - LOOP - GROOM) / 3.2; return MYTH || u <= 0 || u >= 1 ? -1 : u; };    
 const actU = (lb) => { const u = (lb - SIP) / 2.6; return u > 0 && u < 1 ? u : -1; }, actM = (u) => u < 0 ? 0 : smooth(cl(u / 0.22)) * smooth(cl((1 - u) / 0.2));
 function buildArms() { const bean = HAIRLESS || SPK === "Shadow" ? "#2a2030" : SPK === "Cyber" ? "#3ff2ff" : WLD && !WX.pale ? "#3a2a2a" : PINK, w = 0.3 * K * (WLD && WX.heavy ? 1.12 : 1);
   const loose = SLEEVE ? (OUTFIT === "Kimono" || MONK ? 1.45 : OUTFIT === "Royal Robe" ? 1.3 : 1.14) : 1;
@@ -1073,62 +1054,62 @@ function buildArms() { const bean = HAIRLESS || SPK === "Shadow" ? "#2a2030" : S
     const cuff = SLEEVE ? seg(shade(SLEEVE, OUTFIT === "Varsity Jacket" ? -0.5 : -0.22), (SHORTSLEEVE ? wU : wF) * 1.1) : null;
     const band = manica ? [0, 1, 2, 3].map(() => seg("#7a4a1c", wF * 0.2)) : markC && !SLEEVE && !SHADED && PAT !== "Plain" ? [0, 1].map(() => seg(markC, wF * 0.28)) : [];
     const hand = E("g", {}, g), top = E("g", {}, hand), palm = E("g", { opacity: 0 }, hand);
-    /* the paw from above: a round mitt with toe lines */
+     
     E("path", { d: cr(Array.from({ length: 12 }, (_, k) => { const a = k / 12 * TAU, r = w * (0.6 + (k % 3 === 0 && Math.sin(a) < 0 ? 0.05 : 0)); return [r * Math.cos(a), r * 0.85 * Math.sin(a)]; })), fill: pawC }, top);
     for (const k of [-1, 0, 1]) E("path", { d: `M${f1(k * w * 0.2)} ${f1(-w * 0.5)}v${f1(w * 0.28)}`, stroke: ol(pawC), "stroke-width": 2.5, "stroke-linecap": "round" }, top);
-    /* the palm, for reaching: pad and toe beans */
+     
     E("path", { d: cr(Array.from({ length: 12 }, (_, k) => { const a = k / 12 * TAU, r = w * (0.66 + (k % 3 === 0 && Math.sin(a) < 0 ? 0.06 : 0)); return [r * Math.cos(a), r * 0.9 * Math.sin(a)]; })), fill: pawC }, palm);
     E("path", { d: `M${f1(-w * 0.3)} ${f1(w * 0.2)}Q${f1(-w * 0.27)} ${f1(-w * 0.1)} 0 ${f1(-w * 0.07)}Q${f1(w * 0.27)} ${f1(-w * 0.1)} ${f1(w * 0.3)} ${f1(w * 0.2)}Q${f1(w * 0.18)} ${f1(w * 0.4)} 0 ${f1(w * 0.34)}Q${f1(-w * 0.18)} ${f1(w * 0.4)} ${f1(-w * 0.3)} ${f1(w * 0.2)}Z`, fill: bean, opacity: 0.92 }, palm);
     for (let k = 0; k < 4; k++) { const a = (-148 + k * 39) * DEG; E("ellipse", { cx: f1(Math.cos(a) * w * 0.45), cy: f1(Math.sin(a) * w * 0.43), rx: f1(w * 0.12), ry: f1(w * 0.14), fill: bean, opacity: 0.92 }, palm);
       if (TEMP === "Fierce" || SPK === "Infernal") E("path", { d: `M${f1(Math.cos(a) * w * 0.54)} ${f1(Math.sin(a) * w * 0.54)}l${f1(Math.cos(a) * w * 0.17)} ${f1(Math.sin(a) * w * 0.17 - 3)}`, stroke: "#ffffff", "stroke-width": 3.5, "stroke-linecap": "round" }, palm); }
-    if (paul) g.appendChild(hand);                                                       // the paw stays on top
+    if (paul) g.appendChild(hand);                                                        
     const item = s < 0 && HOLD !== "None" ? holdItem(g, hand) : null;
     arms.push({ g, eU, eF, up, fore, cuff, band, hand, top, palm, s, ext: 0, seam, crease, wU, paul, item });
   } }
 
-/* ============================================================ temperament */
+ 
 const soft = () => (R() + R()) / 2;
 const NUDGE = { N: (GAIT === "Sneak" ? 0.15 : 0) - (HAT === "Crown" ? 0.1 : 0) + (SPK === "Ghost" ? 0.1 : 0),
   E: (GAIT === "Prance" ? 0.1 : 0) + (HAT === "Headphones" ? 0.08 : 0), D: (HAT === "Crown" || GOLD || OUTFIT === "Royal Robe" ? 0.3 : 0) + (WLD && WX.heavy ? 0.15 : 0),
   I: (GAIT === "Prance" ? 0.1 : 0) - (BUILD === "Chonk" ? 0.15 : 0), A: BUILD === "Chonk" ? 0.08 : 0 };
 const F5 = {}; for (const k of "NEDIA") F5[k] = cl(soft() + NUDGE[k]);
-/* seven more temperaments for portraits, on the same Feline Five axes [N, E, D, I, A] */
+ 
 DATA.arch.push(["Mischievous", [0.3, 0.7, 0.6, 0.85, 0.45], "wink", "wink", "Slyly", 0.02], ["Sleepy", [0.3, 0.15, 0.3, 0.2, 0.65], "doze", "zzz", "Drowsily", 0.0],
   ["Goofy", [0.25, 0.75, 0.25, 0.9, 0.75], "blep", "dizzy", "Goofily", 0.03], ["Fierce", [0.45, 0.6, 0.9, 0.65, 0.15], "snarl", "snarl", "Fiercely", -0.02],
   ["Dramatic", [0.72, 0.82, 0.55, 0.7, 0.45], "gasp", "gasp", "Dramatically", 0.01], ["Mysterious", [0.4, 0.22, 0.68, 0.25, 0.38], "glow", "glowStare", "Mysteriously", 0.0],
   ["Zen", [0.05, 0.25, 0.4, 0.1, 0.78], "meditate", "om", "Serenely", 0.0]);
-/* rarity tuning for the portraits (fitted by simulation to: common ~9% … Regal and Zen ~3%) */
+ 
 const OFF = { Confident: -0.026, Shy: -0.07, Playful: 0.08, Grumpy: -0.098, Chill: 0.208, Curious: -0.05, Sassy: -0.042, Sweet: 0.123, Regal: -0.001,
   Mischievous: -0.014, Sleepy: 0.105, Goofy: 0.132, Fierce: -0.049, Dramatic: -0.143, Mysterious: -0.091, Zen: 0.226 };
 for (const a of DATA.arch) a[5] = OFF[a[0]];
 Object.assign(DATA.moments, { wink: [9, 2.5], doze: [8.5, 4], blep: [9, 3], snarl: [9, 2.5], gasp: [9.5, 2], glow: [9, 3], meditate: [8.5, 4] });
-if (SUP && (SPK === "Shadow" || SPK === "Cosmic")) DATA.arch.find((a) => a[0] === "Mysterious")[5] += 0.12;   // the spirits lean mysterious,
-if (WLD && WX.heavy) DATA.arch.find((a) => a[0] === "Fierce")[5] += 0.08;                                   // the big cats fierce
+if (SUP && (SPK === "Shadow" || SPK === "Cosmic")) DATA.arch.find((a) => a[0] === "Mysterious")[5] += 0.12;    
+if (WLD && WX.heavy) DATA.arch.find((a) => a[0] === "Fierce")[5] += 0.08;                                    
 const ARCH = DATA.arch.map(([name, c, moment, reaction, adverb, off]) => ({ name, c, moment, reaction, adverb,
   d: [..."NEDIA"].reduce((s, k, i) => s + (F5[k] - c[i]) ** 2, 0) - off })).sort((a, b) => a.d - b.d)[0];
 const TEMP = ARCH.name;
-/* Grabby Paws: some cats can't resist your cursor (the playful ones most of all) */
-/* every cat's forelegs are alive: a resting stance and a gesture by temperament, grooming, a sip of
-   whatever it holds, and (live) a reach for your pointer in its own style */
-const GRABBY = false;   // paws don't chase the pointer; only the mythics' weapons answer it
-/* the enchanted blade: pommel, wrapped grip, a curling gold guard, a long blade with a fuller,
-   runes that pulse up it, and cold light along its edges (local units: up the blade is -y) */
+ 
+
+
+const GRABBY = false;    
+
+
 let SW_ = null;
 if (KNIGHT) {
-  const g = E("g", {}, PAWG), L = 4.5 * K /* a two-handed longsword, far too big for its knight */, bw = 0.12 * K, trail = E("path", { fill: "#cfeeff", opacity: 0, filter: "url(#eg)" }, PAWG);
+  const g = E("g", {}, PAWG), L = 4.5 * K  , bw = 0.12 * K, trail = E("path", { fill: "#cfeeff", opacity: 0, filter: "url(#eg)" }, PAWG);
   PAWG.insertBefore(trail, g);
-  E("path", { d: `M${f1(-bw)} ${f1(-0.06 * K)}L${f1(-bw * 0.85)} ${f1(-L + 0.25 * K)}L0 ${f1(-L)}L${f1(bw * 0.85)} ${f1(-L + 0.25 * K)}L${f1(bw)} ${f1(-0.06 * K)}Z`, fill: "#9fd8ff", opacity: 0.55, filter: "url(#eg)" }, g);   // the glow
+  E("path", { d: `M${f1(-bw)} ${f1(-0.06 * K)}L${f1(-bw * 0.85)} ${f1(-L + 0.25 * K)}L0 ${f1(-L)}L${f1(bw * 0.85)} ${f1(-L + 0.25 * K)}L${f1(bw)} ${f1(-0.06 * K)}Z`, fill: "#9fd8ff", opacity: 0.55, filter: "url(#eg)" }, g);    
   const bl = E("linearGradient", { id: "blade", x1: 0, x2: 1, y1: 0, y2: 0 }, defs);
   for (const [o, c] of [[0, "#9aa7b8"], [0.45, "#ffffff"], [0.55, "#e8f4ff"], [1, "#8796a8"]]) E("stop", { offset: o, "stop-color": c }, bl);
   E("path", { d: `M${f1(-bw * 0.8)} ${f1(-0.06 * K)}L${f1(-bw * 0.7)} ${f1(-L + 0.25 * K)}L0 ${f1(-L + 0.02 * K)}L${f1(bw * 0.7)} ${f1(-L + 0.25 * K)}L${f1(bw * 0.8)} ${f1(-0.06 * K)}Z`, fill: "url(#blade)", stroke: "#6f7c8e", "stroke-width": 2 }, g);
-  E("path", { d: `M0 ${f1(-0.12 * K)}L0 ${f1(-L + 0.4 * K)}`, stroke: "#8fa0b4", "stroke-width": 3 }, g);                                   // fuller
+  E("path", { d: `M0 ${f1(-0.12 * K)}L0 ${f1(-L + 0.4 * K)}`, stroke: "#8fa0b4", "stroke-width": 3 }, g);                                    
   const runes = [];
   for (let i = 0; i < 9; i++) { const y = -0.4 * K - i * 0.38 * K, rs = 0.05 * K;
     runes.push(E("path", { d: [`M${f1(-rs)} ${f1(y - rs)}L${f1(rs)} ${f1(y + rs)}M${f1(rs)} ${f1(y - rs)}L0 ${f1(y)}`, `M0 ${f1(y - rs)}L0 ${f1(y + rs)}M${f1(-rs)} ${f1(y)}L${f1(rs)} ${f1(y - rs * 0.5)}`, `M${f1(-rs)} ${f1(y + rs)}L0 ${f1(y - rs)}L${f1(rs)} ${f1(y + rs)}`][i % 3],
       fill: "none", stroke: "#7fe6ff", "stroke-width": 3, "stroke-linecap": "round", filter: "url(#eg)" }, g)); }
   E("path", { d: `M${f1(-0.44 * K)} ${f1(-0.02 * K)}Q${f1(-0.24 * K)} ${f1(-0.12 * K)} 0 ${f1(-0.06 * K)}Q${f1(0.24 * K)} ${f1(-0.12 * K)} ${f1(0.44 * K)} ${f1(-0.02 * K)}Q${f1(0.52 * K)} ${f1(-0.12 * K)} ${f1(0.42 * K)} ${f1(-0.17 * K)}M${f1(-0.44 * K)} ${f1(-0.02 * K)}Q${f1(-0.52 * K)} ${f1(-0.12 * K)} ${f1(-0.42 * K)} ${f1(-0.17 * K)}`,
-    fill: "none", stroke: "#e2b44a", "stroke-width": f1(0.07 * K), "stroke-linecap": "round", "stroke-linejoin": "round" }, g);   // the guard, curled
-  /* the grip and pommel live in their own layer, under the paws; the blade rides above the forelegs */
+    fill: "none", stroke: "#e2b44a", "stroke-width": f1(0.07 * K), "stroke-linecap": "round", "stroke-linejoin": "round" }, g);    
+   
   const gg = E("g", {}, PAWG);
   E("rect", { x: f1(-0.055 * K), y: 0, width: f1(0.11 * K), height: f1(0.5 * K), rx: 4, fill: "#5a3a2a" }, gg);
   for (let i = 1; i < 9; i++) E("path", { d: `M${f1(-0.055 * K)} ${f1(i * 0.055 * K)}l${f1(0.11 * K)} ${f1(0.03 * K)}`, stroke: "#3a2418", "stroke-width": 2 }, gg);
@@ -1139,7 +1120,7 @@ if (KNIGHT) {
   SW_ = { g, gg, trail, runes, sparks, motes, L, ang: -19, gx: HX - 0.32 * K, gy: HY + 1.66 * K, hist: [], atk: -9, parry: -9, lunge: -9, hit: -9, hitXY: [0, 0], eng: 0 };
 }
 if (MONK) {
-  /* the plasma blade: a light-coloured glow around a white-hot core, from a ribbed metal hilt */
+   
   const g = E("g", {}, PAWG), L = 3.3 * K, trail = E("path", { fill: PLC, opacity: 0, filter: "url(#eg)" }, PAWG);
   const glow = E("path", { d: `M0 ${f1(-0.06 * K)}L0 ${f1(-L)}`, stroke: PLC, "stroke-width": f1(0.24 * K), "stroke-linecap": "round", opacity: 0.6, filter: "url(#eg)" }, g);
   E("path", { d: `M0 ${f1(-0.06 * K)}L0 ${f1(-L)}`, stroke: PLC, "stroke-width": f1(0.12 * K), "stroke-linecap": "round" }, g);
@@ -1147,8 +1128,8 @@ if (MONK) {
   const gg = E("g", {}, PAWG), hl = E("linearGradient", { id: "hilt", x1: 0, x2: 1, y1: 0, y2: 0 }, defs);
   for (const [o, c] of [[0, "#5f6a78"], [0.45, "#e6ebf2"], [1, "#4a5360"]]) E("stop", { offset: o, "stop-color": c }, hl);
   E("rect", { x: f1(-0.065 * K), y: f1(-0.06 * K), width: f1(0.13 * K), height: f1(0.5 * K), rx: 4, fill: "url(#hilt)", stroke: "#2c3038", "stroke-width": 2 }, gg);
-  E("rect", { x: f1(-0.085 * K), y: f1(-0.08 * K), width: f1(0.17 * K), height: f1(0.08 * K), rx: 3, fill: "#3a404a" }, gg);           // emitter
-  for (let i = 0; i < 5; i++) E("rect", { x: f1(-0.07 * K), y: f1((0.12 + i * 0.055) * K), width: f1(0.14 * K), height: f1(0.025 * K), fill: "#16151a" }, gg);   // grip rings
+  E("rect", { x: f1(-0.085 * K), y: f1(-0.08 * K), width: f1(0.17 * K), height: f1(0.08 * K), rx: 3, fill: "#3a404a" }, gg);            
+  for (let i = 0; i < 5; i++) E("rect", { x: f1(-0.07 * K), y: f1((0.12 + i * 0.055) * K), width: f1(0.14 * K), height: f1(0.025 * K), fill: "#16151a" }, gg);    
   E("circle", { cx: f1(0.04 * K), cy: f1(0.04 * K), r: 3.5, fill: "#ff3b3b" }, gg);
   const sparks = Array.from({ length: 10 }, () => E("path", { stroke: PLC, "stroke-width": 4, "stroke-linecap": "round", filter: "url(#eg)", opacity: 0 }, PAWG));
   const rings = [0, 1, 2].map(() => E("ellipse", { fill: "none", stroke: mix(PLC, "#ffffff", 0.5), "stroke-width": 6, opacity: 0, filter: "url(#eg)", "pointer-events": "none" }));
@@ -1157,7 +1138,7 @@ if (MONK) {
 let SH_ = null, GUN_ = null, KICK = -9;
 const CRUMBS = ACTN === "bite" ? Array.from({ length: 7 }, (_, i) => E("circle", { r: f1(3 + (i % 3)), fill: { Donut: "#d9a066", Pizza: "#ffd25e", Fish: "#ffb070" }[HOLD], opacity: 0 }, PAWG)) : [];
 if (CIB) {
-  /* a tiny chrome blaster with a glowing core: small enough to hide in a paw, far too powerful */
+   
   const g = E("g", {}, PAWG), gs = K / 186, ch_ = E("linearGradient", { id: "chrome2", x1: 0, x2: 1, y1: 0, y2: 0 }, defs);
   for (const [o, c] of [[0, "#7f8a99"], [0.4, "#ffffff"], [0.6, "#dfe5ec"], [1, "#6f7a88"]]) E("stop", { offset: o, "stop-color": c }, ch_);
   E("rect", { x: -9 * gs, y: 0, width: 18 * gs, height: 26 * gs, rx: 5 * gs, fill: "#2a2a33" }, g);
@@ -1172,7 +1153,7 @@ if (CIB) {
   GUN_ = { g, core, muzzle, bolts, booms, flash, gs, x: HX + 0.62 * K, y: HY + 0.8 * K, ang: -8, eng: 0, last: -9, shots: [], big: -9, n: 0 };
 }
 if (GLAD) {
-  /* the gladius: a short, broad, leaf-shaped blade; a bronze guard, a ribbed bone grip, a ball pommel */
+   
   const g = E("g", {}, PAWG), L = 1.85 * K, bw = 0.15 * K, trail = E("path", { fill: "#fff3d0", opacity: 0, filter: "url(#eg)" }, PAWG);
   const bl = E("linearGradient", { id: "gblade", x1: 0, x2: 1, y1: 0, y2: 0 }, defs);
   for (const [o, c] of [[0, "#8796a8"], [0.45, "#ffffff"], [0.55, "#eef3f8"], [1, "#7d8b9c"]]) E("stop", { offset: o, "stop-color": c }, bl);
@@ -1185,24 +1166,24 @@ if (GLAD) {
   E("circle", { cy: f1(0.32 * K), r: f1(0.08 * K), fill: "#d6a24c", stroke: "#7a4a1c", "stroke-width": 2 }, gg);
   const sparks = Array.from({ length: 10 }, () => E("path", { stroke: "#fff3b0", "stroke-width": 4, "stroke-linecap": "round", filter: "url(#eg)", opacity: 0 }, PAWG));
   SW_ = { g, gg, trail, runes: [], sparks, motes: [], L, ang: 22, gx: HX + 0.62 * K, gy: HY + 1.72 * K, hist: [], atk: -9, parry: -9, lunge: -9, hit: -9, hitXY: [0, 0], eng: 0, glad: true };
-  /* the scutum: tall, curved, red; a gold border, a bronze boss, gold thunderbolts and wings */
+   
   const sg = E("g", {}, PAWG), w = 0.5 * K, h = 0.78 * K;
   E("rect", { x: f1(-w), y: f1(-h), width: f1(2 * w), height: f1(2 * h), rx: f1(0.12 * K), fill: "#b3202c", stroke: "#e2b44a", "stroke-width": f1(0.05 * K) }, sg);
-  E("rect", { x: f1(-w * 0.62), y: f1(-h), width: f1(w * 0.32), height: f1(2 * h), fill: "#ffffff", opacity: 0.08 }, sg);                          // the curve catches the light
+  E("rect", { x: f1(-w * 0.62), y: f1(-h), width: f1(w * 0.32), height: f1(2 * h), fill: "#ffffff", opacity: 0.08 }, sg);                           
   for (const [a, b_] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) E("path", { d: `M${f1(a * w * 0.18)} ${f1(b_ * h * 0.14)}l${f1(a * w * 0.22)} ${f1(b_ * h * 0.18)}l${f1(-a * w * 0.08)} ${f1(b_ * h * 0.02)}l${f1(a * w * 0.32)} ${f1(b_ * h * 0.34)}`, fill: "none", stroke: "#f4c66a", "stroke-width": 5, "stroke-linejoin": "round", "stroke-linecap": "round" }, sg);
-  for (const a of [-1, 1]) E("path", { d: `M${f1(a * w * 0.2)} 0q${f1(a * w * 0.35)} ${f1(-h * 0.12)} ${f1(a * w * 0.62)} ${f1(-h * 0.02)}q${f1(-a * w * 0.25)} ${f1(h * 0.06)} ${f1(-a * w * 0.4)} ${f1(h * 0.1)}`, fill: "#f4c66a" }, sg);   // wings
+  for (const a of [-1, 1]) E("path", { d: `M${f1(a * w * 0.2)} 0q${f1(a * w * 0.35)} ${f1(-h * 0.12)} ${f1(a * w * 0.62)} ${f1(-h * 0.02)}q${f1(-a * w * 0.25)} ${f1(h * 0.06)} ${f1(-a * w * 0.4)} ${f1(h * 0.1)}`, fill: "#f4c66a" }, sg);    
   E("circle", { r: f1(0.17 * K), fill: "url(#bronze)", stroke: "#6b3f12", "stroke-width": 3 }, sg); E("circle", { r: f1(0.07 * K), fill: "#f4c66a" }, sg);
   SH_ = { g: sg, x: HX - 0.5 * K, y: HY + 1.9 * K, rot: -6 };
-  /* rose petals for the triumph */
+   
   SH_.petals = Array.from({ length: 16 }, (_, i) => E("ellipse", { rx: 9, ry: 5, fill: i % 3 ? "#e8334a" : "#ff7a8a", opacity: 0, "pointer-events": "none" }));
 }
 buildArms();
-if (CIB) { for (const W of arms) PAWG.appendChild(W.g); PAWG.appendChild(GUN_.g); }   // the gun sits in the paw, in front
-if (GLAD) { PAWG.appendChild(SW_.gg); for (const W of arms) PAWG.appendChild(W.g); PAWG.appendChild(SH_.g);   // the shield covers its paw
+if (CIB) { for (const W of arms) PAWG.appendChild(W.g); PAWG.appendChild(GUN_.g); }    
+if (GLAD) { PAWG.appendChild(SW_.gg); for (const W of arms) PAWG.appendChild(W.g); PAWG.appendChild(SH_.g);    
   PAWG.appendChild(SW_.trail); PAWG.appendChild(SW_.g); for (const sp of SW_.sparks) PAWG.appendChild(sp); }
-if (KNIGHT || MONK) { PAWG.appendChild(SW_.gg); for (const W of arms) PAWG.appendChild(W.g);                           // the paws close over the grip,
-  PAWG.appendChild(SW_.trail); PAWG.appendChild(SW_.g); for (const sp of SW_.sparks) PAWG.appendChild(sp); }   // the blade always swings in front of the forelegs
-const S0 = cl(1.3 + 1.6 * F5.N - 0.5 * F5.A + 0.3 * F5.I * F5.N, 1.1, 3.4);      // sitting for a portrait: calmer than walking
+if (KNIGHT || MONK) { PAWG.appendChild(SW_.gg); for (const W of arms) PAWG.appendChild(W.g);                            
+  PAWG.appendChild(SW_.trail); PAWG.appendChild(SW_.g); for (const sp of SW_.sparks) PAWG.appendChild(sp); }    
+const S0 = cl(1.3 + 1.6 * F5.N - 0.5 * F5.A + 0.3 * F5.I * F5.N, 1.1, 3.4);       
 const V0 = cl(0.2 + 0.5 * F5.A + 0.3 * F5.E - 0.5 * F5.D * (1 - F5.A) - 0.3 * F5.N, -1, 1);
 const A0 = cl(0.2 + 0.45 * F5.E + 0.4 * F5.I - 0.2 * (1 - F5.N) * F5.A);
 const level = (s) => { const i = cl(Math.floor(s) - 1, 0, DATA.levels.length - 2), m = cl(s - 1 - i);
@@ -1211,9 +1192,9 @@ const VAL = (v) => { const o = {}, src = v >= 0 ? DATA.valence.pos : DATA.valenc
 const MOM = DATA.moments[ARCH.moment], MS = MOM[0], MD = MOM[1];
 const free = (lo, hi) => { let x; do x = rr(lo, hi); while (x > MS - 1 && x < MS + MD + 1); return x; };
 const BLINKS = [free(3, 8)]; if (F5.A > 0.5 && F5.N < 0.55) BLINKS.push(free(12.5, 15.5));
-const GT = free(1, 12.5), GROOM = free(1, 14), SIP = free(1, 14);                       // when, in the loop, the gesture, the grooming and the sip happen
+const GT = free(1, 12.5), GROOM = free(1, 14), SIP = free(1, 14);                        
 const BW8 = 0.34 - 0.12 * F5.N;
-/* [left, right] resting stance; the gesture; how it reaches for you: [max reach, swipe Hz, swipe px, only when close] */
+ 
 const POSE = { Confident: ["hip", "hip"], Regal: ["clasp", "clasp"], Sassy: ["hip", "rest"], Grumpy: ["cross", "cross"], Shy: ["clasp", "clasp"], Playful: ["rest", "rest"], Goofy: ["rest", "rest"],
   Curious: ["rest", "rest"], Chill: ["rest", "rest"], Sleepy: ["rest", "rest"], Sweet: ["clasp", "clasp"], Mischievous: ["clasp", "clasp"], Fierce: ["guard", "guard"], Dramatic: ["rest", "rest"],
   Mysterious: ["steeple", "steeple"], Zen: ["prayer", "prayer"] }[TEMP];
@@ -1222,9 +1203,9 @@ const GEST = { Confident: "wave", Regal: "royal", Sassy: "flick", Shy: "cover", 
 const REACH = { Playful: [1, 12, 34, 0], Goofy: [1, 14, 40, 0], Grumpy: [0.9, 16, 46, 1], Fierce: [1, 15, 46, 0], Shy: [0.5, 5, 12, 0], Sweet: [0.8, 4, 14, 0], Regal: [0.75, 5, 16, 1],
   Zen: [0.6, 3, 10, 1], Mysterious: [0.7, 4, 12, 1] }[TEMP] || [0.9, 9, 26, 0];
 const TWITCH = free(1.5, 15), TSIDE = ch(0.5) ? 1 : -1, FLICK = free(1.5, 15), LOOK = free(2, 14), LOOKS = ch(0.5) ? 1 : -1, SNIFF = free(1.5, 15);
-const BPM = Math.round(wp([[72, 2], [80, 3], [88, 3], [96, 2]]) * (0.9 + 0.2 * A0)), BEAT = 60 / BPM;   // the portrait's own slow pulse
+const BPM = Math.round(wp([[72, 2], [80, 3], [88, 3], [96, 2]]) * (0.9 + 0.2 * A0)), BEAT = 60 / BPM;    
 
-/* the emote for a tap, by temperament (as in Prancers) */
+ 
 { const ink = { stroke: "#fff", "stroke-width": 7, "stroke-linecap": "round", "stroke-linejoin": "round", fill: "none" };
   const heartD = (x, y, k) => `M${x} ${y + 12 * k}C${x - 22 * k} ${y - 4 * k} ${x - 15 * k} ${y - 22 * k} ${x} ${y - 11 * k}C${x + 15 * k} ${y - 22 * k} ${x + 22 * k} ${y - 4 * k} ${x} ${y + 12 * k}Z`;
   const starD = (x, y, r) => `M${x} ${y - r}Q${x} ${y} ${x + r} ${y}Q${x} ${y} ${x} ${y + r}Q${x} ${y} ${x - r} ${y}Q${x} ${y} ${x} ${y - r}Z`;
@@ -1243,8 +1224,8 @@ const BPM = Math.round(wp([[72, 2], [80, 3], [88, 3], [96, 2]]) * (0.9 + 0.2 * A
   else if (r === "om") { E("circle", { cy: -14, r: 22, ...ink, "stroke-width": 4 }, EMO); E("circle", { cy: -14, r: 6, fill: "#fff" }, EMO); }
   else { E("path", { d: "M-12 -38q0 -16 14 -16q14 0 14 13q0 9 -12 14v8", ...ink }, EMO); E("circle", { cx: 2, cy: 2, r: 5, fill: "#fff" }, EMO); } }
 
-/* ================================================================ the pose */
-let CLICK = null, CLICKXY = null;                 // live only
+ 
+let CLICK = null, CLICKXY = null;                  
 const LIVE = { gx: 0, gy: 0, att: 0, pet: 0, tx: 500, ty: 400, in: false };
 function pose(t, b, lb) {
   let s = S0, v = V0;
@@ -1259,22 +1240,22 @@ function pose(t, b, lb) {
   P.head += (F5.D - 0.5) * 16 + (F5.E - 0.5) * 6 - (F5.N - 0.5) * 8;
   P.tilt = 0; P.gx = 0; P.gy = 0; P.yawn = 0; P.flick = 0; P.yaw = 0; P.sniff = 0; P.back = 0; P.lean = 0;
   P.wink = 0; P.smirk = 0; P.blep = 0; P.cross = 0; P.snarl = 0; P.gasp = 0; P.glow = 0; P.aura = 0; P.float = 0; P.zzz = 0; P.dizzy = 0; P.eyeS = 1;
-  P.emo = 0; P.emoY = 0;                                                                   // no reaction bubbles: the cat answers a tap with its face and body
+  P.emo = 0; P.emoY = 0;                                                                    
   let lidMul = 1;
   for (const k of BLINKS) lidMul = Math.min(lidMul, 1 - 0.95 * bump(lb, k, BW8));
   P.twitch = -18 * bump(lb, TWITCH, 0.16) + 7 * bump(lb, TWITCH + 0.3, 0.14);
   P.flick += 26 * bump(lb, FLICK, 0.45);
   P.sniff = bump(lb, SNIFF, 0.12) + bump(lb, SNIFF + 0.3, 0.12);
-  /* an idle glance away, then straight back to you */
+   
   const lk = bump(lb, LOOK + 0.6, 0.9); P.gx += 0.75 * LOOKS * lk; P.yaw += 0.35 * LOOKS * lk; P.ear += 6 * lk;
   switch (ARCH.moment) {
-    case "slowBlink": case "catKiss": case "nod":                  // the slow blink: a cat's "I trust you", right at the viewer
+    case "slowBlink": case "catKiss": case "nod":                   
       lidMul = Math.min(lidMul, 1 - 0.9 * bump(lb, mid, MD * 0.32)); P.ear += 3 * m;
       if (ARCH.moment === "catKiss") P.tilt += 9 * m;
       if (ARCH.moment === "nod") { P.head -= 10 * bump(lb, mid, 0.6); } break;
     case "glance":
       P.gx = 0.8 * LOOKS * m * (lb > MS + 0.4 ? 1 : 0.3); P.gy = 0.4 * m; P.head -= 6 * m; P.ear -= 16 * m; P.earH = lerp(P.earH, 0.9, m); break;
-    case "frenzy": {                                             // something tiny flies past: eyes track it
+    case "frenzy": {                                              
       const u = cl((lb - MS) / MD); P.pupil += 0.14 * m; P.ear += 12 * m; P.gx = m * Math.cos(Math.PI * u) * -0.9; P.gy = -0.5 * m * Math.sin(Math.PI * u); P.yaw = 0.4 * P.gx; P.flick += 30 * m; break; }
     case "glare":
       P.lid = lerp(P.lid, 0.4, m); P.ear -= 26 * m; P.earH = lerp(P.earH, 0.86, m); P.flick += 18 * m; break;
@@ -1282,7 +1263,7 @@ function pose(t, b, lb) {
     case "doubleTake": { const look = m * (lb < mid ? 1 : 0); P.gx = 0.9 * LOOKS * look; P.yaw = 0.45 * LOOKS * look; P.tilt -= 16 * m * (lb >= mid ? 1 : 0); P.ear += 12 * m; P.pupil += 0.06 * m; break; }
     case "chinUp": P.head += 14 * m; P.tilt -= 7 * m; P.lid = lerp(P.lid, 0.55, m); break;
     case "wink": P.wink = bump(lb, mid, MD * 0.32); P.smirk = m; P.tilt += 7 * WSIDE * m; P.ear += 4 * m; break;
-    case "doze": { const u = cl((lb - MS) / MD), d = u < 0.78 ? smooth(cl(u * 1.5)) : 0;   // drifts off... then snaps awake
+    case "doze": { const u = cl((lb - MS) / MD), d = u < 0.78 ? smooth(cl(u * 1.5)) : 0;    
       lidMul = Math.min(lidMul, 1 - 0.9 * d); P.head -= 16 * d; P.tilt += 6 * d; P.zzz = d; P.ear += 14 * bump(u, 0.84, 0.1) - 8 * d; P.pupil += 0.1 * bump(u, 0.84, 0.12); break; }
     case "blep": P.blep = m; P.cross = 0.55 * m; P.tilt -= 5 * m; break;
     case "snarl": { const k = bump(lb, mid, MD * 0.42); P.snarl = k; P.yawn = Math.max(P.yawn, 0.45 * k); P.ear -= 30 * k; P.earH = lerp(P.earH, 0.82, k); P.lid = lerp(P.lid, 0.6, k); P.puff += 0.2 * k; break; }
@@ -1290,7 +1271,7 @@ function pose(t, b, lb) {
     case "glow": P.glow = m; P.pupil -= 0.13 * m; P.lid = lerp(P.lid, 0.72, m); break;
     case "meditate": P.aura = m; lidMul = Math.min(lidMul, 1 - 0.94 * m); P.float = 16 * m; P.ear += 2 * m; break;
   }
-  /* live: your pointer pulls the gaze; petting softens everything */
+   
   const a = LIVE.att * (1 - m * 0.5);
   P.gx = lerp(P.gx, LIVE.gx, a); P.gy = lerp(P.gy, LIVE.gy, a); P.yaw = lerp(P.yaw, LIVE.gx * 0.55, a); P.tilt += 6 * LIVE.gx * a; P.ear += 8 * a;
   P.lid = lerp(P.lid, 0.22, LIVE.pet); P.tilt += 14 * LIVE.pet * (LIVE.tx > HX ? 1 : -1); P.ear -= 6 * LIVE.pet; P.whisk += 6 * LIVE.pet;
@@ -1310,11 +1291,11 @@ function pose(t, b, lb) {
     case "glowStare": P.glow = Math.max(P.glow, rx); P.pupil -= 0.14 * rx; P.lid = lerp(P.lid, 0.7, rx); break;
     case "om": P.aura = Math.max(P.aura, rx); lidMul = Math.min(lidMul, 1 - 0.94 * rx); P.float = Math.max(P.float, 18 * rx); break;
   }
-  if (CIB && t - KICK < 1.5) { const k = Math.exp(-(t - KICK) * 3); P.back += 1.6 * k; P.ear -= 20 * k; P.puff += 0.3 * k; }   // a tiny gun with a huge kick
-  /* the held thing: a sip, a bite (two chomps), a lick, a sniff; eyes follow a toss up and back */
+  if (CIB && t - KICK < 1.5) { const k = Math.exp(-(t - KICK) * 3); P.back += 1.6 * k; P.ear -= 20 * k; P.puff += 0.3 * k; }    
+   
   const gw = groomU(b);
   if (gw > 0) { const ge = smooth(cl(gw / 0.12)) * smooth(cl((1 - gw) / 0.12)); lidMul = Math.min(lidMul, 1 - 0.85 * ge); P.blep = Math.max(P.blep, gw < 0.3 ? bump(gw, 0.12, 0.06) + bump(gw, 0.22, 0.06) : 0);
-    P.tilt += 10 * ge * (gw > 0.3 ? 1 : 0); }                                                   // eyes shut, a lick, the head leaning into the wipe
+    P.tilt += 10 * ge * (gw > 0.3 ? 1 : 0); }                                                    
   const au = actU(lb), am = actM(au);
   if (am > 0) switch (ACTN) {
     case "sip": P.lid = lerp(P.lid, 0.45, am); P.whisk += 4 * am; break;
@@ -1328,11 +1309,11 @@ function pose(t, b, lb) {
   return P;
 }
 
-/* ================================================================== frame */
+ 
 let LASTT = null;
 function draw(t) {
   const b = t / BEAT, lb = frac(b / LOOP) * LOOP, P = pose(t, b, lb);
-  const br = Math.sin(TAU * b / 4);                                   // one breath every four beats
+  const br = Math.sin(TAU * b / 4);                                    
   const float = SPK === "Ghost" || SPK === "Celestial" ? 10 * Math.sin(TAU * lb / 8) : 0;
   const hx = HX + P.yaw * 12, hy = HY - P.head * 0.9 + P.crouch * 0.5 - 4 * br + float + P.back * 14 - P.float;
   const sc = 1 - 0.04 * P.back;
@@ -1341,12 +1322,12 @@ function draw(t) {
   set(LEGG, { transform: `translate(${HX} ${f1(HY + float * 0.6)})` });
   set(BODYG, { transform: `translate(${HX} ${f1(HY + float * 0.6 + 0.9 * K)}) scale(${f1((1 + 0.014 * br) * 1000) / 1000} ${f1((1 + 0.01 * br) * 1000) / 1000}) translate(0 ${f1(-0.9 * K)})` });
   set(WINGG, { transform: `translate(${HX} ${f1(HY + float * 0.6)})` });
-  for (const w of wings) set(w.g, { transform: `translate(${f1(w.s * BX(0.32) * K)} ${U(1.0)}) scale(.7) rotate(${f1(w.s * (5 * Math.sin(TAU * lb / 4) + 3 * pulse(b / 2)))})` });   // a slow beat of the wings, rooted at the shoulder blades
+  for (const w of wings) set(w.g, { transform: `translate(${f1(w.s * BX(0.32) * K)} ${U(1.0)}) scale(.7) rotate(${f1(w.s * (5 * Math.sin(TAU * lb / 4) + 3 * pulse(b / 2)))})` });    
   set(FACE, { transform: `translate(${f1(P.yaw * 0.12 * K)} ${f1(P.gy * 0.04 * K)})` }); set(FACEM, { transform: `translate(${f1(P.yaw * 0.1 * K)} 0)` });
-  /* ears */
+   
   for (const E_ of EARG) { const rot = E_.s * (-P.ear * 0.7 + (E_.s === TSIDE ? P.twitch : 0) * 0.8) + P.yaw * 6;
     set(E_.g, { transform: `translate(${f1(P.yaw * 0.05 * K)} 0) rotate(${f1(E_.fold ? rot * 0.3 : rot)} ${f1(E_.pv[0])} ${f1(E_.pv[1])}) translate(0 ${f1(E_.pv[1] * (1 - P.earH))}) scale(1 ${f1(P.earH * 100) / 100})` }); }
-  /* eyes: lids, pupils, gaze */
+   
   for (const e of eyes) {
     const lid = P.lid * (e.s === WSIDE ? 1 - 0.95 * P.wink : 1);
     set(e.lid, { transform: `scale(${f1(P.eyeS * 100) / 100} ${f1(Math.max(0.03, lid * P.eyeS) * 100) / 100})` });
@@ -1362,17 +1343,17 @@ function draw(t) {
   STARS.forEach((st, i) => { const a = TAU * (t / 1.2 + i / 3); set(st, { opacity: f1(P.dizzy * 100) / 100, transform: `translate(${f1(hx + 0.9 * K * Math.cos(a))} ${f1(hy - 1.05 * K + 0.22 * K * Math.sin(a))})` }); });
   set(MOUTH, { opacity: P.yawn > 0.02 ? 1 : 0, transform: `translate(0 ${U(0.5)}) scale(1 ${f1(Math.max(0.05, P.yawn) * 100) / 100}) translate(0 ${-U(0.5)})` });
   set(NOSE, { transform: `translate(0 ${f1(-3 * P.sniff)})` });
-  /* whiskers sweep forward when content, back when wary; they twitch with a sniff */
+   
   for (const w of whisk) {
     const len = K * 1.15 * WHL * (0.92 + 0.08 * Math.sin(TAU * b / 4 + w.i)), a = (w.a - P.whisk * 0.8 + 4 * P.sniff * (w.i % 2 ? 1 : -1) + 2 * Math.sin(TAU * b / 2 + w.i)) * DEG;
     const x0 = w.s * 0.24 * K + P.yaw * 0.12 * K, y0 = 0.4 * K, ex = x0 + w.s * len * Math.cos(a), ey = y0 + len * Math.sin(a);
     set(w.e, { d: `M${f1(x0)} ${f1(y0)}Q${f1((x0 + ex) / 2)} ${f1((y0 + ey) / 2 + len * DROOP)} ${f1(ex)} ${f1(ey)}` });
   }
-  /* tails: a slow sway with a flick of the tip */
+   
   for (const T of tails) {
     let x = T.side * (BX(0.72) + T.dx) * K, y = 2.72 * K;
     for (let i = 0; i < T.n; i++) {
-      /* up past the shoulder, curling outward at the tip; posture raises or drops it, the sway and tip-flick keep it alive */
+       
       const tip = i / (T.n - 1), a = T.side * (-4 + T.fork * tip + i * T.curl - P.tail * 0.3 + 10 * Math.sin(TAU * (lb / 8 + T.ph) - i * 0.4) * (0.6 + P.sway * 0.4) + P.flick * tip * tip * Math.sin(TAU * b * 2 - i * 0.7)) * DEG;
       const ang = -Math.PI / 2 + a + T.side * 0.25, L = 0.16 * K * (T.n === 4 ? 0.8 : 1), nx = x + L * Math.cos(ang), ny = y + L * Math.sin(ang);
       set(T.segs[i], { x1: f1(HX + x), y1: f1(HY + y), x2: f1(HX + nx), y2: f1(HY + ny) });
@@ -1382,7 +1363,7 @@ function draw(t) {
       set(T.flame, { d: `M${f1(fx - 18)} ${f1(fy)}Q${f1(fx - 20)} ${f1(fy - h * 0.6)} ${f1(fx + 4 * Math.sin(TAU * b * 1.5))} ${f1(fy - h)}Q${f1(fx + 20)} ${f1(fy - h * 0.6)} ${f1(fx + 18)} ${f1(fy)}Q${f1(fx)} ${f1(fy + 14)} ${f1(fx - 18)} ${f1(fy)}Z` }); }
   }
   if (HALOG) set(HALOG, { cx: 0, cy: f1(-1.25 * K + 6 * Math.sin(TAU * lb / 8)) });
-  /* laser beams: out toward wherever you point (or, untouched, out of the frame toward you) */
+   
   if (LZ) {
     const fire = CLICK === null ? 0 : cl(1 - (t - CLICK) / 1.6), aim = LIVE.att;
     for (const B_ of beams) {
@@ -1394,9 +1375,9 @@ function draw(t) {
       const dx = tx - ex, dy = ty - ey, d = Math.hypot(dx, dy) || 1, far = 3000;
       set(B_.e, { d: `M${f1(ex)} ${f1(ey)}L${f1(ex + dx / d * far)} ${f1(ey + dy / d * far)}` });
     }
-    set(LZ, { opacity: f1((0.8 + 0.2 * Math.sin(TAU * b)) * cl((P.lid - 0.12) / 0.22) * 100) / 100 });   // eyes shut, lasers off
+    set(LZ, { opacity: f1((0.8 + 0.2 * Math.sin(TAU * b)) * cl((P.lid - 0.12) / 0.22) * 100) / 100 });    
   }
-  /* emote, hearts, spirits, sparkles */
+   
   set(EMO, { opacity: f1(P.emo * 100) / 100, transform: `translate(${f1(hx + 0.95 * K)} ${f1(hy - 1.25 * K - 30 * P.emoY)}) scale(${f1(0.7 + 0.6 * Math.min(1, P.emo * 1.3))})` });
   HEARTS.forEach((h, i) => { const u = frac(t / 2.2 + i / 4); set(h, { opacity: f1(LIVE.pet * (1 - u) * 100) / 100, transform: `translate(${f1(hx + (i % 2 ? 1 : -1) * (0.5 + 0.2 * i) * K)} ${f1(hy - 0.9 * K - u * 220)}) scale(${f1(1.2 + u)})` }); });
   SPIRITS.forEach((f, i) => { const a = TAU * (lb / 8 + i / 2), x = hx + 1.45 * K * Math.cos(a), y = hy - 0.2 * K + 0.5 * K * Math.sin(a), h = 40 + 8 * Math.sin(TAU * b + i);
@@ -1406,10 +1387,10 @@ function draw(t) {
   for (const fn of BGA) fn(lb);
   for (const fn of OANIM) fn(lb);
   for (const fn of HATA) fn(b);
-  /* the knight: on guard at rest; live, it duels your pointer — it aims, slashes every so often
-     (a wind-up, the cut, a light trail), parries when you swipe fast, and lunges when you tap */
+  
+
   if (GUN_) {
-    /* the agent: gun up by its face at rest; live, it draws down on your pointer and fires pew-pew pairs */
+     
     const G = GUN_, eng = G.eng = G.eng + ((LIVE.in && LIVE.att > 0.25 && LIVE.pet < 0.25 ? 1 : 0) - G.eng) * 0.12;
     const shx = HX + BX(0.4) * K, shy = HY + 1.0 * K + 3 * br;
     if (eng > 0.65 && t - G.last > (G.n % 2 ? 0.16 : 0.9) && t - G.big > 1.2) { G.last = t; G.n++; G.shots.push({ t0: t, big: false }); SOUND.pew(); }
@@ -1417,7 +1398,7 @@ function draw(t) {
     const dx = LIVE.tx - shx, dy = LIVE.ty - shy, d = Math.hypot(dx, dy) || 1, aim = cl(Math.atan2(dx, -dy) / DEG, -120, 150), sg = dx >= 0 ? 1 : -1;
     const rx = HX + 0.62 * K, ry = HY + 0.78 * K + 3 * br;
     const ex = shx + dx / d * K * (0.95 - 0.12 * rec - 0.5 * brec), ey = shy + dy / d * K * (0.95 - 0.12 * rec - 0.5 * brec);
-    G.x = lerp(rx, ex, eng); G.y = lerp(ry, ey, eng); G.ang = lerp(-6 + br, aim, eng) - 22 * rec * sg - 70 * brec * sg;   // the recoil kicks the barrel up
+    G.x = lerp(rx, ex, eng); G.y = lerp(ry, ey, eng); G.ang = lerp(-6 + br, aim, eng) - 22 * rec * sg - 70 * brec * sg;    
     set(G.g, { transform: `translate(${f1(G.x)} ${f1(G.y)}) rotate(${f1(G.ang)})` });
     set(G.core, { r: f1((7 + 3 * Math.sin(t * 8) + 8 * rec) * G.gs) }); set(G.muzzle, { r: f1((4 + 10 * rec + 26 * brec) * G.gs) });
     const a = G.ang * DEG, mx = G.x + Math.sin(a) * 76 * G.gs, my = G.y - Math.cos(a) * 76 * G.gs;
@@ -1430,8 +1411,8 @@ function draw(t) {
     set(G.flash, { opacity: t - G.big < 1 ? f1(0.55 * Math.exp(-(t - G.big) * 9) * 100) / 100 : 0 });
   }
   if (SW_ && SW_.glad) {
-    /* Marcus fights like a legionary: shield up, short thrusts at you, a block when you swipe,
-       and on a tap the sword goes up to the roar of the crowd while petals fall */
+    
+
     const S_ = SW_, eng = S_.eng = S_.eng + ((LIVE.in && LIVE.att > 0.25 && LIVE.pet < 0.25 ? 1 : 0) - S_.eng) * 0.1;
     const rgx = HX + 0.62 * K, rgy = HY + 1.72 * K + 3 * br + float * 0.6;
     const aim = cl(Math.atan2(LIVE.tx - rgx, -(LIVE.ty - rgy)) / DEG, -100, 120);
@@ -1442,7 +1423,7 @@ function draw(t) {
     let ang = lerp(22 + 1.5 * br, aim, eng); ang = lerp(ang, -4, tu);
     S_.gx = lerp(rgx + ux * K * (0.1 * eng + 0.42 * thr), HX + 0.5 * K, tu); S_.gy = lerp(rgy + uy * K * (0.08 * eng + 0.36 * thr) - 0.08 * K * eng, HY + 1.05 * K, tu); S_.ang = ang;
     const stf = `translate(${f1(S_.gx)} ${f1(S_.gy)}) rotate(${f1(ang)})`; set(S_.g, { transform: stf }); set(S_.gg, { transform: stf });
-    /* the shield: held across the body; raised toward you when engaged; swung to block a fast swipe */
+     
     const pr = cl(1 - (t - S_.parry) / 0.45), sx0 = HX - 0.5 * K, sy0 = HY + 1.9 * K + 3 * br;
     const bx = (LIVE.tx - sx0), by = (LIVE.ty - sy0), bd = Math.hypot(bx, by) || 1;
     SH_.x = sx0 + (bx / bd) * K * (0.06 * eng + 0.3 * pr) * (1 - tu) - 0.15 * K * tu; SH_.y = sy0 - 0.18 * K * eng + (by / bd) * K * 0.22 * pr + 0.25 * K * tu; SH_.rot = lerp(-6, -6 + 18 * Math.sign(bx) * pr, 1) - 10 * tu;
@@ -1457,7 +1438,7 @@ function draw(t) {
     SH_.petals.forEach((pe, i) => { const k = (t - S_.lunge) / 2.4, y = -40 + (k * 1.1 + (i % 4) * 0.12) * 1100, x = 60 + i * 58 + 30 * Math.sin(t * 3 + i);
       set(pe, { opacity: k > 0 && k < 1 && y < 1040 ? 0.95 : 0, transform: `translate(${f1(x)} ${f1(y)}) rotate(${f1(t * 200 + i * 40)})` }); });
   } else if (SW_) {
-    const S_ = SW_, eng = S_.eng = S_.eng + ((LIVE.in && LIVE.att > 0.25 && LIVE.pet < 0.25 ? 1 : 0) - S_.eng) * 0.1;   // petted, it lowers its guard
+    const S_ = SW_, eng = S_.eng = S_.eng + ((LIVE.in && LIVE.att > 0.25 && LIVE.pet < 0.25 ? 1 : 0) - S_.eng) * 0.1;    
     const rgx = HX - 0.32 * K, rgy = HY + 1.66 * K + 3 * br + float * 0.6;
     const aim = cl(Math.atan2(LIVE.tx - rgx, -(LIVE.ty - rgy)) / DEG, -100, 100);
     if (eng > 0.6 && t - S_.atk > 1.35 + 0.35 * Math.sin(t * 1.7) && t - S_.parry > 0.5 && t - S_.lunge > 0.6) { S_.atk = t; SOUND.swish(); }
@@ -1471,30 +1452,30 @@ function draw(t) {
     const stf = `translate(${f1(S_.gx)} ${f1(S_.gy)}) rotate(${f1(ang)})`; set(S_.g, { transform: stf }); set(S_.gg, { transform: stf });
     S_.runes.forEach((r, i) => set(r, { opacity: f1((0.35 + 0.65 * bump(frac(lb / 4 - i / 7), 0.5, 0.18) + 0.5 * lu) * 100) / 100 }));
     if (S_.plasma) { set(S_.glow, { opacity: f1((0.55 + 0.08 * Math.sin(t * 41) + 0.05 * Math.sin(t * 17)) * 100) / 100 });
-      /* the push: three ripples from the paw out toward your pointer */
+       
       const px = HX - BX(0.4) * K, py = HY + 1.0 * K, q0 = (t - S_.push) / 0.9;
       S_.rings.forEach((rg, i) => { const q = q0 - i * 0.12; if (q < 0 || q > 1) return set(rg, { opacity: 0 });
         const cx = lerp(px, S_.pushXY[0], q), cy = lerp(py, S_.pushXY[1], q), r = 20 + 120 * q, an = Math.atan2(S_.pushXY[1] - py, S_.pushXY[0] - px) / DEG;
         set(rg, { cx: f1(cx), cy: f1(cy), rx: f1(r * 0.45), ry: f1(r), transform: `rotate(${f1(an)} ${f1(cx)} ${f1(cy)})`, opacity: f1((1 - q) * 0.9 * 100) / 100 }); }); }
-    /* the light trail of a cut: a ribbon through the recent tip and mid-blade positions */
+     
     const a = ang * DEG, tip = [S_.gx + Math.sin(a) * S_.L, S_.gy - Math.cos(a) * S_.L], midp = [S_.gx + Math.sin(a) * S_.L * 0.62, S_.gy - Math.cos(a) * S_.L * 0.62];
     S_.hist.push([t, tip, midp]); while (S_.hist.length && t - S_.hist[0][0] > 0.07) S_.hist.shift();
     const moving = S_.hist.length > 2 && Math.hypot(S_.hist[0][1][0] - tip[0], S_.hist[0][1][1] - tip[1]) > 60;
     set(S_.trail, { opacity: moving ? 0.28 : 0, d: moving ? "M" + S_.hist.map((h) => `${f1(h[1][0])} ${f1(h[1][1])}`).join("L") + "L" + S_.hist.slice().reverse().map((h) => `${f1(h[2][0])} ${f1(h[2][1])}`).join("L") + "Z" : "M0 0" });
-    /* clang: sparks where steel meets your pointer (parry, lunge) */
+     
     const hk = cl(1 - (t - S_.hit) / 0.35);
     S_.sparks.forEach((sp, i) => { const q = i / 10 * TAU + S_.hit, r0 = 10 + 70 * (1 - hk), r1 = r0 + 30 * hk;
       set(sp, { opacity: f1(hk * 100) / 100, d: `M${f1(S_.hitXY[0] + Math.cos(q) * r0)} ${f1(S_.hitXY[1] + Math.sin(q) * r0)}L${f1(S_.hitXY[0] + Math.cos(q) * r1)} ${f1(S_.hitXY[1] + Math.sin(q) * r1)}` }); });
-    /* spell motes drift up around the blade */
+     
     S_.motes.forEach((m, i) => { const k = frac(lb / 8 + i / 8), y = S_.gy - S_.L * (0.2 + 0.8 * k), x = S_.gx + Math.sin(a) * S_.L * (0.2 + 0.8 * k) + 40 * Math.sin(TAU * (k * 2 + i / 3));
       set(m, { opacity: f1(bump(k, 0.5, 0.5) * 0.9 * 100) / 100, transform: `translate(${f1(x)} ${f1(y)}) scale(${f1(0.5 + 0.7 * bump(k, 0.5, 0.5))})` }); });
   }
-  /* the starry cape billows */
+   
   if (KCAPE) { const w = Math.sin(TAU * lb / 8), w2 = Math.sin(TAU * lb / 4 + 1), X = (x) => f1(HX + x * K), Y = (y) => f1(HY + y * K + float * 0.6);
     const d = `M${X(-0.36)} ${Y(0.82)}Q${X(BX(-0.95))} ${Y(1.3)} ${X(BX(-1.0))} ${Y(3.28)}Q${X(0)} ${Y(3.36 + 0.04 * w2)} ${X(BX(1.45) + 0.12 * w)} ${Y(3.12 - 0.08 * w)}Q${X(BX(1.6) + 0.1 * w2)} ${Y(2.2)} ${X(BX(1.1) + 0.08 * w)} ${Y(1.5)}Q${X(0.7)} ${Y(1.0)} ${X(0.36)} ${Y(0.82)}Z`;
     KCAPE.forEach((e) => set(e, { d })); }
-  /* forelegs: a resting stance by temperament, a gesture once a loop, grooming, a sip; live, a reach for the
-     pointer in the cat's own style. All of it before a tap is a pure function of loop time. */
+  
+
   const L1 = 0.56 * K, L2 = 0.52 * K;
   for (const W of arms) {
     const s = W.s, [rmax, rhz, ramp, close] = REACH;
@@ -1504,11 +1485,11 @@ function draw(t) {
     W.ext += (want - W.ext) * 0.12;
     let tx = LIVE.tx + Math.sin(t * rhz + s) * ramp, ty = LIVE.ty + 0.1 * K + Math.cos(t * rhz + s) * ramp * 0.4;
     const R_ = L1 + L2 - 6, dd = Math.hypot(tx - sx, ty - sy); if (dd > R_) { tx = sx + (tx - sx) / dd * R_; ty = sy + (ty - sy) / dd * R_; }
-    /* the idle paw */
+     
     const pose = (n) => ({ rest: [s * BX(0.56), 1.98], hip: [s * BX(0.76), 2.12], cross: s > 0 ? [-0.2, 1.55] : [0.22, 1.63], clasp: [s * 0.08, 1.78], guard: [s * 0.22, 1.28],
       steeple: [s * 0.05, 1.42], prayer: [s * 0.03, 1.32], mouth: [s * 0.1, 0.58], chin: [s * 0.14, 0.74], up: [s * 0.72, 0.28], high: [s * 0.62, -0.1], brow: [s * 0.36, -0.12], eye: [s * 0.36, 0.02] }[n]);
     let [ix, iy] = pose(POSE[s < 0 ? 0 : 1]), palm = 0;
-    ix += 0.025 * Math.sin(TAU * lb / 8 + s); iy += 0.02 * Math.sin(TAU * b / 4 + s);       // a little sway
+    ix += 0.025 * Math.sin(TAU * lb / 8 + s); iy += 0.02 * Math.sin(TAU * b / 4 + s);        
     const mix2 = (p, e) => { ix = lerp(ix, p[0], e); iy = lerp(iy, p[1], e); };
     if (!MYTH) {
       const gu = (lb - GT) / 2.6, ge = gu > 0 && gu < 1 ? smooth(cl(Math.min(gu, 1 - gu) * 5)) : 0, g = TAU * gu;
@@ -1522,38 +1503,38 @@ function draw(t) {
         case "chin": if (s > 0) mix2([s * 0.14, 0.74 + 0.03 * Math.sin(g * 4)], ge); break;
         case "stretch": mix2(pose("high"), ge); palm = ge * 0.7; break;
         case "rub": if (s > 0) mix2([s * 0.34 + 0.05 * Math.cos(g * 3), 0.04 + 0.05 * Math.sin(g * 3)], ge); break;
-        case "knead": mix2([s * 0.14, 1.88 + 0.1 * Math.max(0, Math.sin(g * 4 + (s > 0 ? Math.PI : 0)))], ge); break;   // making biscuits
+        case "knead": mix2([s * 0.14, 1.88 + 0.1 * Math.max(0, Math.sin(g * 4 + (s > 0 ? Math.PI : 0)))], ge); break;    
         case "scheme": mix2([s * (0.04 + 0.04 * Math.sin(g * 6)), 1.55], ge); break;
         case "jab": if (s > 0) { const j = Math.max(0, Math.sin(g * 2)); mix2([s * (0.22 + 0.5 * j), 1.28 - 0.4 * j], ge); } break;
         case "swoon": if (s < 0) { mix2(pose("brow"), ge); palm = ge * 0.6; } break;
       }
-      /* grooming, every other loop: lick the paw, then two slow wipes up over the cheek toward the ear */
+       
       const gw = groomU(b), gwe = gw < 0 ? 0 : smooth(cl(gw / 0.12)) * smooth(cl((1 - gw) / 0.12));
       if (gwe > 0 && s > 0 && !(gu > 0 && gu < 1)) { const wp_ = cl((gw - 0.3) / 0.6), sw = Math.sin(Math.PI * frac(wp_ * 2));
         mix2(gw < 0.3 ? [s * 0.1, 0.56] : [s * (0.18 + 0.4 * sw), 0.5 - 0.75 * sw], gwe); }
       const au = actU(lb), am = actM(au);
       if (am > 0 && W.item) {
-        if (MOUTHOFF) mix2([(hx - HX) / K - 0.06, (hy - HY) / K + 0.5 + MOUTHOFF - (ACTN === "sniff" ? 0.22 : 0)], am);   // up to the mouth (the nose, for a rose)
+        if (MOUTHOFF) mix2([(hx - HX) / K - 0.06, (hy - HY) / K + 0.5 + MOUTHOFF - (ACTN === "sniff" ? 0.22 : 0)], am);    
         else if (ACTN === "spell") mix2([s * (0.5 + 0.22 * Math.sin(TAU * au)), 0.7 - 0.35 * Math.sin(Math.PI * au)], am);
-        else mix2([s * 0.42, 1.35 - 0.3 * bump(au, 0.36, 0.1)], am);                  // a flick of the paw: toss, flip, bop
+        else mix2([s * 0.42, 1.35 - 0.3 * bump(au, 0.36, 0.1)], am);                   
       }
     }
     const rx_ = HX + ix * K, ry_ = HY + iy * K + float * 0.6;
     tx = lerp(rx_, tx, W.ext); ty = lerp(ry_, ty, W.ext); W.palm_ = Math.max(W.ext, palm);
     if (SW_ && !SW_.glad) { const a = SW_.ang * DEG, k = W.s < 0 ? 0.1 : 0.36; tx = SW_.gx - Math.sin(a) * k * K; ty = SW_.gy + Math.cos(a) * k * K; W.ext = 0;
       if (SW_.plasma && W.s < 0) { const f = smooth(cl((t - SW_.push) / 0.15)) * cl(1 - (t - SW_.push - 0.4) / 0.5), dx = SW_.pushXY[0] - sx, dy = SW_.pushXY[1] - sy, dd_ = Math.hypot(dx, dy) || 1;
-        if (f > 0) { tx = lerp(tx, sx + dx / dd_ * R_, f); ty = lerp(ty, sy + dy / dd_ * R_, f); W.ext = f; } } }   // both paws on the grip
+        if (f > 0) { tx = lerp(tx, sx + dx / dd_ * R_, f); ty = lerp(ty, sy + dy / dd_ * R_, f); W.ext = f; } } }    
     if (GUN_ && W.s > 0) { const a = GUN_.ang * DEG; tx = GUN_.x - Math.sin(a) * 0.05 * K; ty = GUN_.y + Math.cos(a) * 0.08 * K; W.ext = 0; }
     if (SW_ && SW_.glad) { if (W.s > 0) { const a = SW_.ang * DEG; tx = SW_.gx - Math.sin(a) * 0.12 * K; ty = SW_.gy + Math.cos(a) * 0.12 * K; } else { tx = SH_.x + 0.1 * K; ty = SH_.y; } W.ext = 0; }
     const d = cl(Math.hypot(tx - sx, ty - sy), Math.abs(L1 - L2) + 2, L1 + L2 - 2), base = Math.atan2(ty - sy, tx - sx), a = Math.acos(cl((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), -1, 1));
-    const ea = [base + a, base - a].sort((p, q) => W.s * Math.cos(q) - W.s * Math.cos(p))[0];   // the elbow bows outward
+    const ea = [base + a, base - a].sort((p, q) => W.s * Math.cos(q) - W.s * Math.cos(p))[0];    
     const ex = sx + L1 * Math.cos(ea), ey = sy + L1 * Math.sin(ea), fa = Math.atan2(ty - ey, tx - ex);
     const wx = tx - Math.cos(fa) * 0.12 * K, wy = ty - Math.sin(fa) * 0.12 * K;
     const U_ = `M${f1(sx)} ${f1(sy)}L${f1(ex)} ${f1(ey)}`, F_ = `M${f1(ex)} ${f1(ey)}L${f1(wx)} ${f1(wy)}`;
     set(W.eU, { d: U_ }); set(W.up, { d: U_ }); set(W.eF, { d: F_ }); set(W.fore, { d: F_ });
     if (W.paul) set(W.paul, { transform: `translate(${f1(sx)} ${f1(sy + 0.02 * K)}) rotate(${f1(W.s * 14 + (Math.atan2(ey - sy, ex - sx) / DEG - 90) * 0.35)})` });
     if (W.seam) { const ua = Math.atan2(ey - sy, ex - sx), r = W.wU * 0.5, nx = -Math.sin(ua), ny = Math.cos(ua), cx = sx + Math.cos(ua) * W.wU * 0.25, cy = sy + Math.sin(ua) * W.wU * 0.25;
-      set(W.seam, { d: `M${f1(cx + nx * r)} ${f1(cy + ny * r)}Q${f1(cx - Math.cos(ua) * r * 0.6)} ${f1(cy - Math.sin(ua) * r * 0.6)} ${f1(cx - nx * r)} ${f1(cy - ny * r)}` }); }   // where the sleeve is set in
+      set(W.seam, { d: `M${f1(cx + nx * r)} ${f1(cy + ny * r)}Q${f1(cx - Math.cos(ua) * r * 0.6)} ${f1(cy - Math.sin(ua) * r * 0.6)} ${f1(cx - nx * r)} ${f1(cy - ny * r)}` }); }    
     if (W.crease) { const r = W.wU * 0.32; set(W.crease, { d: `M${f1(ex - r)} ${f1(ey - r * 0.3)}q${f1(r)} ${f1(r * 0.6)} ${f1(2 * r)} 0M${f1(ex - r * 0.7)} ${f1(ey + r * 0.4)}q${f1(r * 0.7)} ${f1(r * 0.4)} ${f1(1.4 * r)} 0` }); }
     const at = (u) => `${f1(ex + (wx - ex) * u)} ${f1(ey + (wy - ey) * u)}`;
     if (W.cuff) set(W.cuff, { d: SHORTSLEEVE ? `M${f1(sx + (ex - sx) * 0.72)} ${f1(sy + (ey - sy) * 0.72)}L${f1(sx + (ex - sx) * 0.82)} ${f1(sy + (ey - sy) * 0.82)}` : `M${at(0.78)}L${at(0.9)}` });
@@ -1563,18 +1544,18 @@ function draw(t) {
         if (ACTN === "sip") rot = 26 * am; else if (ACTN === "bite" || ACTN === "lick") rot = 12 * am;
         else if (ACTN === "toss") { off = -0.95 * K * arc; rot = 540 * q; } else if (ACTN === "flip") { off = -0.8 * K * arc; sx_ = Math.cos(q * Math.PI * 6) || 0.05; }
         else if (ACTN === "bop") off = -0.35 * K * bump(au, 0.4, 0.15); else if (ACTN === "spell") rot = 35 * Math.sin(TAU * au * 1.5) * am; }
-      set(it.g, { transform: `translate(${f1(tx)} ${f1(ty)}) rotate(${f1(rot)}) translate(0 ${f1(off)}) scale(${f1(Math.max(0.05, Math.abs(sx_)) * 100) / 100} 1)` });   // upright in the paw, whatever the wrist does
+      set(it.g, { transform: `translate(${f1(tx)} ${f1(ty)}) rotate(${f1(rot)}) translate(0 ${f1(off)}) scale(${f1(Math.max(0.05, Math.abs(sx_)) * 100) / 100} 1)` });    
       it.sparks.forEach((sp, k) => { const e = au < 0 ? 0 : bump(au, 0.3 + k * 0.07, 0.12); set(sp, { opacity: f1(e * 100) / 100, transform: `translate(${f1(8 * K / 186 + Math.cos(k * 1.3) * 40 * e)} ${f1(-88 * K / 186 - 0.12 * K + Math.sin(k * 1.3) * 40 * e)}) scale(${f1(0.6 + e)})` }); });
       CRUMBS.forEach((c, k) => { const q = au < 0 ? -1 : (au - 0.38 - (k % 2) * 0.2) / 0.3; if (q < 0 || q > 1) return set(c, { opacity: 0 });
         set(c, { opacity: f1((1 - q) * 100) / 100, cx: f1(hx - 0.1 * K + (k - 3) * 9 + q * (k - 3) * 6), cy: f1(hy + 0.6 * K + q * q * 1.1 * K) }); });
       const li = Math.floor(b / LOOP); if (AC && au > 0.36 && W.actLoop !== li) { W.actLoop = li; SOUND.act(); } }
-    const pv = Math.max(W.ext, W.palm_ || 0);                                    // palm out for a reach, a wave, a stretch
-    set(W.palm, { opacity: f1(pv * 100) / 100 });                                        // the palm fades in over an always-solid paw: never see-through
+    const pv = Math.max(W.ext, W.palm_ || 0);                                     
+    set(W.palm, { opacity: f1(pv * 100) / 100 });                                         
     set(W.hand, { transform: `translate(${f1(tx)} ${f1(ty)}) rotate(${f1(fa / DEG - 90 + pv * (180 + Math.sin(t * 9) * 8))}) scale(${f1((1 + 0.25 * W.ext) * 100) / 100})` });
   }
 }
 
-/* ================================================================== live */
+ 
 const T0 = performance.now(), now = () => (performance.now() - T0) / 1000;
 const svgPt = (e) => { const r = S.getBoundingClientRect(), k = 1000 / Math.min(r.width, r.height); return [(e.clientX - r.left - (r.width - 1000 / k) / 2) * k, (e.clientY - r.top - (r.height - 1000 / k) / 2) * k]; };
 let PT = null, PTT = -9, STROKE = -9, PDIR = 0; const FLIPS = [];
@@ -1603,9 +1584,9 @@ function live(t) {
   SOUND.purr(LIVE.pet); if (SW_ && SW_.plasma) SOUND.hum(SW_.eng);
 }
 
-/* ================================================================== sound */
-/* nothing sounds until a tap (the platform allows audio only after one): then a
-   meow (or a chirp, a hiss, a roar) in character, and a purr while you pet */
+ 
+
+
 let AC = null, VB = null, PG = null, NB = null, HUM = null;
 const VOICE = WLD && (SPECIES === "Lion" || SPECIES === "Tiger" || SPECIES === "Jaguar" || SPECIES === "Leopard") ? "roar" : WLD && (SPECIES === "Cheetah" || SPECIES === "Serval") ? "chirp" : "meow";
 const PITCH = (BUILD === "Chonk" ? 0.85 : BUILD === "Slim" ? 1.12 : 1) * (SPK === "Cyber" ? 1.3 : SPK === "Shadow" || SPK === "Infernal" ? 0.7 : 1);
@@ -1621,7 +1602,7 @@ const SOUND = {
     pf.type = "lowpass"; pf.frequency.value = 230; PG.gain.value = 0; po.connect(pf).connect(PG).connect(comp); po.start();
     if (MONK) { HUM = AC.createGain(); HUM.gain.value = 0.03; const hf = flt("lowpass", 420, 2); hf.connect(HUM).connect(comp);
       for (const [f, ty] of [[92, "sawtooth"], [138, "sawtooth"], [184, "triangle"]]) { const o = AC.createOscillator(); o.type = ty; o.frequency.value = f; o.detune.value = rr(-6, 6); o.connect(hf); o.start(); } } },
-  swish() { if (!AC) return; if (MONK) { tone(AC.currentTime + 0.12, 160, 0.42, { type: "sawtooth", f2: 72, cut: 750, v: 0.13, a: 0.04 }); return; }   // vwoom
+  swish() { if (!AC) return; if (MONK) { tone(AC.currentTime + 0.12, 160, 0.42, { type: "sawtooth", f2: 72, cut: 750, v: 0.13, a: 0.04 }); return; }    
     const at = AC.currentTime + 0.18, n = AC.createBufferSource(), f = flt("bandpass", 600, 1.4), g = AC.createGain(); n.buffer = NB;
     f.frequency.setValueAtTime(500, at); f.frequency.exponentialRampToValueAtTime(2600, at + 0.18); n.connect(f).connect(g).connect(VB); aenv(g, at, 0.04, 0.12, 0.16); n.start(at); n.stop(at + 0.3); },
   clang(at = AC && AC.currentTime + 0.01) { if (!AC) return; for (const [f, v] of [[1650, 0.06], [2475, 0.04], [3310, 0.03], [4960, 0.015]]) tone(at, f, 0.9, { type: "sine", v, a: 0.002 }); noise(at, 0.06, "highpass", 3000, 0.08); },
@@ -1642,7 +1623,7 @@ const SOUND = {
   react() { if (!AC) return; const at = AC.currentTime + 0.03, r = ARCH.reaction;
     if (GLAD) { SOUND.crowd(at); return; }
     if (CIB) { tone(at, 2400, 0.3, { type: "square", f2: 200, cut: 4000, v: 0.06, a: 0.002 }); tone(at, 90, 0.7, { type: "sine", f2: 40, v: 0.3, a: 0.003 }); noise(at, 0.4, "lowpass", 900, 0.2); return; }
-    if (MONK) { noise(at, 0.9, "lowpass", 300, 0.25, { a: 0.08 }); tone(at, 70, 0.9, { type: "sine", f2: 45, v: 0.25, a: 0.05 }); return; }   // the push: a deep whoomph
+    if (MONK) { noise(at, 0.9, "lowpass", 300, 0.25, { a: 0.08 }); tone(at, 70, 0.9, { type: "sine", f2: 45, v: 0.25, a: 0.05 }); return; }    
     if (KNIGHT) { SOUND.clang(at + 0.15); for (const [k, f] of [[0, 1318], [0.08, 1760], [0.16, 2637]]) tone(at + 0.2 + k, f, 0.6, { type: "sine", v: 0.04 }); return; }
     if (LASER) [0, 0.09, 0.18].forEach((d) => tone(at + d, 2600 - d * 6e3, 0.12, { type: "square", cut: 4e3, v: 0.03 }));
     if (r === "glare") noise(at, 0.5, "bandpass", 3800, 0.08, { q: 0.6, a: 0.03 });
@@ -1650,8 +1631,8 @@ const SOUND = {
     else if (VOICE === "chirp" || r === "perk" || r === "headTilt") { tone(at, 900 * PITCH, 0.15, { f2: 1250 * PITCH, v: 0.07, type: "sine" }); tone(at + 0.2, 1000 * PITCH, 0.15, { f2: 1350 * PITCH, v: 0.06, type: "sine" }); }
     else if (r === "melt") tone(at, 620 * PITCH, 0.4, { f2: 700 * PITCH, trem: 24, v: 0.06, a: 0.03 });
     else if (r === "wink") { tone(at, 1100 * PITCH, 0.1, { f2: 1500 * PITCH, v: 0.06, type: "sine" }); }
-    else if (r === "zzz") for (let k = 0; k < 2; k++) noise(at + k * 1.1, 0.8, "lowpass", 380, 0.06, { a: 0.4 });     // a little snore
-    else if (r === "dizzy") tone(at, 900 * PITCH, 0.7, { f2: 260 * PITCH, trem: 9, v: 0.07, type: "sine" });            // boing-oing
+    else if (r === "zzz") for (let k = 0; k < 2; k++) noise(at + k * 1.1, 0.8, "lowpass", 380, 0.06, { a: 0.4 });      
+    else if (r === "dizzy") tone(at, 900 * PITCH, 0.7, { f2: 260 * PITCH, trem: 9, v: 0.07, type: "sine" });             
     else if (r === "snarl") { if (VOICE === "roar") tone(at, 150 * PITCH, 1.2, { type: "sawtooth", f2: 75 * PITCH, cut: 600, trem: 20, v: 0.13, a: 0.2 });
       else { noise(at, 0.55, "bandpass", 3600, 0.08, { q: 0.6, a: 0.02 }); tone(at, 140, 0.6, { type: "sawtooth", f2: 95, cut: 380, trem: 28, v: 0.08 }); } }
     else if (r === "gasp") meow(at, 1000 * PITCH, 1250 * PITCH, 0.3, false, 0.08);
@@ -1680,7 +1661,7 @@ function meow(at, f0, f1_, len, peak, v = 0.09) {
   for (const x of [o, n]) { x.start(at); x.stop(at + len + 0.05); }
 }
 
-/* ================================================================== names */
+ 
 const NAMES = ["Biscuit", "Mochi", "Pickles", "Noodle", "Waffles", "Tofu", "Nacho", "Dumpling", "Pudding", "Pretzel", "Tater", "Bean", "Olive", "Clementine",
   "Sprout", "Crumpet", "Meatball", "Pistachio", "Churro", "Toast", "Juniper", "Pepper", "Gizmo", "Pixel", "Disco", "Boogie", "Tango", "Ziggy", "Bowie",
   "Stevie", "Dolly", "Cher", "Elvis", "Aretha", "Moxie", "Pippin", "Rascal", "Scout", "Nimbus", "Comet", "Orbit", "Mango", "Kiwi", "Maple", "Cocoa",
@@ -1699,18 +1680,17 @@ const HON = HAT === "Crown" || OUTFIT === "Royal Robe" ? (MALE ? "King" : "Queen
   HAT === "Wizard Hat" ? pk(["Wizard", "Sorcerer", "Mage"]) : SUP && ch(0.3) ? pk(["Lord", "Lady", "Spirit", "Great"]) : ch(0.1) ? pk(MALE ? ["Sir", "Professor", "Baron", "Doctor"] : ["Lady", "Professor", "Duchess", "Doctor"]) : "";
 const FAM = pk(["Whisker", "Purr", "Mitten", "Fluff", "Paw", "Velvet", "Tuna", "Catnip", "Meow", "Pounce", "Snooze", "Floof", "Scratch", "Kibble", "Yarn", "Toebean", "Sunbeam"]);
 const SUR = wp([["", 30], [FAM + pk(["ton", "worth", "ington", "bottom", "field", "stein", "berg", "ley", "wick", "shire", "more"]), 50], ["Mc" + FAM + pk(["s", "ers", "ey"]), 10], ["von " + FAM, 10]]);
-/* a Gladiator's and an Agent's names repeat by design, so they take a numeral (or an agent number) from their own seed */
+ 
 const ROMAN = (n) => [[40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]].reduce((o, [v, r]) => { while (n >= v) { o += r; n -= v; } return o; }, "");
 const MNUM = ri(1, 40);
 const NAME = MONK ? "Master " + pk(["Whiskaro", "Pawdren", "Mewlora", "Tallowen", "Kittar", "Sorrel", "Velunna", "Purrvan", "Felindra", "Miravel", "Orrin", "Solenne", "Bramwen", "Quillon",
   "Nyssa", "Talwyn", "Corvi", "Ashkin", "Mewsa", "Zephra", "Kestrel", "Ilvar", "Renwick", "Saffi", "Thessaly", "Pounceval", "Nimbleth", "Aurelin", "Wisperra"]) : CIB ? "Agent " + pk(["Midnight", "Shadow", "Onyx", "Inkwell", "Nightshade"]) + "-" + String(MNUM * 2 + ri(0, 1)).padStart(2, "0") : GLAD ? "Marcus Purrileous " + ROMAN(MNUM) : (HON ? HON + " " : "") + FIRST + (SUR ? " " + SUR : "");
 document.title = NAME;
 
-/* ================================================================ features */
+ 
 const KINDN = DOM ? (GOLD ? "Maneki Gold" : "Domestic") : WLD ? (MORPH === "Classic" ? SPECIES : MORPH + " " + SPECIES) : SPK;
-/* ---- the outline: a clean ink line around every body part, or (rare, and always for spirits) the neon glow.
-   Rolled last, so it changes no other trait. Dark cats get a thin light edge outside the ink so they never sink
-   into a dark backdrop. */
+
+
 const OUTLINE = SUP ? "Neon" : MYTH ? "Ink" : ch(0.12) ? "Neon" : "Ink";
 if (OUTLINE === "Ink") {
   const lum = (c) => { if (!c || !c.startsWith("#")) return 0.5; const [r, g, b] = [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16) / 255); return 0.3 * r + 0.59 * g + 0.11 * b; };
@@ -1719,13 +1699,13 @@ if (OUTLINE === "Ink") {
   if (dark) { E("feMorphology", { in: "SourceAlpha", operator: "dilate", radius: 5, result: "l" }, f); E("feFlood", { "flood-color": "#e9e2f2", "flood-opacity": 0.55 }, f); E("feComposite", { in2: "l", operator: "in", result: "lo" }, f); }
   E("feMorphology", { in: "SourceAlpha", operator: "dilate", radius: 3, result: "d" }, f); E("feFlood", { "flood-color": "#120d16" }, f); E("feComposite", { in2: "d", operator: "in", result: "o" }, f);
   const m = E("feMerge", {}, f); for (const i of dark ? ["lo", "o", "SourceGraphic"] : ["o", "SourceGraphic"]) E("feMergeNode", { in: i }, m);
-  /* each part gets its own line: legs, tail, wings, capes, torso, head, and each foreleg (with what it holds) */
+   
   CAT.removeAttribute("filter");
   for (const c of Array.from(CAT.children || [])) if (c !== PAWG) c.setAttribute("filter", "url(#ink)");
   for (const W of arms) W.g.setAttribute("filter", "url(#ink)");
 }
-/* ---- the master line: every accessory and garment piece gets its own fine ink edge (hats, glasses, neckwear,
-   ears, feet, held things, pockets, collars, lapels...). Glows, markings, light and shade stay unlined. */
+
+
 { const SKIP = (e) => { const f = e.getAttribute("fill"), o = e.getAttribute("opacity");
     return !f || f === "none" || e.getAttribute("stroke") || e.getAttribute("filter") || (o !== null && +o < 0.6) || /url\(#(cfold|f|eg|mask|iris|halo|hoodin|frim)/.test(f); };
   const walk = (e) => { for (const c of Array.from(e.children || [])) { if (c.getAttribute && (c.getAttribute("filter") === "url(#eg)" || c.getAttribute("clip-path") === "url(#hc)")) continue;
@@ -1743,21 +1723,18 @@ if (GLAD) FEAT.Mythic = "Gladiator";
 if (CIB) { FEAT.Mythic = "CIB Agent"; FEAT.Outfit = "Black Suit"; }
 if (MONK) { FEAT.Mythic = "Star Monk"; FEAT["Plasma Blade"] = PLASMA; }
 FEAT.Outline = OUTLINE; FEAT.Holding = HOLD; FEAT.Cheeks = CHEEKS; FEAT.Earring = EARRING;
-/* ---- rarity: every cat's tier, from how rare its whole combination really is. The table is each
-   trait value's true frequency (basis points) and the cut-offs are score percentiles, both measured
-   by simulating this generator (tools/rarity.mjs), so at mint the tiers land at their intended shares:
-   Legendary 1%, Epic 4%, Rare 12%, Uncommon 28%, Common 55%; mythics are their own tier. */
-/* RAR scores the traits every cat has; RARD the coat genes, which count for domestic cats only
-   (a spirit's or wild cat's pattern, eyes and finish come with its kind, which is already counted) */
-/* @rarity */const RAR = {"Cat":{"Domestic":5415,"Snow Leopard":210,"Leopard":272,"Lynx":237,"Jaguar":207,"Puma":174,"Shadow":142,"Infernal":219,"Cyber":207,"Cheetah":293,"Clouded Leopard":120,"Ocelot":121,"Tiger":339,"Cosmic":254,"Crystal":172,"Nekomata":232,"Ghost":263,"Lion":347,"Maneki Gold":90,"Caracal":146,"Serval":170,"Black Leopard":40,"White Tiger":33,"Celestial":197,"White Lion":30,"Black Jaguar":30,"Golden Tiger":14,"King Cheetah":29},"Outfit":{"Raincoat":416,"Kimono":296,"Lab Coat":299,"Band Tee":618,"Hawaiian Shirt":447,"None":2156,"Astronaut":157,"Puffer Jacket":524,"Sweater":507,"Tracksuit":404,"Flannel":510,"Leather Jacket":465,"Denim Jacket":463,"Hoodie":732,"Turtleneck":517,"Overalls":355,"Suit & Tie":500,"Varsity Jacket":399,"Royal Robe":139,"Black Suit":27,"Hooded Robe":27,"Gladiator's Armor":22,"Knight's Armor":23},"Headwear":{"None":3505,"Crown":383,"Party Hat":370,"Beret":372,"Beanie":671,"Cowboy Hat":338,"Headphones":663,"Wizard Hat":377,"Top Hat":459,"Horns":218,"Cap":561,"Bucket Hat":386,"Flower Crown":475,"Chef Hat":242,"Pirate Hat":240,"Viking Helmet":198,"Propeller Cap":276,"Halo":197,"Hood":25,"Gladiator's Helm":22,"Ribbon Bow":22},"Eyewear":{"None":5433,"Heart Glasses":457,"Shades":778,"Visor":291,"3D Glasses":296,"Round Glasses":675,"Eyepatch":201,"Star Glasses":284,"Aviators":585,"Ski Goggles":298,"Cat-Eye Glasses":384,"Monocle":292,"Agent Shades":27},"Neckwear":{"None":7315,"Gold Chain":956,"Bow Tie":173,"Gold Medal":251,"Scarf":104,"Collar":362,"Flower Lei":269,"Bandana":461,"Pearls":109},"Holding":{"Boba Tea":609,"None":4587,"Ice Cream":515,"Pizza":403,"Coffee":610,"Yarn Ball":516,"Tez Coin":258,"Balloon":508,"Lollipop":355,"Rose":404,"Magic Wand":200,"Fish":625,"Donut":411},"Laser Eyes":{"None":9029,"Blue":335,"Red":339,"Gold":149,"Green":147},"Temperament":{"Sweet":1011,"Fierce":534,"Sassy":536,"Goofy":707,"Chill":722,"Mysterious":355,"Confident":679,"Mischievous":727,"Shy":796,"Zen":246,"Sleepy":595,"Playful":995,"Dramatic":553,"Curious":870,"Regal":211,"Grumpy":462},"Fur":{"Shorthair":6696,"Longhair":2225,"Hairless":490,"Rex":589},"Ears":{"Folded":666,"Round":1937,"Pointed":5228,"Tufted":1441,"Huge":263,"Small":321,"Tall Tufted":146},"Cheeks":{"None":6807,"Blush":2386,"Freckles":807},"Earring":{"None":7818,"Pearl":591,"Tez Stud":394,"Gold Hoop":994,"Diamond":203},"Outline":{"Ink":7324,"Neon":2676},"Wings":{"None":9692,"Bat":112,"Feathered":196},"Mane":{"None":9719,"Black":10,"Tawny":100,"Blond":101,"Dark":48,"Cream":23}}, RARD = {"Pattern":{"Classic":1039,"Rosetted":246,"Marbled":371,"Solid":3949,"Mackerel":1674,"Spotted":900,"Brindle":337,"Ticked":504,"Tortie":397,"Colorpoint":174,"Shaded":298,"Lynx Point":111},"Eyes":{"Copper":1347,"Odd-Eyed":313,"Green":2853,"Hazel":1363,"Gold":3144,"Blue":980},"Finish":{"Lit":4436,"Neon":5401,"Gold":164}}, TIERS = [22.721,25.752,28.533,31.376];/* @endrarity */
+
+
+
+
+ const RAR = {"Cat":{"Domestic":5415,"Snow Leopard":210,"Leopard":272,"Lynx":237,"Jaguar":207,"Puma":174,"Shadow":142,"Infernal":219,"Cyber":207,"Cheetah":293,"Clouded Leopard":120,"Ocelot":121,"Tiger":339,"Cosmic":254,"Crystal":172,"Nekomata":232,"Ghost":263,"Lion":347,"Maneki Gold":90,"Caracal":146,"Serval":170,"Black Leopard":40,"White Tiger":33,"Celestial":197,"White Lion":30,"Black Jaguar":30,"Golden Tiger":14,"King Cheetah":29},"Outfit":{"Raincoat":416,"Kimono":296,"Lab Coat":299,"Band Tee":618,"Hawaiian Shirt":447,"None":2156,"Astronaut":157,"Puffer Jacket":524,"Sweater":507,"Tracksuit":404,"Flannel":510,"Leather Jacket":465,"Denim Jacket":463,"Hoodie":732,"Turtleneck":517,"Overalls":355,"Suit & Tie":500,"Varsity Jacket":399,"Royal Robe":139,"Black Suit":27,"Hooded Robe":27,"Gladiator's Armor":22,"Knight's Armor":23},"Headwear":{"None":3505,"Crown":383,"Party Hat":370,"Beret":372,"Beanie":671,"Cowboy Hat":338,"Headphones":663,"Wizard Hat":377,"Top Hat":459,"Horns":218,"Cap":561,"Bucket Hat":386,"Flower Crown":475,"Chef Hat":242,"Pirate Hat":240,"Viking Helmet":198,"Propeller Cap":276,"Halo":197,"Hood":25,"Gladiator's Helm":22,"Ribbon Bow":22},"Eyewear":{"None":5433,"Heart Glasses":457,"Shades":778,"Visor":291,"3D Glasses":296,"Round Glasses":675,"Eyepatch":201,"Star Glasses":284,"Aviators":585,"Ski Goggles":298,"Cat-Eye Glasses":384,"Monocle":292,"Agent Shades":27},"Neckwear":{"None":7315,"Gold Chain":956,"Bow Tie":173,"Gold Medal":251,"Scarf":104,"Collar":362,"Flower Lei":269,"Bandana":461,"Pearls":109},"Holding":{"Boba Tea":609,"None":4587,"Ice Cream":515,"Pizza":403,"Coffee":610,"Yarn Ball":516,"Tez Coin":258,"Balloon":508,"Lollipop":355,"Rose":404,"Magic Wand":200,"Fish":625,"Donut":411},"Laser Eyes":{"None":9029,"Blue":335,"Red":339,"Gold":149,"Green":147},"Temperament":{"Sweet":1011,"Fierce":534,"Sassy":536,"Goofy":707,"Chill":722,"Mysterious":355,"Confident":679,"Mischievous":727,"Shy":796,"Zen":246,"Sleepy":595,"Playful":995,"Dramatic":553,"Curious":870,"Regal":211,"Grumpy":462},"Fur":{"Shorthair":6696,"Longhair":2225,"Hairless":490,"Rex":589},"Ears":{"Folded":666,"Round":1937,"Pointed":5228,"Tufted":1441,"Huge":263,"Small":321,"Tall Tufted":146},"Cheeks":{"None":6807,"Blush":2386,"Freckles":807},"Earring":{"None":7818,"Pearl":591,"Tez Stud":394,"Gold Hoop":994,"Diamond":203},"Outline":{"Ink":7324,"Neon":2676},"Wings":{"None":9692,"Bat":112,"Feathered":196},"Mane":{"None":9719,"Black":10,"Tawny":100,"Blond":101,"Dark":48,"Cream":23}}, RARD = {"Pattern":{"Classic":1039,"Rosetted":246,"Marbled":371,"Solid":3949,"Mackerel":1674,"Spotted":900,"Brindle":337,"Ticked":504,"Tortie":397,"Colorpoint":174,"Shaded":298,"Lynx Point":111},"Eyes":{"Copper":1347,"Odd-Eyed":313,"Green":2853,"Hazel":1363,"Gold":3144,"Blue":980},"Finish":{"Lit":4436,"Neon":5401,"Gold":164}}, TIERS = [22.721,25.752,28.533,31.376]; 
 let SCORE = 0;
 for (const [T, on] of [[RAR, true], [RARD, DOM && !MYTH]]) if (on) for (const k in T) { const v = FEAT[k] === undefined ? "None" : FEAT[k], bp = T[k][v]; SCORE += -Math.log((bp || 0.5) / 1e4); }
 FEAT.Rarity = MYTH ? "Mythic" : SCORE >= TIERS[3] ? "Legendary" : SCORE >= TIERS[2] ? "Epic" : SCORE >= TIERS[1] ? "Rare" : SCORE >= TIERS[0] ? "Uncommon" : "Common";
 
-/* ================================================================= finish */
-/* the photographer's finish, on top of everything: a warm key light from the upper left that brightens
-   without lifting the shadows (soft-light), a soft glow behind the cat to lift it off the backdrop, a
-   darker floor, and a fine, static film grain */
+ 
+
+
 { const rg_ = rgrad("frim", [[0, "#fff8ee", 0.16], [1, "#fff8ee", 0]], { r: 0.5 });
   S.insertBefore(E("ellipse", { cx: HX, cy: f1(HY + 0.9 * K), rx: f1(1.9 * K), ry: f1(2.3 * K), fill: "url(#frim)", "pointer-events": "none" }), CAT);
   rgrad("fkey", [[0, "#ffffff", 0.55], [0.6, "#ffffff", 0]], { cx: 0.26, cy: 0.16, r: 0.85 });
@@ -1769,12 +1746,12 @@ FEAT.Rarity = MYTH ? "Mythic" : SCORE >= TIERS[3] ? "Legendary" : SCORE >= TIERS
   E("rect", { width: 1000, height: 1000, fill: "url(#ffloor)" }, FIN);
   E("rect", { width: 1000, height: 1000, filter: "url(#fgrain)", opacity: 0.18, style: "mix-blend-mode:overlay" }, FIN); }
 
-/* ================================================================== start */
+ 
 draw(0);
 A.features(FEAT);
 { const g = {}; for (const [k, f] of [["KIND", () => KIND], ["KINDN", () => KINDN], ["SPECIES", () => SPECIES], ["MORPH", () => MORPH], ["SPK", () => SPK], ["GENES", () => GENES], ["FINISH", () => FINISH], ["NEON", () => NEON], ["GOLD", () => GOLD], ["SW", () => SW], ["POINT", () => POINT], ["LYNX", () => LYNX], ["TABBY", () => TABBY], ["TPAT", () => TPAT], ["TORTIE", () => TORTIE], ["BRINDLE", () => BRINDLE], ["ORANGE", () => ORANGE], ["SILVER", () => SILVER], ["DILUTE", () => DILUTE], ["AGOUTI", () => AGOUTI], ["EUN", () => EUN], ["REDN", () => REDN], ["WHITE", () => WHITE], ["VANISH", () => VANISH], ["FUR", () => FUR], ["HAIRLESS", () => HAIRLESS], ["EARS", () => EARS], ["TAILK", () => TAILK], ["PAT", () => PAT], ["bodyFill", () => bodyFill], ["vanC", () => vanC], ["earC", () => earC], ["markC", () => markC], ["patchC", () => patchC], ["pointC", () => pointC], ["muzC", () => muzC], ["noseC", () => noseC], ["earIn", () => earIn], ["RIM", () => RIM], ["EYEC", () => EYEC], ["EYEN", () => EYEN], ["ODD", () => ODD], ["MARKO", () => MARKO], ["BUILD", () => BUILD], ["CW", () => CW], ["BW", () => BW], ["MALE", () => MALE], ["MANE", () => MANE], ["WINGS", () => WINGS], ["HORNS", () => HORNS], ["HALO", () => HALO], ["WX", () => WX], ["CIB", () => CIB], ["KNIGHT", () => KNIGHT], ["GLAD", () => GLAD], ["MONK", () => MONK], ["MYTH", () => MYTH], ["PLASMA", () => PLASMA], ["PLC", () => PLC], ["OUTFIT", () => OUTFIT], ["HAT", () => HAT], ["SPECS", () => SPECS], ["NECK", () => NECK], ["EARRING", () => EARRING], ["HOLD", () => HOLD], ["LASERC", () => LASERC], ["CHEEKS", () => CHEEKS], ["C1", () => C1], ["C2", () => C2], ["JACKET", () => JACKET], ["TEE", () => TEE], ["SLEEVE", () => SLEEVE], ["PANTS", () => PANTS], ["SHORTSLEEVE", () => SHORTSLEEVE], ["TEMP", () => TEMP], ["F5", () => F5], ["NAME", () => NAME], ["FEAT", () => FEAT], ["bgH", () => bgH], ["accH", () => accH], ["BACKDROP", () => BACKDROP], ["WHITEC", () => WHITEC]]) { try { g[k] = f(); } catch (e) {} }
   g.ARCH = { name: ARCH.name, c: ARCH.c }; A._genes = JSON.parse(JSON.stringify(g)); }
-S.remove(); return;   // genes only: nothing is drawn, nothing keeps running
+S.remove(); return;    
 A.ready();
 const loop = () => { const t = now(); live(t); draw(t); requestAnimationFrame(loop); };
 requestAnimationFrame(loop);

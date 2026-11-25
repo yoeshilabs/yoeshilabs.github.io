@@ -1,6 +1,5 @@
-/* Prancer 3D: a mint's genes from its seed, with no three.js (cat.js builds the cat from them).
-     rollSeed(seed) -> G   (G.FEAT: the traits as Aleatory shows them)
-   The harness is Aleatory's: xmur3 over the seed string, four words into sfc32. */
+
+
 import { roll } from "./traits.js";
 
 export function harness(seed) {
