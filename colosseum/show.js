@@ -20,14 +20,15 @@ export function startShow({ THREE, arena, cam, renderer, song, setCheer, walk = 
   document.head.appendChild(css);
   const door = document.createElement("div"); door.id = "door";
   door.innerHTML = `<div class="b">${beta}</div><h1>Explore the Colosseum</h1><p>The Purrancers on the center stage, a joust on every chorus. You come in as a cat of your own, at the mouth of an aisle.</p><p class="s">W A S D to walk, Shift to run, click and move the mouse to look. Walk down the stair to the ring corridor and out through the South Gate. More of the building opens as it is finished. Sound on.</p><button id="enter">Enter</button>`;
-  document.body.appendChild(door);
+  document.body.appendChild(door); document.getElementById("cover")?.remove();    
   const audio = new Audio(song); audio.preload = "auto"; audio.crossOrigin = "anonymous";
   const gate = document.createElement("button"); gate.id = "gate"; gate.textContent = "Tap for sound"; gate.hidden = true; document.body.appendChild(gate);
   let live = false;
   let AC = null, GAIN = null;    
   door.querySelector("#enter").onclick = async () => { door.hidden = true; live = true; audio.currentTime = 0;
     try { if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); GAIN = AC.createGain(); AC.createMediaElementSource(audio).connect(GAIN).connect(AC.destination); } await AC.resume(); } catch (e) {   }
-    try { await audio.play(); } catch (e) { gate.hidden = false; await new Promise((r) => gate.addEventListener("click", r, { once: true })); gate.hidden = true; await audio.play().catch(() => {}); } };
+     
+    try { await audio.play(); setTimeout(() => { if (live && audio.paused) audio.play().catch(() => { gate.hidden = false; }); }, 600); } catch (e) { gate.hidden = false; await new Promise((r) => gate.addEventListener("click", r, { once: true })); gate.hidden = true; await audio.play().catch(() => {}); } };
   audio.addEventListener("ended", () => { live = false; door.querySelector("p").textContent = "Thank you for coming. Enter again to hear it from the start."; door.querySelector("p.s").hidden = true; door.querySelector("#enter").textContent = "Enter again"; door.hidden = false; });
    
   const EYE = new THREE.Vector3(0, 15, 53), V = { yaw: Math.PI, pitch: -0.32 }; let drag = null;    
