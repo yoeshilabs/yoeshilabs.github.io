@@ -102,8 +102,11 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
 
   
 
-  const near1 = (x0, z0, y) => { let best = null, bd = 1e9; for (let dz = -2.5; dz <= 2.5; dz += W.cell) for (let dx = -2.5; dx <= 2.5; dx += W.cell) { const x = x0 + dx, z = z0 + dz, h = heightAt(x, z, y); if (h === null || Math.abs(h - y) > 0.6) continue;
-      if (![[BODY, 0], [-BODY, 0], [0, BODY], [0, -BODY]].every(([ex, ez]) => heightAt(x + ex, z + ez, h) !== null)) continue; const d = Math.hypot(dx, dz); if (d < bd) { bd = d; best = { x, z, y: h }; } } return best; };    
+  
+
+  const free = (x, y, z) => { refreshNear(x, z); let open = 0; for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2; let clear = true; for (const hk of [0.45, 1.3]) { RO.set(x, y + hk, z); RD.set(Math.sin(a), 0, Math.cos(a)); sray.set(RO, RD); sray.far = 2; if (sray.intersectObjects(near, false).length) clear = false; } if (clear) open++; } return open >= 6; };
+  const near1 = (x0, z0, y) => { let best = null, bd = 1e9; for (let dz = -4; dz <= 4; dz += W.cell) for (let dx = -4; dx <= 4; dx += W.cell) { const x = x0 + dx, z = z0 + dz, h = heightAt(x, z, y); if (h === null || Math.abs(h - y) > 0.6) continue;
+      if (![[BODY, 0], [-BODY, 0], [0, BODY], [0, -BODY]].every(([ex, ez]) => heightAt(x + ex, z + ez, h) !== null)) continue; const d = Math.hypot(dx, dz); if (d < bd && free(x, h, z)) { bd = d; best = { x, z, y: h }; } } return best; };    
   const LIFTS = [0, 1, 2, 3].map((k) => { const t = Math.PI / 4 + k * Math.PI / 2, x0 = 85.2 * Math.cos(t), z0 = 67.2 * Math.sin(t), up = near1(x0, z0, 11.7), dn = near1(x0, z0, 0.1);
     return up && dn ? { k, x: up.x, z: up.z, y: up.y, gx: dn.x, gz: dn.z, ground: dn.y } : null; }).filter(Boolean);    
   const liftHint = document.createElement("button"); liftHint.style.cssText = "position:fixed;left:50%;bottom:64px;transform:translateX(-50%);padding:10px 18px;border-radius:999px;border:0;background:#ffd36e;color:#1c1622;font:600 15px Helvetica,Arial,sans-serif;cursor:pointer;z-index:3;display:none"; document.body.appendChild(liftHint);
@@ -112,7 +115,7 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
   const ride = () => { if (!liftNear || riding) return; const l = liftNear, up = m.y * K < 6, y = up ? l.y : l.ground; if (y === null || y === undefined) return; riding = true; fade.style.opacity = "1";
     setTimeout(() => { const face = Math.atan2(-l.x, -l.z), tx = up ? l.x : l.gx, tz = up ? l.z : l.gz; YREF = y; player.stand({ x: tx / K, z: tz / K, face }); here = null; cur = null; m = player.tick({}); YREF = m.y * K; view.yaw = face; first = true; fade.style.opacity = "0"; riding = false; }, 320); };
   liftHint.onclick = ride; addEventListener("keydown", (e) => { if (e.code === "KeyE" && !e.repeat) ride(); });
-  const liftCheck = () => { const x = m.x * K, z = m.z * K, y = m.y * K; liftNear = LIFTS.find((l) => (y < 6 ? Math.hypot(l.gx - x, l.gz - z) < 3 && Math.abs(y - l.ground) < 1 : Math.hypot(l.x - x, l.z - z) < 3 && Math.abs(y - l.y) < 1)) || null;
+  const liftCheck = () => { const x = m.x * K, z = m.z * K, y = m.y * K; liftNear = LIFTS.find((l) => (y < 6 ? Math.hypot(l.gx - x, l.gz - z) < 3.5 && Math.abs(y - l.ground) < 1 : Math.hypot(l.x - x, l.z - z) < 3.5 && Math.abs(y - l.y) < 1)) || null;
     const want = liftNear ? (y < 6 ? "E  Lift up to the concourse" : "E  Lift down to the corridor") : ""; if (liftHint.textContent !== want) liftHint.textContent = want; liftHint.style.display = want ? "block" : "none"; };
 
    
