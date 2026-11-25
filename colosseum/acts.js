@@ -83,7 +83,7 @@ export async function stageActs(name, ctx) { let HALF = 0;
     const tip = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.35, 12), mat("#e2b44a", { roughness: 0.25, metalness: 1 })); tip.position.y = 6.55; lance.add(tip);
     const vamp = new THREE.Mesh(new THREE.ConeGeometry(0.42, 0.55, 24, 1, true), mat("#cdd5df", { roughness: 0.3, metalness: 1, side: THREE.DoubleSide })); vamp.rotation.x = Math.PI; vamp.position.y = 0.45; lance.add(vamp);    
     const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.7, 12), mat("#5a3a22", { roughness: 0.7 })); grip.position.y = -0.1; lance.add(grip);
-    const root = new THREE.Group(), mount = new THREE.Group(); mount.add(pony.root); root.add(mount); root.add(kn.cape.mesh);    
+    const root = new THREE.Group(), mount = new THREE.Group(); mount.name = "knight-mount"; mount.add(pony.root); root.add(mount); root.add(kn.cape.mesh);    
     root.traverse((o) => { if (o.isMesh) o.castShadow = true; });
     const legR = { up: 0.22 * Math.min(av.L.bw, 1.25) + (av.L.furLen || 0), fore: 0.19, paw: 0.21 };
     const couch = new THREE.Quaternion().setFromUnitVectors(P(0, 1, 0), P(0.2, 0.06, 1).normalize());
@@ -173,7 +173,15 @@ export async function stageActs(name, ctx) { let HALF = 0;
     acts.focus = () => ({ p: W0(K[0].pony.root).lerp(W0(K[1].pony.root), 0.5).setY(1.5), yaw: 0 });
     let lastJ = -1; const reset = () => { broke = false; K[1].tip.visible = true; K[1].shaft.scale.y = 1; K[1].shaft.position.y = 3.3; for (const s2 of SPL) scene.remove(s2.m || s2.flash); SPL.length = 0; };    
     let idle = false;    
-    acts.tick = (t) => { if (t === 0 && lastJ === 0 && idle) return; idle = t === 0; if (t < lastJ - 0.01) reset(); lastJ = t; const dt = clock(t), v = 5.6, xs = [-15.5 + v * t, 15.5 - v * t];
+    
+
+    let idleT = 0, idleLast = null; const idleX = [-15.5, 15.5];
+    const pace = () => { const now = performance.now(), dt = idleLast === null ? 1 / 60 : Math.min(0.1, (now - idleLast) / 1000); idleLast = now; idleT += dt; HALF++;
+      for (let i = 0; i < 2; i++) { const k = K[i], side = i ? 1 : -1, u = idleT * 0.5 + i * 1.7, x = side * (15.5 + 3 * (1 - Math.cos(u))), v = Math.sin(u), dir = v >= 0 ? side : -side, z = ZB + (i ? -2.3 : 2.3);
+        idleX[i] = x; k.mount.position.set(x / S, 0.3 / S, z / S); k.mount.rotation.set(0, dir > 0 ? Math.PI / 2 : -Math.PI / 2, 0);
+        if ((HALF + i) % 2) { k.root.updateMatrixWorld(true); continue; }
+        k.root.scale.setScalar(1); k.root.position.set(0, 0, 0); k.root.updateMatrixWorld(true); k.mount.updateMatrixWorld(true); k.update(idleT, dt * 2, look); k.root.scale.setScalar(S); k.root.updateMatrixWorld(true); } };
+    acts.tick = (t) => { if (ctx.half && t === 0) { if (lastJ > 0) reset(); lastJ = 0; idle = true; return pace(); } idleLast = null; if (t === 0 && lastJ === 0 && idle) return; idle = t === 0; if (t < lastJ - 0.01) reset(); lastJ = t; const dt = clock(t), v = 5.6, xs = [-15.5 + v * t, 15.5 - v * t]; if (ctx.half && t < 0.8) { const e = t / 0.8; xs[0] = idleX[0] * (1 - e) + xs[0] * e; xs[1] = idleX[1] * (1 - e) + xs[1] * e; }    
       HALF++; for (let i = 0; i < 2; i++) { const k = K[i], x = xs[i], dir = i ? -1 : 1, z = ZB + (i ? -2.3 : 2.3);
         if (ctx.half && (HALF + i) % 2) { k.mount.position.set(x / S, 0.3 / S, z / S); k.mount.rotation.set(0, dir > 0 ? Math.PI / 2 : -Math.PI / 2, 0); k.root.updateMatrixWorld(true); continue; }    
         k.root.scale.setScalar(1); k.root.position.set(0, 0, 0); k.root.updateMatrixWorld(true);
