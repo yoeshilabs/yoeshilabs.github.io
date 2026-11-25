@@ -145,7 +145,7 @@ export function makeKiosk({ THREE, works, logo, conf }) {
 
   const esc = (e) => { if (e.key === "Escape") api.close(); };
   const api = { group, screen, isOpen: false,
-    update(T) { if (T - pageT > 12) { pageT = T; page++; screenDirty = true; } if (!screenDirty && T - last < 1) return; last = T; draw(T); },
+    update(T) { if (!group.visible) return;   /* put away in the alcove by the stage: nothing to draw */ if (T - pageT > 12) { pageT = T; page++; screenDirty = true; } if (!screenDirty && T - last < 1) return; last = T; draw(T); },
     setTheme(c) { const ok = Array.isArray(c) && c.every((h) => /^#[0-9a-f]{6}$/i.test(h)); accent = ok ? c.slice().sort((a, b) => sat(b) - sat(a))[0] : "#ffffff"; lit.color.set(accent); marquee();
       sel = ok ? list.findIndex((w) => w.theme && Array.isArray(w.theme.colors) && w.theme.colors.join() === c.join()) : -1; page = 0; screenDirty = true; if (ui) { ui.S.tab = Math.max(-1, curEv()); ui.render(); } },
     select(i) { sel = i; page = 0; screenDirty = true; },
