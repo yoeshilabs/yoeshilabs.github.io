@@ -8,16 +8,18 @@ const RISE = 0.42, BODY = 0.34;
 
 export async function makeWalk({ THREE, scene, cam, renderer }) {
   const W = await (await fetch(new URL("./data/walkmap.json", import.meta.url))).json();
-  const bin = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0)), HB = bin(W.heights), H = new Int16Array(HB.buffer, HB.byteOffset, HB.length >> 1), PART = bin(W.part);
+  const bin = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0)), gunzip = async (s) => new Uint8Array(await new Response(new Blob([bin(s)]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer());    
+  const HB = W.heightsGz ? await gunzip(W.heightsGz) : bin(W.heights), H = new Int16Array(HB.buffer, HB.byteOffset, HB.length >> 1), PART = W.partGz ? await gunzip(W.partGz) : bin(W.part);
   const cellOf = (x, z) => { const i = Math.floor((x - W.x0) / W.cell), j = Math.floor((z - W.z0) / W.cell); return i < 0 || j < 0 || i >= W.nx || j >= W.nz ? -1 : j * W.nx + i; };
   const heightAt = (x, z) => { const c = cellOf(x, z); return c < 0 || !PART[c] ? null : H[c] / 100; };
   const partAt = (x, z) => { const c = cellOf(x, z); return c < 0 ? 0 : PART[c]; };
    
   const floor = (x, z) => { const fx = (x - W.x0) / W.cell - 0.5, fz = (z - W.z0) / W.cell - 0.5, i = Math.floor(fx), j = Math.floor(fz), u = fx - i, v = fz - j; let s = 0, w = 0;
-    for (const [di, dj, k] of [[0, 0, (1 - u) * (1 - v)], [1, 0, u * (1 - v)], [0, 1, (1 - u) * v], [1, 1, u * v]]) { const ii = i + di, jj = j + dj; if (ii < 0 || jj < 0 || ii >= W.nx || jj >= W.nz) continue; const c = jj * W.nx + ii; if (PART[c] && k > 0) { s += H[c] / 100 * k; w += k; } }
+    const own = heightAt(x, z);    
+    for (const [di, dj, k] of [[0, 0, (1 - u) * (1 - v)], [1, 0, u * (1 - v)], [0, 1, (1 - u) * v], [1, 1, u * v]]) { const ii = i + di, jj = j + dj; if (ii < 0 || jj < 0 || ii >= W.nx || jj >= W.nz) continue; const c = jj * W.nx + ii; if (PART[c] && k > 0 && (own === null || Math.abs(H[c] / 100 - own) <= RISE)) { s += H[c] / 100 * k; w += k; } }
     return w ? s / w : heightAt(x, z) ?? 0; };
    
-  let here = null, cur = null; const near = [], sray = new THREE.Raycaster(), RO = new THREE.Vector3(), RD = new THREE.Vector3();    
+  let here = null, cur = null; const near = [], ALL = [], sray = new THREE.Raycaster(), RO = new THREE.Vector3(), RD = new THREE.Vector3();    
   const may = (mx, mz) => { const x = mx * K, z = mz * K, h = heightAt(x, z); if (h === null) return false;
     for (const [dx, dz] of [[BODY, 0], [-BODY, 0], [0, BODY], [0, -BODY]]) { const g = heightAt(x + dx, z + dz); if (g === null || Math.abs(g - h) > RISE) return false; }
     if (here !== null && Math.abs(h - here) > RISE) return false;
@@ -46,26 +48,41 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
   const lock = () => { try { renderer.domElement.requestPointerLock?.()?.catch?.(() => {}); } catch (e) {} };
   renderer.domElement.addEventListener("click", () => { if (matchMedia("(pointer: fine)").matches && document.pointerLockElement !== renderer.domElement) lock(); });
   addEventListener("mousemove", (e) => { if (document.pointerLockElement !== renderer.domElement) return; view.yaw -= e.movementX * 0.0022; view.pitch = Math.max(-0.6, Math.min(0.9, view.pitch - e.movementY * 0.0022)); });
+   
+  const leaveFP = (zoom) => { FP = false; FPsince = 0; ZOOM = zoom; camDist = 0; if (!m.air) { player.stand({ x: m.x, z: m.z, face: view.yaw }); m = player.tick({}); } };    
+  const toggleFP = () => { if (FP) leaveFP(1); else { FP = true; FPsince = 1; } };    
+  addEventListener("keydown", (e) => { if ((e.code === "KeyC" || e.code === "KeyV") && !e.repeat && !e.target.closest?.("input,textarea")) toggleFP(); });    
+  renderer.domElement.addEventListener("mousedown", (e) => { if (e.button === 1) { e.preventDefault(); toggleFP(); } });    
+  renderer.domElement.addEventListener("wheel", (e) => { if (FP) { if (e.deltaY > 0) leaveFP(2.2 / DIST); return; }
+    const z = ZOOM * Math.exp(e.deltaY * 0.001); if (z * DIST < 1.8 && e.deltaY < 0) { FP = true; FPsince = 1; } else ZOOM = Math.max(1.8 / DIST, Math.min(1.5, z)); }, { passive: true });
   addEventListener("pointerdown", pd); addEventListener("pointerup", pu); addEventListener("pointercancel", pu); addEventListener("pointermove", pm);
 
    
   const hud = document.createElement("div"); hud.style.cssText = "position:fixed;right:16px;bottom:16px;padding:8px 12px;border-radius:10px;background:rgba(20,14,30,.6);color:#f6f2ee;font:13px/1.45 Helvetica,Arial,sans-serif;pointer-events:none;z-index:2;max-width:46vw";
-  const touch = matchMedia("(pointer: coarse)").matches; hud.textContent = touch ? "Stick to walk, push far to run, drag to look" : "W A S D walk, Shift runs, click and move the mouse to look (Esc lets go), Space jumps on the plaza"; document.body.appendChild(hud);
+  const touch = matchMedia("(pointer: coarse)").matches; hud.textContent = touch ? "Stick to walk, push far to run, drag to look" : "W A S D walk, Shift runs, click and move the mouse to look (Esc lets go), C, V or the wheel for first person, Space jumps on the plaza"; document.body.appendChild(hud);
   setTimeout(() => { hud.style.transition = "opacity 1.2s"; hud.style.opacity = "0.35"; }, 12000);
-  const barriers = (await import("./barriers.js")).placeBarriers({ THREE, scene });
+  const barriers = (await import("./barriers.js")).placeBarriers({ THREE, scene, closed: W.closed || [] });
 
   
 
   { const box = new THREE.Box3(new THREE.Vector3(W.x0 - 6, -2, W.z0 - 6), new THREE.Vector3(W.x0 + W.nx * W.cell + 6, 16, W.z0 + W.nz * W.cell + 6)), bb = new THREE.Box3();
-    const mine = new Set(); me.holder.traverse((o) => mine.add(o)); scene.updateMatrixWorld(true); scene.traverse((o) => { if (!o.isMesh || mine.has(o) || (o.isInstancedMesh && o.count > 64) || o.isSkinnedMesh || !o.visible) return; if (o.material && o.material.transparent && o.material.opacity < 0.2) return; if (o.isInstancedMesh) { o.computeBoundingBox(); bb.copy(o.boundingBox); if (bb.intersectsBox(box)) near.push(o); return; }
-      o.geometry.computeBoundingBox(); bb.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld); if (bb.intersectsBox(box)) near.push(o); }); }
+    const mine = new Set(); me.holder.traverse((o) => mine.add(o)); scene.updateMatrixWorld(true); scene.traverse((o) => { if (!o.isMesh || mine.has(o) || (o.isInstancedMesh && o.count > 64) || o.isSkinnedMesh || !o.visible) return; if (o.material && o.material.transparent && o.material.opacity < 0.2) return; if (o.isInstancedMesh) { o.computeBoundingBox(); bb.copy(o.boundingBox); if (bb.intersectsBox(box)) ALL.push([o, bb.clone()]); return; }
+      o.geometry.computeBoundingBox(); bb.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld); if (bb.intersectsBox(box)) ALL.push([o, bb.clone()]); }); }
   const CH = 2.1, DIST = 2.8 * CH / 1.15, EYE = CH * 0.86, ray = new THREE.Raycaster(), head = new THREE.Vector3(), want = new THREE.Vector3(), dir = new THREE.Vector3(), aim = new THREE.Vector3(), cam3 = new THREE.Vector3();
-  const SIDES = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]].map((v) => new THREE.Vector3(...v)); let first = true, camDist = DIST, aimed = null, intro0 = null; const WIDE = new THREE.Vector3(0, 15, 53), WIDE_AT = new THREE.Vector3(0, 15 + Math.sin(-0.32) * 10, 53 - Math.cos(0.32) * 10);    
+  const SIDES = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]].map((v) => new THREE.Vector3(...v)); let first = true, camDist = DIST, aimed = null, intro0 = null, FP = false, FPsince = 0, ZOOM = 1; const WIDE = new THREE.Vector3(0, 15, 53), WIDE_AT = new THREE.Vector3(0, 15 + Math.sin(-0.32) * 10, 53 - Math.cos(0.32) * 10);    
+  
+
+  let nearKey = null; const NB = new THREE.Box3(), NV = new THREE.Vector3();
+  const refreshNear = (x, z) => { const key = Math.floor(x / 6) + "," + Math.floor(z / 6); if (key === nearKey) return; nearKey = key; NB.setFromCenterAndSize(NV.set(x, 6, z), NV.clone().set(28, 30, 28)); near.length = 0; for (const [o, bx] of ALL) if (bx.intersectsBox(NB)) near.push(o); };
   function placeCamera(dt, m) {
     const el = Math.max(0.05, Math.min(1.1, 0.28 - view.pitch * 0.95)), ce = Math.cos(el), fx = Math.sin(view.yaw), fz = Math.cos(view.yaw);
     head.set(m.x * K, m.y * K + EYE, m.z * K); dir.set(-fx * ce, Math.sin(el), -fz * ce);
-    ray.set(head, dir); ray.far = DIST + 0.5; const hit = ray.intersectObjects(near, false)[0], d = hit ? Math.max(0, hit.distance - 0.35) : DIST;
-    camDist += (d - camDist) * Math.min(1, d < camDist ? 1 : dt * 2.5);    
+    
+
+    if (FP && !(m.t - (intro0 ?? m.t) < 4 && intro0 !== null && !FPsince)) { const cp = Math.cos(view.pitch); cam3.copy(head); camDist = 0; cam.position.copy(head); me.holder.visible = false;
+      aim.set(head.x + fx * cp * 8, head.y + Math.sin(view.pitch) * 8, head.z + fz * cp * 8); aimed = aim.clone(); first = false; if (cam.near > 0.05) { cam.near = 0.05; cam.updateProjectionMatrix(); } cam.lookAt(aim); return; }
+    const far = DIST * ZOOM; ray.set(head, dir); ray.far = far + 0.5; const hit = ray.intersectObjects(near, false)[0], d = hit ? Math.max(0, Math.min(far, hit.distance - 0.35)) : far;
+    camDist += (d - camDist) * Math.min(1, d < camDist ? 1 : dt * 2.5); if (camDist < 1.2) cam3.copy(head).addScaledVector(dir, camDist);    
     want.copy(head).addScaledVector(dir, camDist);    
     if (first) cam3.copy(want); else cam3.lerp(want, 1 - Math.exp(-dt * 14));
     for (const sd of SIDES) { ray.set(cam3, sd); ray.far = 0.3; const h = ray.intersectObjects(near, false)[0]; if (h) cam3.addScaledVector(sd, h.distance - 0.3); }
@@ -75,13 +92,13 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
     if (it < 4) { const k = it < 1.5 ? 0 : (1 - Math.cos(Math.PI * Math.min(1, (it - 1.5) / 2.5))) / 2; cam.position.copy(WIDE).lerp(cam3, k);
       aim.set(head.x + fx * 8, head.y, head.z + fz * 8); const look = WIDE_AT.clone().lerp(aim, k); aimed = look.clone(); cam.lookAt(look); me.holder.visible = true; if (cam.near > 0.1) { cam.near = 0.1; cam.updateProjectionMatrix(); } return; }
     cam.position.copy(cam3); if (cam.near > 0.1) { cam.near = 0.1; cam.updateProjectionMatrix(); }
-    me.holder.visible = camDist > 0.8;    
+    me.holder.visible = camDist > 1.2;    
     aim.set(head.x + fx * 8, head.y + Math.sin(-view.pitch) * 3, head.z + fz * 8);
     if (first || !aimed) { aimed = aim.clone(); first = false; } else aimed.lerp(aim, 1 - Math.exp(-dt * 14)); cam.lookAt(aimed); }
 
    
   let acc = 0, last = null, m = player.tick({}), AUTO = null;    
-  function frame(nowMs) {
+  function frame(nowMs) { refreshNear(m.x * K, m.z * K);
     const dt = last === null ? TICK : Math.min(0.1, (nowMs - last) / 1000); last = nowMs; acc = Math.min(acc + dt, TICK * 6);
     while (acc >= TICK) { acc -= TICK; here = m.air ? here : floor(m.x * K, m.z * K); cur = { x: m.x * K, y: m.y * K, z: m.z * K };
       const onPlaza = partAt(m.x * K, m.z * K) === 1, k = onPlaza ? keys : new Set([...keys].filter((c) => c !== "Space"));
@@ -90,5 +107,5 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
     me.step(dt, undefined, { speed: m.speed, phase: m.phase, air: m.air, vy: m.vy, land: m.land, emote: m.emote, emoteT: m.emoteT, emoteLen: m.emoteLen });
     placeCamera(dt, m); barriers.tick(nowMs / 1000); }
   function reset() { player.stand({ x: START.x / K, z: START.z / K, face: START.face }); view.yaw = START.face; view.pitch = 0; here = null; first = true; aimed = null; intro0 = null; m = player.tick({}); }
-  return { frame, reset, auto(fn) { AUTO = fn; }, place(x, z, face = 0) { player.stand({ x: x / K, z: z / K, face }); here = null; cur = null; m = player.tick({}); }, K, map: W, partAt, heightAt, near, get where() { return { x: m.x * K, y: m.y * K, z: m.z * K, part: partAt(m.x * K, m.z * K) }; }, player, view, keys, me };
+  return { frame, reset, auto(fn) { AUTO = fn; }, firstPerson(v) { if (v) { FP = true; FPsince = 1; } else if (FP) leaveFP(1); }, get fp() { return FP; }, place(x, z, face = 0) { player.stand({ x: x / K, z: z / K, face }); here = null; cur = null; m = player.tick({}); }, K, map: W, partAt, heightAt, near, get where() { return { x: m.x * K, y: m.y * K, z: m.z * K, part: partAt(m.x * K, m.z * K) }; }, player, view, keys, me };
 }

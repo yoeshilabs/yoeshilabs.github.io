@@ -1,9 +1,9 @@
 
 
 const D = 64 - 46, GT = (a, t) => [a * Math.cos(t), (a - D) * Math.sin(t)];
-const TS = Math.PI / 2, T4 = (4 + 0.5) / 16 * Math.PI * 2;
 
-export function placeBarriers({ THREE, scene }) {
+
+export function placeBarriers({ THREE, scene, closed = [] }) {
   const g = new THREE.Group(); g.name = "barriers"; scene.add(g); const lamps = [];
   const sign = (() => { const c = document.createElement("canvas"); c.width = 512; c.height = 160; const x = c.getContext("2d");
     x.fillStyle = "#1c1622"; x.fillRect(0, 0, 512, 160); x.strokeStyle = "#ffd36e"; x.lineWidth = 8; x.strokeRect(6, 6, 500, 148);
@@ -22,16 +22,17 @@ export function placeBarriers({ THREE, scene }) {
     for (const u of [-0.5, 0.5]) { const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 8), new THREE.MeshStandardMaterial({ color: 0xffb030, emissive: 0xffa020, emissiveIntensity: 1 })); lamp.position.set(u * (L - 0.2), 1.32, 0); b.add(lamp); lamps.push(lamp); }
     b.position.set((p0[0] + p1[0]) / 2, y, (p0[1] + p1[1]) / 2); b.rotation.y = -Math.atan2(dz, dx); g.add(b); return b; }
    
-  barrier(GT(87.1, TS - 0.016), GT(92.3, TS - 0.016)); barrier(GT(87.1, T4 + 0.021), GT(92.3, T4 + 0.021));
+  for (const [tg, half] of [[0, 4.5], [Math.PI / 2, 3.6], [Math.PI, 4.5], [Math.PI * 1.5, 3.6]]) { const a = 86.7, h = half / Math.hypot(a * Math.sin(tg), (a - D) * Math.cos(tg)); barrier(GT(a, tg - h), GT(a, tg + h)); }
    
-  { const a = 86.7, h = 3.6 / a; barrier(GT(a, TS - h), GT(a, TS + h)); }
-   
-  const post = new THREE.MeshStandardMaterial({ color: 0xc9a24a, roughness: 0.35, metalness: 0.8 }), rope = new THREE.MeshStandardMaterial({ color: 0x9c1d2a, roughness: 0.8 });
-  const across = (a, w) => { const t = TS + w / Math.hypot(a * Math.sin(TS), (a - D) * Math.cos(TS)); return GT(a, t); };
-  const edge = []; for (let a = 97; a <= 123.6; a += 3) edge.push(across(a, -15.6)); for (let w = -15.6; w <= 15.6; w += 3.12) edge.push(across(123.6, w)); for (let a = 123.6; a >= 97; a -= 3) edge.push(across(a, 15.6));
-  const P = new THREE.CylinderGeometry(0.05, 0.07, 0.95, 10), top = new THREE.SphereGeometry(0.08, 10, 8);
-  edge.forEach((p, i) => { const m = new THREE.Mesh(P, post); m.position.set(p[0], 0.47, p[1]); g.add(m); const k = new THREE.Mesh(top, post); k.position.set(p[0], 0.97, p[1]); g.add(k);
-    const q = edge[i + 1]; if (!q) return; const dx = q[0] - p[0], dz = q[1] - p[1], L = Math.hypot(dx, dz);
-    const r = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, L, 6), rope); r.position.set((p[0] + q[0]) / 2, 0.78, (p[1] + q[1]) / 2); r.rotation.set(0, -Math.atan2(dz, dx), Math.PI / 2); g.add(r); });
+  for (const c of closed) { const dx = c.x1 - c.x0, dz = c.z1 - c.z0, L = Math.hypot(dx, dz) || 1, ex = 0.4 / L; barrier([c.x0 - dx * ex, c.z0 - dz * ex], [c.x1 + dx * ex, c.z1 + dz * ex]); }
+  
+
+  { const post = new THREE.MeshStandardMaterial({ color: 0xc9a24a, roughness: 0.35, metalness: 0.8 }), rope = new THREE.MeshStandardMaterial({ color: 0x9c1d2a, roughness: 0.8 });
+    const RA = 116 - 0.45, RB = 100 - 0.45, pts = []; let L = 0, prev = [RA, 0]; const fine = []; for (let i = 0; i <= 4000; i++) { const u = i / 4000 * Math.PI * 2, p = [RA * Math.cos(u), RB * Math.sin(u)]; L += Math.hypot(p[0] - prev[0], p[1] - prev[1]); prev = p; fine.push([L, p]); }
+    const n = Math.round(L / 3); let k = 0; for (let i = 0; i < n; i++) { const d = i / n * L; while (fine[k][0] < d) k++; pts.push(fine[k][1]); }
+    const P = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.05, 0.07, 1.0, 10), post, n), R = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.025, 0.025, 1, 6), rope, n), o = new THREE.Object3D();
+    pts.forEach((p, i) => { o.position.set(p[0], 0.5, p[1]); o.rotation.set(0, 0, 0); o.scale.set(1, 1, 1); o.updateMatrix(); P.setMatrixAt(i, o.matrix);
+      const q = pts[(i + 1) % n], dx = q[0] - p[0], dz = q[1] - p[1], len = Math.hypot(dx, dz); o.position.set((p[0] + q[0]) / 2, 0.8, (p[1] + q[1]) / 2); o.rotation.set(0, -Math.atan2(dz, dx), Math.PI / 2); o.scale.set(1, len, 1); o.updateMatrix(); R.setMatrixAt(i, o.matrix); });
+    g.add(P, R); }
   return { group: g, tick(t) { const k = 0.6 + 0.6 * (0.5 + 0.5 * Math.sin(t * 3)); for (const l of lamps) l.material.emissiveIntensity = k; } };
 }
