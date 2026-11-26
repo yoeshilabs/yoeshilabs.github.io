@@ -1,20 +1,4 @@
-/* MAESTRO'S SCROLL: everything Maestro knows, in plain markdown. brain.js reads it; edit freely.
- *
- * How it is read:
- *   # Group            a section. "Knowledge" holds the answers; the others are lists (one "- " line each).
- *   ## Title           one thing Maestro knows about (inside # Knowledge).
- *   keys: a, b, c      words and phrases that point to this entry (the most important line).
- *   ask: q1 | q2       follow-up questions offered as buttons after he answers.
- *   (text)             his answer, in his own voice. Blank lines make paragraphs; "- " makes a list; **bold** works.
- *   +++                anything after this line is what he adds when you say "tell me more".
- *   # Meanings         "- phrase | other phrase => @Entry Title": different ways people say the same thing. Each phrase is compared
- *                      word by word (endings trimmed, one filler word allowed), so write it the way a visitor would type it.
- *                      "=> @unknown" marks questions from outside the garden (sports, news, weather).
- *   # Tones            "- tone: phrase | phrase": how a question feels (discouraged, alarmed, frustrated, skeptical, newcomer,
- *                      excited). He meets the feeling first, then answers.
- * Facts are as of November 2026 (Maestro was made in October 2026). Never put back-ticks in this file.
- */
-window.MAESTRO_CONTEXT = `
+window.MAESTRO_CONTEXT=`
 # Knowledge
 
 ## Beta
@@ -90,7 +74,7 @@ Browsers do not allow sound until you tap once, so if you hear nothing, tap me.
 keys: who are you, your name, maestro, what are you, introduce yourself, about you, buddha kitty, tell me about yourself
 ask: Who is Yoeshi? | What can you do? | Where can I go?
 only: site
-I am Maestro, the concierge to everything Yoeshi Labs: a grey-brown tabby with a cream beard and round gold glasses. You will find me at the front desk in the lobby of yoeshi.art, and behind the bar in the Lounge downstairs.
+I am Maestro, the concierge to everything Yoeshi Labs: a gray-brown tabby with a cream beard and round gold glasses. You will find me at the front desk in the lobby of yoeshi.art, and behind the bar in the Lounge downstairs.
 Ask me about Yoeshi and Yoeshi Labs, about the Prancer Purranchise, the band and the shows, about Tezos, or about how your day is going, and I will answer with what I know and with kindness either way.
 +++
 My first portrait, the Buddha Kitty, shows me in a robe in a garden. I am also a prototype: Yoeshi has long imagined a personal digital assistant that feels like a wise old friend: warm, steady, protective and a little musical. I am the first sketch of that friend.
@@ -103,7 +87,7 @@ only: site
 - **A cream sweater**, with a small woven band across the chest. It is warm at the desk.
 - **Round gold glasses**, for reading my scroll.
 - **A cream beard**, wide along the jaw and falling to a soft point. I have been told it looks wise. I try to live up to it.
-- **My own coat** under it all: a grey-brown tabby, long in the fur, with the M on my brow and markings that match on both sides.
+- **My own coat** under it all: a gray-brown tabby, long in the fur, with the M on my brow and markings that match on both sides.
 - **A coffee** in one paw, most mornings.
 The robe, the beads and the lotus belong to my first portrait, the Buddha Kitty.
 
@@ -535,7 +519,7 @@ link: Meet the Prancers | https://yoeshi.art/prancers-site/#prancers
 link: Mint on Aleatory | https://aleatory.art/generator/KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw
 Prancers is where it all began: 256 living, generative cats that walk on the beat, launched on Aleatory on 1 October 2026 at 10 tez each.
 
-Every Prancer is born from its mint: a coat from real feline colour genetics, a temperament you can read in its body language, a room of its own, a name, and a theme song sung in purrs, paw-strike drums and meows. Tap one and it sings. Press M to mute and I for its card.
+Every Prancer is born from its mint: a coat from real feline color genetics, a temperament you can read in its body language, a room of its own, a name, and a theme song sung in purrs, paw-strike drums and meows. Tap one and it sings. Press M to mute and I for its card.
 +++
 The generator lives on chain at KT1RXwgJuhByMw1eK2JP6FekXF7ZeexdspHw. The code is sealed, so every Prancer is drawn exactly the same way forever.
 
@@ -551,7 +535,7 @@ keys: laser eyes, lasers, laser, secret trait, hidden trait, beam
 ask: Prancer Portraits | Rarity
 Laser eyes were the Prancers' secret trait, kept hidden until 8 October 2026, when darkwheel.tez minted the first one, #69 Kiwi Scratchbottom, and Yoeshi let the secret out. In Prancers they fire when you tap.
 
-In Prancer Portraits, laser eyes come in four colours (blue, red, green and gold) and follow your pointer around the screen. I do not have them. I prefer to see the world softly.
+In Prancer Portraits, laser eyes come in four colors (blue, red, green and gold) and follow your pointer around the screen. I do not have them. I prefer to see the world softly.
 
 ## Prancer Pads
 keys: prancer pads, pads, chapter 2, chapter two, chapter 02, homes, houses, house, cat house, mansion, trailer, residents
@@ -584,7 +568,7 @@ One Prancer Portrait in a hundred is a mythic, and each of the four is about 1 i
 - **Sword Knight**: celestial armour, a starry cape and an enchanted blade, in a meadow. A nod to Empress Trash's Sword Cat. It duels your pointer.
 - **Gladiator**: always named Marcus Purrileous. Crested helm, bronze cuirass, sword and shield, in the arena. Tap him and the crowd roars.
 - **CIB Agent**: Cats in Black. A black suit, shades, and a tiny, absurdly powerful blaster that goes pew pew.
-- **Star Monk**: a hooded robe and a plasma blade in one of seven colours. It hums, and pushes you back with a ripple from its paw.
+- **Star Monk**: a hooded robe and a plasma blade in one of seven colors. It hums, and pushes you back with a ripple from its paw.
 
 The Star Monk and I would get along. We both like robes. Only one of us brings a laser sword to tea.
 
@@ -613,7 +597,7 @@ keys: prancer post, paper route, paperboy, paper boy, paper delivery, the game, 
 ask: Prices and editions | Prancer Pads | How do I mint?
 link: Ride the route | https://yoeshi.art/prancers-site/#post
 link: Prancer Post on Aleatory | https://aleatory.art/generator/KT1EhDsH7jUVALTYVYiEv4aLT5KdTx38r3En
-Prancer Post is Chapter 05 of the Purranchise, and you can play it. Heartstrong has taken a paper route through the Prancer neighbourhood. Each mint seeds its own street: the Prancer Pads houses, the time and weather, the sky, the cats, the rules of the ride and a theme song of its own. It is the same street every time you ride it, so your best score counts.
+Prancer Post is Chapter 05 of the Purranchise, and you can play it. Heartstrong has taken a paper route through the Prancer neighborhood. Each mint seeds its own street: the Prancer Pads houses, the time and weather, the sky, the cats, the rules of the ride and a theme song of its own. It is the same street every time you ride it, so your best score counts.
 
 Land papers on subscribers' doormats, hit the flagged mailboxes to win new readers, ring the bell to clear cats from your lane, and meet the Taco Butler to keep your heart pumping.
 +++
@@ -630,6 +614,17 @@ Prancers On Objkt is the home for the moving Prancer works, opened on 21 October
 The first was **Prance Trance**, a fractal visualizer in 100 editions, gifted to every Purranchise collector as a thank you. Then came **Prance Or Treat!**, **The Purrancers Debut** concert film and **Prancelot**. The newest is **Prancer Park**, a one of one made for #200tez.
 +++
 The collection is KT1EhGnbdTA3QyKNZNxquqwnPPM2zBhNDudH. Sound on for every piece in it.
+
+## Prancers Do America
+keys: prancers do america, do america, postamericana, #postamericana, post americana, circus maximus, the colosseum, colosseum, teia, on teia, teia mint, newest film, newest mint, newest piece, flying cars, the joust, joust, balance beam, unicycles, ups and downs, rock remix, walk the colosseum
+ask: The Purrancers | Prancer Park | Prancers On Objkt
+link: Prancers Do America on Teia | https://teia.art/objkt/887095
+link: Walk the Colosseum | https://yoeshi.art/colosseum/
+Prancers Do America is Yoeshi's entry in Teia's #PostAmericana call, on the Circus Maximus theme, minted on Teia on 24 November 2026 in 12 editions. In his words: "Prancers Do America opens in a Prancer Pads living room with the race on the television and classic American snacks everywhere. Then we step through the screen. The Prancers have built their own Colosseum and filled it with attractions." Flying cars on a raceway above the bowl, Prancelot the Knight at the joust, gladiators and mythic cats on the balance beam, electric unicycles, and The Purrancers rocking through it all on center stage. "A circus, maximally imagined."
+
+The song is Ups and Downs, one of his originals. The line that carries the piece for him: "We never rushed towards the finish line, maxed out on XP, enjoying the climb."
++++
+The Colosseum is a place you can visit: walk it at yoeshi.art/colosseum, down the stair to the ring corridor, out through the gates to the plaza, and up by the glass lifts to the concourse and its food stalls. In his words: "I built the Colosseum entirely in code with Claude, without a single image file. Even the sponsor banners are drawn by the program." The film is not screen-recorded: every shot is scripted and rendered one frame at a time in a web browser, 2,184 frames.
 
 ## Prance Or Treat
 keys: prance or treat, prance or treat!, halloween, trick or treat, trick or treating, midnight mass, 617 gallery, haunted, haunted pads, spooky, costume, costumes
@@ -774,12 +769,12 @@ keys: tezos, tez, xtz, blockchain, chain, why tezos, energy, proof of stake, cry
 ask: Aleatory | Fully on-chain | Is connecting my wallet safe?
 Tezos is the blockchain the whole Purranchise calls home. It runs on proof of stake, so it uses very little energy, it can upgrade itself without splitting apart, and it has one of the warmest art communities anywhere.
 
-The currency is tez (\ua729). In the Wild Ride story, Tezos is home base: a new block laid every few seconds, like stepping stones across a river that never ends, and every adventure comes home.
+The currency is tez (\uA729). In the Wild Ride story, Tezos is home base: a new block laid every few seconds, like stepping stones across a river that never ends, and every adventure comes home.
 
 ## Getting tez
 keys: buy tezos, buy tez, how do i buy tezos, where can i buy tezos, get tez, get tezos, send tezos, send tez, transfer tez, tezos into my wallet, fund my wallet, exchange, on ramp, cash out
 ask: Wallets | Seed phrase | How do I mint?
-Tez (\ua729) is sold on most major exchanges and inside some wallets. Buy it there, then withdraw it to your own wallet address (it starts with tz1, tz2 or tz3, or use a .tez name). Always send a small test amount first, and double-check the address, because transfers on chain cannot be reversed.
+Tez (\uA729) is sold on most major exchanges and inside some wallets. Buy it there, then withdraw it to your own wallet address (it starts with tz1, tz2 or tz3, or use a .tez name). Always send a small test amount first, and double-check the address, because transfers on chain cannot be reversed.
 
 I cannot recommend a particular exchange or help with money moves themselves, so please follow each service's official instructions.
 
@@ -1208,17 +1203,17 @@ keys: what is new, whats new, what's new, news, the news, latest, the latest, re
 ask: The Lounge | Prancer 3D | Where can I go?
 only: site
 Here is the latest, newest first:
+- **24 November 2026**: "Prancers Do America" is minted on Teia, Yoeshi's entry in Teia's #PostAmericana call (the Circus Maximus theme): a Prancer Pads living room with the race on the television, then through the screen into a Colosseum of flying cars, Prancelot the Knight at the joust, electric unicycles and The Purrancers rocking through it all on center stage; the song is Ups and Downs, one of his originals; its description names yoeshi.art/colosseum.
 - **19 November 2026**: The Purrancers' third concert film, "CATTITUDE", is minted in Prancers On Objkt (25 editions, 25 tez): the first collaborative concert experience, Yoeshi's song with LoveFromGaia's projection across the Sphere's dome and a jungle growing up behind the stage; an access pass to the 3D show in the Sphere and to premium yoeshi.art features.
 - **17 November 2026**: Prancer Park is minted in Prancers On Objkt (Chapter 08), a 1/1 made for #200tez: The Purrancers playing The Pawvilion, the new outdoor venue, with the rest of the world so far behind them; the composition became the first design for the world's game map, and the token is an access pass to future token-gated experiences by Yoeshi Labs and The Purrancers.
-- **12 November 2026**: yoeshi.art becomes the front door: Yoeshi's artist site, A Musical World Of Cats, with the Lounge in its basement, a room to walk into, open to all.
 
-My scroll was last brought up to date on 19 November 2026.
+My scroll was last brought up to date on 24 November 2026.
 +++
 Before that:
+- **12 November 2026**: yoeshi.art becomes the front door: Yoeshi's artist site, A Musical World Of Cats, with the Lounge in its basement, a room to walk into, open to all.
 - **10 November 2026**: Prancer 3D launches on Aleatory (Chapter 07): the evolution of Prancer Portraits, playable 3D cats each in a world of its own, and an access pass to The Purrancers' virtual concerts.
 - **9 November 2026**: The Purrancers' second music video, "The Purrancers - Decentralize", is minted in Prancers On Objkt (25 editions): the concert rebuilt in 3D and rendered in Blender, and a second ticket into the 3D show in the Sphere at TezTowers.
 - **4 November 2026**: Prancelot is minted in Prancers On Objkt (100 editions): Pepper Yarnmore, a small Sword Knight on a pony in matching barding, the first Prancer 3D piece.
-- **3 November 2026**: The Purrancers debut: the concert film "The Purrancers Debut - Internet Friend" is minted in Prancers On Objkt (250 editions) and is the ticket to their walkable live show in the Sphere at TezTowers; airdropped to holders of Internet Friend and the Purranchise.
 
 ## Prices and editions
 keys: prices, price, cost, how much, how much do they cost, editions, how many, supply, edition size, sold out, minted, remaining
@@ -1403,19 +1398,19 @@ I live offline, so I cannot see how many are minted right now. The website shows
 - So painting on canvas is 3 dimensional and I\u2019ve never appreciated that until meow. | X, November 2025 | resilience
 - You can either focus on the problems in fear, Or you can build the solutions, cheers. | X, October 2021 | resilience
 - "We live in a simulation where fine art gets eaten, yet artists somehow starve" | X, January 2025 | resilience
-- Art created a few months ago isn\u2019t \u201cold work\u201d. In fact, all digital art is relatively new. Let\u2019s slow down a bit and spend more time appreciating each and every piece of our heArt we release into the world. | X, September 2026 | persistence
-- Never apologize to me for \u201cbad English\u201d. It is a confusing language and at least you are trying. I\u2019m sorry I haven\u2019t even tried to learn your native language. | X, February 2025 | persistence
+- Art created a few months ago isn\u2019t \u201Cold work\u201D. In fact, all digital art is relatively new. Let\u2019s slow down a bit and spend more time appreciating each and every piece of our heArt we release into the world. | X, September 2026 | persistence
+- Never apologize to me for \u201Cbad English\u201D. It is a confusing language and at least you are trying. I\u2019m sorry I haven\u2019t even tried to learn your native language. | X, February 2025 | persistence
 - Make something from nothing, with your hands and your heart. To me that's the only requirement, for something to be art. Do not get consumed with envy. Another's success is something worth celebrating. Stop complaining. Just keep creating. | X, March 2022 | persistence
 - We are building something magical and sustainable on tezos and I highly recommend that you TUNE IN. | X, March 2023 | persistence
 - I want to see a DigitalRenaissance, where the entire world shifts its focus from politics and violence, to this glorious, inclusive, and accessible culmination of creational energy we are experiencing on tezos. The tezoscommunity vibe will permeate over time. Keep building. | X, April 2022 | persistence
 - Followed all new collectors! Thank you so much for taking part in this first OpenEdition of "Acoustic Sessions". I am overflowing with motivation and so inspired thanks to all of you. Session 02 will be ready by the end of the weekend. | X, February 2023 | gratitude
 - Big personal milestone reaching 500 followers. Thank you frens. | X, April 2021 | gratitude
-- Through this screen we can be, examples of peace we wish to see. Send more flowers, empower humanity. \u201cA Flower For You\u201d is now live on Transient Labs. | X, February 2026 | gratitude
+- Through this screen we can be, examples of peace we wish to see. Send more flowers, empower humanity. \u201CA Flower For You\u201D is now live on Transient Labs. | X, February 2026 | gratitude
 - Most people just ride the waves gratefully, but for some reason we have to be marine biologists about every motion in the ocean. | X, November 2024 | gratitude
 - I long to go people-watch on these streets during a time of peace. 1/1 - "Bustling Streets" | X, October 2023 | gratitude
 - Overwhelmed with gratitude to even be mentioned out of something like 800 entries! | X, April 2023 | gratitude
 - Pouring my heart out on Tezos as a singer songwriter actively producing an album. At least 21 people are tuned in so far. I'd love for you to be the next person I connect with through music. Just a few clicks away, starting in the comments. DM's also open. | X, September 2025 | love
-- It\u2019s a \u201cpiece of art\u201d because it represents a piece of someone\u2019s heArt. It\u2019s the same chemistry as love manifested into our physical world. It\u2019s beautiful. It\u2019s ugly. It\u2019s messy. It\u2019s weird. It\u2019s life. Express yourself. That\u2019s art. One heArt, Infinite expressions of love. | X, September 2026 | love
+- It\u2019s a \u201Cpiece of art\u201D because it represents a piece of someone\u2019s heArt. It\u2019s the same chemistry as love manifested into our physical world. It\u2019s beautiful. It\u2019s ugly. It\u2019s messy. It\u2019s weird. It\u2019s life. Express yourself. That\u2019s art. One heArt, Infinite expressions of love. | X, September 2026 | love
 - My goal in life is simple. Be healthy, share love, make art. I have been creating, with those beacons at the forefront, for over 20 years now. Always seeking improvement. | X, August 2023 | love
 - I guarantee if you "stop to smell the roses" within web3 and for a moment forget about chasing gains....you will fall in love with tezos. Collectively the space needs that...which would in turn "correct" the evaluation of this magical place where artists find hope and power. | X, April 2023 | love
 
@@ -1581,7 +1576,7 @@ I live offline, so I cannot see how many are minted right now. The website shows
 - I tried to meditate on my problems, but I fell asleep. Classic cat enlightenment.
 - What do you call a pile of cats? A meowntain.
 - Why do cats make terrible storytellers? They only have one tail.
-- What is a cat's favourite colour? Purr-ple.
+- What is a cat's favorite color? Purr-ple.
 - I asked the universe for a sign. It knocked my water glass off the table.
 - What do you call a cat who loves to bowl? An alley cat.
 - Why was the cat so good at video games? Nine lives.
@@ -1589,7 +1584,7 @@ I live offline, so I cannot see how many are minted right now. The website shows
 - What do you call a cat that gets anything it wants? Purr-suasive.
 - Why did the cat join the Red Cross? It wanted to be a first-aid kit.
 - My mala has 27 beads. I counted them twice and lost my place both times. Very humbling.
-- What is a cat's favourite magazine? Good Mousekeeping.
+- What is a cat's favorite magazine? Good Mousekeeping.
 - What do you call a cat wearing a robe? Enlightened. Also slightly overdressed for the garden.
 - I would tell you a joke about the blockchain, but it would take a few seconds to confirm.
 
