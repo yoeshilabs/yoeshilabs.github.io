@@ -34,5 +34,21 @@ export function placeBarriers({ THREE, scene, closed = [] }) {
     pts.forEach((p, i) => { o.position.set(p[0], 0.5, p[1]); o.rotation.set(0, 0, 0); o.scale.set(1, 1, 1); o.updateMatrix(); P.setMatrixAt(i, o.matrix);
       const q = pts[(i + 1) % n], dx = q[0] - p[0], dz = q[1] - p[1], len = Math.hypot(dx, dz); o.position.set((p[0] + q[0]) / 2, 0.8, (p[1] + q[1]) / 2); o.rotation.set(0, -Math.atan2(dz, dx), Math.PI / 2); o.scale.set(1, len, 1); o.updateMatrix(); R.setMatrixAt(i, o.matrix); });
     g.add(P, R); }
+  
+
+  const board = (lines, w, h, bg = "#ffd36e", fg = "#1c1622") => { const c = document.createElement("canvas"); c.width = 512; c.height = Math.round(512 * h / w); const x = c.getContext("2d");
+    x.fillStyle = bg; x.fillRect(0, 0, c.width, c.height); x.fillStyle = fg; x.textAlign = "center"; x.textBaseline = "middle"; const fs = Math.round(c.height / (lines.length + 0.6));
+    lines.forEach((t, i) => { let f = fs; do { x.font = `700 ${f}px Helvetica, Arial, sans-serif`; f -= 2; } while (x.measureText(t).width > c.width * 0.9 && f > 8); x.fillText(t, 256, c.height * (i + 0.8) / (lines.length + 0.6)); });    
+    const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 4; return new THREE.MeshStandardMaterial({ map: tx, emissive: 0xffffff, emissiveMap: tx, emissiveIntensity: 0.9, roughness: 0.6 }); };
+  const liftM = board(["LIFT ↑ CONCOURSE"], 3.6, 0.7), CORES = [0, 1, 2, 3].map((k) => Math.PI / 4 + k * Math.PI / 2);
+  const hang = (a, t, m, w, h, y) => { const [x, z] = GT(a, t), [x2, z2] = GT(a, t + 0.01), dx = x2 - x, dz = z2 - z, b = new THREE.Group();    
+    for (const ry of [0, Math.PI]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(w, h), m); p.rotation.y = ry; b.add(p); }
+    const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.2, 6), leg); rod.position.y = h / 2 + 0.6; b.add(rod);
+    b.position.set(x, y, z); b.rotation.y = Math.atan2(dx, dz); g.add(b); };
+  for (const tc of CORES) for (const s of [-1, 1]) hang(89.7, tc + s * 0.115, liftM, 3.6, 0.7, 3.5);
+   
+  for (let i = 0; i < 16; i++) { const tv = (i + 0.5) / 16 * Math.PI * 2; let best = null; for (const tc of CORES) { const d = Math.atan2(Math.sin(tc - tv), Math.cos(tc - tv)); if (!best || Math.abs(d) < Math.abs(best)) best = d; }
+    const [x, z] = GT(91.9, tv), f = [Math.cos(tv), Math.sin(tv) * (91.9 - D) / 91.9], r = [-f[1], f[0]], tg = [-91.9 * Math.sin(tv) * Math.sign(best), (91.9 - D) * Math.cos(tv) * Math.sign(best)], right = tg[0] * r[0] + tg[1] * r[1] > 0;
+    const m = board(right ? ["LIFT →"] : ["← LIFT"], 1.3, 0.5), p = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.5), m); p.position.set(x, 2.6, z); p.lookAt(0, 2.6, 0); g.add(p); }    
   return { group: g, tick(t) { const k = 0.6 + 0.6 * (0.5 + 0.5 * Math.sin(t * 3)); for (const l of lamps) l.material.emissiveIntensity = k; } };
 }

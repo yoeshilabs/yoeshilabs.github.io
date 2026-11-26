@@ -76,6 +76,18 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
   const SIDES = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]].map((v) => new THREE.Vector3(...v)); let first = true, camDist = DIST, aimed = null, intro0 = null, FP = false, FPsince = 0, ZOOM = 1; const WIDE = new THREE.Vector3(0, 15, 53), WIDE_AT = new THREE.Vector3(0, 15 + Math.sin(-0.32) * 10, 53 - Math.cos(0.32) * 10);    
   
 
+  { const D3 = 18, gtA3 = (x, z) => { let lo = 19, hi = 260; for (let i = 0; i < 26; i++) { const a = (lo + hi) / 2; ((x / a) ** 2 + (z / (a - D3)) ** 2 > 1) ? (lo = a) : (hi = a); } return (lo + hi) / 2; };
+    const V3 = new THREE.Vector3(), IM3 = new THREE.Matrix4(), WM3 = new THREE.Matrix4(), done = new Set(), WARM = [1.08, 0.9, 0.7], COOL = [0.5, 0.48, 0.62];
+    const inside = (geo, mw) => { const p = geo.attributes.position, n = p.count, step = Math.max(1, Math.floor(n / 120)); for (let i = 0; i < n; i += step) { V3.fromBufferAttribute(p, i).applyMatrix4(mw); const a = gtA3(V3.x, V3.z); if (a < 68 || a > 92.9 || V3.y > 11.2) return false; } return true; };
+    scene.traverse((o) => { if (!o.isMesh || done.has(o.geometry)) return; const mats = [].concat(o.material); if (!mats.some((m) => m && m.vertexColors) || !o.geometry.attributes.color) return;
+      let mw = o.matrixWorld; if (o.isInstancedMesh) { o.getMatrixAt(0, IM3); mw = WM3.multiplyMatrices(o.matrixWorld, IM3); } if (!inside(o.geometry, mw)) return;
+      const c = o.geometry.attributes.color; for (let i = 0; i < c.count; i++) { const g = (c.getX(i) + c.getY(i) + c.getZ(i)) / 3, t = Math.min(1, Math.max(0, (g - 0.42) / 0.5)), e = t * t * (3 - 2 * t), d = Math.pow(g, 1.35);
+        c.setXYZ(i, d * (COOL[0] + (WARM[0] - COOL[0]) * e), d * (COOL[1] + (WARM[1] - COOL[1]) * e), d * (COOL[2] + (WARM[2] - COOL[2]) * e)); }
+      c.needsUpdate = true; done.add(o.geometry); });
+    window.__tunnelLit = done.size; }
+
+  
+
   let nearKey = null; const NB = new THREE.Box3(), NV = new THREE.Vector3();
   const refreshNear = (x, z) => { const key = Math.floor(x / 6) + "," + Math.floor(z / 6); if (key === nearKey) return; nearKey = key; NB.setFromCenterAndSize(NV.set(x, 6, z), NV.clone().set(28, 30, 28)); near.length = 0; for (const [o, bx] of ALL) if (bx.intersectsBox(NB)) near.push(o); };
   function placeCamera(dt, m) {
@@ -115,7 +127,7 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
   const ride = () => { if (!liftNear || riding) return; const l = liftNear, up = m.y * K < 6, y = up ? l.y : l.ground; if (y === null || y === undefined) return; riding = true; fade.style.opacity = "1";
     setTimeout(() => { const face = Math.atan2(-l.x, -l.z), tx = up ? l.x : l.gx, tz = up ? l.z : l.gz; YREF = y; player.stand({ x: tx / K, z: tz / K, face }); here = null; cur = null; m = player.tick({}); YREF = m.y * K; view.yaw = face; first = true; fade.style.opacity = "0"; riding = false; }, 320); };
   liftHint.onclick = ride; addEventListener("keydown", (e) => { if (e.code === "KeyE" && !e.repeat) ride(); });
-  const liftCheck = () => { const x = m.x * K, z = m.z * K, y = m.y * K; liftNear = LIFTS.find((l) => (y < 6 ? Math.hypot(l.gx - x, l.gz - z) < 3.5 && Math.abs(y - l.ground) < 1 : Math.hypot(l.x - x, l.z - z) < 3.5 && Math.abs(y - l.y) < 1)) || null;
+  const liftCheck = () => { const x = m.x * K, z = m.z * K, y = m.y * K; liftNear = LIFTS.find((l) => (y < 6 ? Math.hypot(l.gx - x, l.gz - z) < 6 && Math.abs(y - l.ground) < 1 : Math.hypot(l.x - x, l.z - z) < 6 && Math.abs(y - l.y) < 1)) || null;
     const want = liftNear ? (y < 6 ? "E  Lift up to the concourse" : "E  Lift down to the corridor") : ""; if (liftHint.textContent !== want) liftHint.textContent = want; liftHint.style.display = want ? "block" : "none"; };
 
    

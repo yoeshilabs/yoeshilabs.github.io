@@ -123,6 +123,10 @@ else if (VIEW === "floor") { cam.position.set(-34, 4.5, 6); cam.lookAt(30, 8, -2
 scene.add(new THREE.HemisphereLight("#ffe6f2", "#a99abc", 1.35));
 const sun = new THREE.DirectionalLight("#ffc27a", 2.6); sun.position.set(-110, 230, 70); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
 Object.assign(sun.shadow.camera, { left: -140, right: 140, top: 140, bottom: -140, near: 10, far: 500 }); scene.add(sun);
+
+const HEMI = scene.children.find((o) => o.isHemisphereLight);
+if (q.get("walk") === "1") { HEMI.color.set("#ffd9b0"); HEMI.groundColor.set("#8a6e62"); HEMI.intensity = 1.15; sun.color.set("#ffae5c"); sun.intensity = 3.3; sun.position.set(-170, 150, 80);
+  scene.fog.color.set("#f0b394"); scene.fog.near = 70; scene.fog.far = 600; }
 const mat = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.85, ...o });
 const glow = (c, k = 2) => new THREE.MeshStandardMaterial({ color: "#111", emissive: c, emissiveIntensity: k, roughness: 0.4 });
 const add = (m, sh = true) => { m.castShadow = sh; m.receiveShadow = true; scene.add(m); return m; };
@@ -1292,7 +1296,7 @@ const moveAt = (t) => { if (D0) { const x = Math.min(1, Math.max(0, t / MDUR)), 
 moveAt(0);
 renderer.render(scene, cam); drawPoche();
 if (PLAY_LOOP && !q.has("still")) PLAY_LOOP();
-window.arena = { ready: true, mode: MODE, scene, cam, seats: SEATS, act: ACT, at: (t, o = {}) => { RESEED(t); if (typeof RACE_AT === "function") RACE_AT(t); else if (CROWD_TICK && q.get("crowdtick") !== "0") CROWD_TICK(t, CHEER); moveAt(t); DRESS.tick(t); ACT.tick(t);
+window.arena = { ready: true, mode: MODE, scene, cam, renderer, seats: SEATS, act: ACT, at: (t, o = {}) => { RESEED(t); if (typeof RACE_AT === "function") RACE_AT(t); else if (CROWD_TICK && q.get("crowdtick") !== "0") CROWD_TICK(t, CHEER); moveAt(t); DRESS.tick(t); ACT.tick(t);
     const J = o.jitter, cams = J ? [cam, ROOMHOOK && ROOMHOOK.on ? ROOMHOOK.cam : null].filter(Boolean) : []; cams.forEach((c) => { c.setViewOffset(W, H, J[0], J[1], W, H); });    
     if (!o.dry) { renderer.render(scene, cam); drawPoche(); } else { scene.updateMatrixWorld(true); if (ROOMHOOK && ROOMHOOK.on) ROOMHOOK.scene.updateMatrixWorld(true);
       for (const c of [cam, ROOMHOOK && ROOMHOOK.on ? ROOMHOOK.cam : null]) if (c) { c.updateMatrixWorld(true); c.matrixWorldInverse.copy(c.matrixWorld).invert(); } }        
