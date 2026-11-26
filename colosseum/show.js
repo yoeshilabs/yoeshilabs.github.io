@@ -1,8 +1,9 @@
 
 
-export function startShow({ THREE, arena, cam, renderer, song, setCheer, walk = null, title = "The Colosseum", beta = "beta" }) {
+export function startShow({ THREE, arena, cam, renderer, song, setCheer, walk = null, tok = null, title = "The Colosseum", beta = "beta" }) {
+  const C = tok ? tok.COLOR : { night: "#1c1622", gold: "#ffd36e", ink: "#f6f2ee", pink: "#ff5fa8" }, UI = tok ? tok.TYPE.ui : "Helvetica,Arial,sans-serif", DISPLAY = tok ? tok.TYPE.display : UI, NIGHT_A = tok ? tok.alpha("night", "panel") : "rgba(10,6,14,.92)";    
   let WALK = null; if (walk) walk.then((w) => { WALK = w; }).catch((e) => { console.error("the walk did not load", e);    
-    const n = document.createElement("div"); n.style.cssText = "position:fixed;left:50%;bottom:18px;transform:translateX(-50%);padding:8px 14px;border-radius:10px;background:rgba(20,14,30,.75);color:#f6f2ee;font:14px Helvetica,Arial,sans-serif;z-index:3";
+    const n = document.createElement("div"); n.style.cssText = "position:fixed;left:50%;bottom:18px;transform:translateX(-50%);padding:8px 14px;border-radius:10px;background:" + NIGHT_A + ";color:" + C.ink + ";font:14px " + UI + ";z-index:3";
     n.textContent = "Walking could not load in this browser. You can watch the show from the stands: drag to look around."; document.body.appendChild(n); });    
    
   const fit = () => { const w = Math.max(1, innerWidth), h = Math.max(1, innerHeight); renderer.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix(); };
@@ -15,13 +16,13 @@ export function startShow({ THREE, arena, cam, renderer, song, setCheer, walk = 
   const schedule = (name, t) => { if (name === "joust") { const p = JOUST.filter((s) => s <= t).at(-1); return p === undefined || t - p > PASS ? 0 : t - p; } return t; };
    
   const css = document.createElement("style"); css.textContent = `
-    #door{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(circle at 50% 40%,rgba(40,20,50,.55),rgba(10,6,14,.92));color:#f6f2ee;font-family:Helvetica,Arial,sans-serif;z-index:10;text-align:center;padding:16px}
-    #door h1{margin:0;font-size:clamp(34px,7vw,68px);letter-spacing:.04em}#door .b{font-size:14px;letter-spacing:.2em;text-transform:uppercase;opacity:.75}
-    #door p{margin:0;max-width:34em;opacity:.85;line-height:1.45}#door p.s{font-size:14px;opacity:.7}#door button,#gate{font:600 20px Helvetica,Arial,sans-serif;padding:14px 34px;border-radius:999px;border:0;background:#ffd36e;color:#1c1622;cursor:pointer}
+    #door{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(circle at 50% 40%,${tok ? tok.alpha("night", 0.55) : "rgba(40,20,50,.55)"},${NIGHT_A});color:${C.ink};font-family:${UI};z-index:10;text-align:center;padding:16px}
+    #door h1{margin:0;font-size:clamp(46px,9vw,92px);font-weight:400;letter-spacing:.03em;color:${C.gold};font-family:${DISPLAY}}#door .b{font-size:14px;letter-spacing:.2em;text-transform:uppercase;opacity:.75}
+    #door p{margin:0;max-width:34em;opacity:.85;line-height:1.45}#door p.s{font-size:14px;opacity:.7}#door button,#gate{font:${tok && tok.WEIGHT ? tok.WEIGHT.control : 600} 20px ${UI};padding:14px 34px;border-radius:999px;border:0;background:${C.gold};color:${C.night};cursor:pointer}
     #gate{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);z-index:11}#door[hidden],#gate[hidden]{display:none}`;    
   document.head.appendChild(css);
   const door = document.createElement("div"); door.id = "door";
-  door.innerHTML = `<div class="b">${beta}</div><h1>Explore the Colosseum</h1><p>The Purrancers on the center stage, a joust on every chorus. You come in as a cat of your own, at the mouth of an aisle.</p><p class="s">W A S D to walk, Shift to run, click and move the mouse to look, C or V for first person. Walk down the stair to the ring corridor: it runs all the way round, with an aisle up to the stands in every section, a gate out to the plaza on every side, and a glass lift at each corner up to the concourse and its food stalls (E takes it). More of the building opens as it is finished. Sound on.</p><button id="enter">Enter</button>`;
+  door.innerHTML = `<div class="b">${beta}</div><h1>Explore the Colosseum</h1><p>The Purrancers on the center stage, a joust on every chorus. You come in as a cat of your own, at the mouth of an aisle.</p><p class="s">W A S D to walk, Shift to run, click and move the mouse to look, You see through your cat's eyes; C or V steps out behind it. Walk down the stair to the ring corridor: it runs all the way round, with an aisle up to the stands in every section, a gate out to the plaza on every side, and a glass lift at each corner up to the concourse and its food stalls (E takes it). More of the building opens as it is finished. Sound on.</p><button id="enter">Enter</button>`;
   document.body.appendChild(door); document.getElementById("cover")?.remove();    
   const audio = new Audio(song); audio.preload = "auto"; audio.crossOrigin = "anonymous";
   const gate = document.createElement("button"); gate.id = "gate"; gate.textContent = "Tap for sound"; gate.hidden = true; document.body.appendChild(gate);

@@ -2,6 +2,7 @@
 
 import { makePlayer, TICK } from "./p3d/labs/shared/player.js";
 import { makeStick } from "./p3d/labs/shared/stick.js";
+import * as TOK from "./p3d/labs/shared/tokens.js";    
 
 const K = 0.58 / 0.133;    
 const RISE = 0.42, BODY = 0.34;    
@@ -62,10 +63,10 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
   addEventListener("pointerdown", pd); addEventListener("pointerup", pu); addEventListener("pointercancel", pu); addEventListener("pointermove", pm);
 
    
-  const hud = document.createElement("div"); hud.style.cssText = "position:fixed;right:16px;bottom:16px;padding:8px 12px;border-radius:10px;background:rgba(20,14,30,.6);color:#f6f2ee;font:13px/1.45 Helvetica,Arial,sans-serif;pointer-events:none;z-index:2;max-width:46vw";
-  const touch = matchMedia("(pointer: coarse)").matches; hud.textContent = touch ? "Stick to walk, push far to run, drag to look" : "W A S D walk, Shift runs, click and move the mouse to look (Esc lets go), C, V or the wheel for first person, E takes a lift, Space jumps on the plaza"; document.body.appendChild(hud);
+  const hud = document.createElement("div"); hud.style.cssText = `position:fixed;right:16px;bottom:16px;padding:8px 12px;border-radius:10px;background:${TOK.alpha("night", "panel")};color:${TOK.COLOR.ink};font:13px/1.45 ${TOK.TYPE.ui};pointer-events:none;z-index:2;max-width:46vw`;
+  const touch = matchMedia("(pointer: coarse)").matches; hud.textContent = touch ? "Stick to walk, push far to run, drag to look" : "W A S D walk, Shift runs, click and move the mouse to look (Esc lets go), C, V or the wheel to see your cat, E takes a lift, Space jumps on the plaza"; document.body.appendChild(hud);
   setTimeout(() => { hud.style.transition = "opacity 1.2s"; hud.style.opacity = "0.35"; }, 12000);
-  const barriers = (await import("./barriers.js")).placeBarriers({ THREE, scene, closed: W.closed || [] });
+  const barriers = (await import("./barriers.js")).placeBarriers({ THREE, scene, closed: W.closed || [], tok: TOK });
 
   
 
@@ -73,7 +74,7 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
     const mine = new Set(); me.holder.traverse((o) => mine.add(o)); scene.updateMatrixWorld(true); scene.traverse((o) => { if (!o.isMesh || mine.has(o) || (o.isInstancedMesh && o.count > 64) || o.isSkinnedMesh || !o.visible) return; if (o.material && o.material.transparent && o.material.opacity < 0.2) return; if (o.isInstancedMesh) { o.computeBoundingBox(); bb.copy(o.boundingBox); if (bb.intersectsBox(box)) ALL.push([o, bb.clone()]); return; }
       o.geometry.computeBoundingBox(); bb.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld); if (bb.intersectsBox(box)) ALL.push([o, bb.clone()]); }); }
   const CH = 2.1, DIST = 2.8 * CH / 1.15, EYE = CH * 0.86, ray = new THREE.Raycaster(), head = new THREE.Vector3(), want = new THREE.Vector3(), dir = new THREE.Vector3(), aim = new THREE.Vector3(), cam3 = new THREE.Vector3();
-  const SIDES = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]].map((v) => new THREE.Vector3(...v)); let first = true, camDist = DIST, aimed = null, intro0 = null, FP = false, FPsince = 0, ZOOM = 1; const WIDE = new THREE.Vector3(0, 15, 53), WIDE_AT = new THREE.Vector3(0, 15 + Math.sin(-0.32) * 10, 53 - Math.cos(0.32) * 10);    
+  const SIDES = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]].map((v) => new THREE.Vector3(...v)); let first = true, camDist = DIST, aimed = null, intro0 = null, FP = true  , FPsince = 0, ZOOM = 1; const WIDE = new THREE.Vector3(0, 15, 53), WIDE_AT = new THREE.Vector3(0, 15 + Math.sin(-0.32) * 10, 53 - Math.cos(0.32) * 10);    
   
 
   { const D3 = 18, gtA3 = (x, z) => { let lo = 19, hi = 260; for (let i = 0; i < 26; i++) { const a = (lo + hi) / 2; ((x / a) ** 2 + (z / (a - D3)) ** 2 > 1) ? (lo = a) : (hi = a); } return (lo + hi) / 2; };
@@ -103,7 +104,7 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
     head.set(m.x * K, m.y * K + EYE, m.z * K); dir.set(-fx * ce, Math.sin(el), -fz * ce);
     
 
-    if (FP && !(m.t - (intro0 ?? m.t) < 4 && intro0 !== null && !FPsince)) { const cp = Math.cos(view.pitch); cam3.copy(head); camDist = 0; cam.position.copy(head); me.holder.visible = false;
+    if (FP && (FPsince || (intro0 !== null && m.t - intro0 >= 4))) {     const cp = Math.cos(view.pitch); cam3.copy(head); camDist = 0; cam.position.copy(head); me.holder.visible = false;
       aim.set(head.x + fx * cp * 8, head.y + Math.sin(view.pitch) * 8, head.z + fz * cp * 8); aimed = aim.clone(); first = false; if (cam.near > 0.05) { cam.near = 0.05; cam.updateProjectionMatrix(); } cam.lookAt(aim); return; }
     const far = DIST * ZOOM; ray.set(head, dir); ray.far = far + 0.5; const hit = ray.intersectObjects(near, false)[0], d = hit ? Math.max(0, Math.min(far, hit.distance - 0.35)) : far;
     camDist += (d - camDist) * Math.min(1, d < camDist ? 1 : dt * 2.5); if (camDist < 1.2) cam3.copy(head).addScaledVector(dir, camDist);    
@@ -129,8 +130,8 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
       if (![[BODY, 0], [-BODY, 0], [0, BODY], [0, -BODY]].every(([ex, ez]) => heightAt(x + ex, z + ez, h) !== null)) continue; const d = Math.hypot(dx, dz); if (d < bd && free(x, h, z)) { bd = d; best = { x, z, y: h }; } } return best; };    
   const LIFTS = [0, 1, 2, 3].map((k) => { const t = Math.PI / 4 + k * Math.PI / 2, x0 = 85.2 * Math.cos(t), z0 = 67.2 * Math.sin(t), up = near1(x0, z0, 11.7), dn = near1(x0, z0, 0.1);
     return up && dn ? { k, x: up.x, z: up.z, y: up.y, gx: dn.x, gz: dn.z, ground: dn.y } : null; }).filter(Boolean);    
-  const liftHint = document.createElement("button"); liftHint.style.cssText = "position:fixed;left:50%;bottom:64px;transform:translateX(-50%);padding:10px 18px;border-radius:999px;border:0;background:#ffd36e;color:#1c1622;font:600 15px Helvetica,Arial,sans-serif;cursor:pointer;z-index:3;display:none"; document.body.appendChild(liftHint);
-  const fade = document.createElement("div"); fade.style.cssText = "position:fixed;inset:0;background:#0c0812;opacity:0;pointer-events:none;transition:opacity .3s;z-index:4"; document.body.appendChild(fade);
+  const liftHint = document.createElement("button"); liftHint.style.cssText = `position:fixed;left:50%;bottom:64px;transform:translateX(-50%);padding:10px 18px;border-radius:999px;border:0;background:${TOK.COLOR.gold};color:${TOK.COLOR.night};font:${TOK.WEIGHT ? TOK.WEIGHT.control : 600} 15px ${TOK.TYPE.ui};cursor:pointer;z-index:3;display:none`; document.body.appendChild(liftHint);
+  const fade = document.createElement("div"); fade.style.cssText = "position:fixed;inset:0;background:" + TOK.COLOR.night + ";opacity:0;pointer-events:none;transition:opacity .3s;z-index:4"; document.body.appendChild(fade);
   let liftNear = null, riding = false;
   const ride = () => { if (!liftNear || riding) return; const l = liftNear, up = m.y * K < 6, y = up ? l.y : l.ground; if (y === null || y === undefined) return; riding = true; fade.style.opacity = "1";
     setTimeout(() => { const face = Math.atan2(-l.x, -l.z), tx = up ? l.x : l.gx, tz = up ? l.z : l.gz; YREF = y; player.stand({ x: tx / K, z: tz / K, face }); here = null; cur = null; m = player.tick({}); YREF = m.y * K; view.yaw = face; first = true; fade.style.opacity = "0"; riding = false; }, 320); };

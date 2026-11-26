@@ -3,13 +3,18 @@
 const D = 64 - 46, GT = (a, t) => [a * Math.cos(t), (a - D) * Math.sin(t)];
 
 
-export function placeBarriers({ THREE, scene, closed = [] }) {
+export function placeBarriers({ THREE, scene, closed = [], tok = null }) {
+  const FONT = tok ? tok.TYPE.display : "Helvetica, Arial, sans-serif", C = tok ? tok.COLOR : { night: "#1c1622", gold: "#ffd36e", ink: "#f2efe8", pink: "#d8342c" };    
   const g = new THREE.Group(); g.name = "barriers"; scene.add(g); const lamps = [];
-  const sign = (() => { const c = document.createElement("canvas"); c.width = 512; c.height = 160; const x = c.getContext("2d");
-    x.fillStyle = "#1c1622"; x.fillRect(0, 0, 512, 160); x.strokeStyle = "#ffd36e"; x.lineWidth = 8; x.strokeRect(6, 6, 500, 148);
-    x.fillStyle = "#ffd36e"; x.textAlign = "center"; x.font = "700 52px Helvetica, Arial, sans-serif"; x.fillText("UNDER", 256, 70); x.fillText("MAINTENANCE", 256, 128);
+  const SH = tok ? 256 : 160;    
+  const sign = (() => { const c = document.createElement("canvas"); c.width = 512; c.height = SH; const x = c.getContext("2d"), bh = tok ? 40 : 16;    
+    x.fillStyle = tok ? C.ink : C.night; x.fillRect(0, 0, 512, SH); x.fillStyle = C.pink; x.fillRect(0, SH - bh, 512, bh); if (tok) x.fillRect(0, 0, 512, bh); x.strokeStyle = C.gold; x.lineWidth = 6; x.strokeRect(4, 4, 504, SH - 8);    
+    x.fillStyle = tok ? C.night : C.ink; x.textAlign = "center"; x.textBaseline = "middle";
+    if (!tok) { x.font = "700 52px Helvetica, Arial, sans-serif"; x.fillText("UNDER", 256, 46); x.fillText("MAINTENANCE", 256, 104); }
+    else { if ("letterSpacing" in x) x.letterSpacing = "3px"; let f = 96; do { x.font = `${f}px ${FONT}`; f -= 2; } while (x.measureText("MAINTENANCE").width > 468 && f > 40);
+      x.strokeStyle = x.fillStyle; x.lineWidth = 4; x.lineJoin = "round"; for (const [t, y] of [["UNDER", 86], ["MAINTENANCE", 172]]) { x.strokeText(t, 256, y); x.fillText(t, 256, y); } }    
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; })();
-  const stripes = (() => { const c = document.createElement("canvas"); c.width = 256; c.height = 32; const x = c.getContext("2d"); x.fillStyle = "#f2efe8"; x.fillRect(0, 0, 256, 32); x.fillStyle = "#d8342c";
+  const stripes = (() => { const c = document.createElement("canvas"); c.width = 256; c.height = 32; const x = c.getContext("2d"); x.fillStyle = C.ink; x.fillRect(0, 0, 256, 32); x.fillStyle = C.pink + "";
     for (let i = -2; i < 12; i++) { x.beginPath(); x.moveTo(i * 32, 32); x.lineTo(i * 32 + 16, 32); x.lineTo(i * 32 + 32, 0); x.lineTo(i * 32 + 16, 0); x.fill(); }
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; return t; })();
   const leg = new THREE.MeshStandardMaterial({ color: 0x2a2630, roughness: 0.6, metalness: 0.4 }), signM = new THREE.MeshStandardMaterial({ map: sign, roughness: 0.7, emissive: 0xffffff, emissiveMap: sign, emissiveIntensity: 0.25 });
@@ -18,7 +23,7 @@ export function placeBarriers({ THREE, scene, closed = [] }) {
     const st = stripes.clone(); st.repeat.set(L / 1.6, 1); st.needsUpdate = true; const bar = new THREE.MeshStandardMaterial({ map: st, roughness: 0.55 });
     for (const h of [0.55, 1.05]) { const m = new THREE.Mesh(new THREE.BoxGeometry(L, 0.2, 0.06), bar); m.position.y = h; m.castShadow = true; b.add(m); }
     for (const u of [-0.5, 0.5]) for (const s of [-1, 1]) { const l = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 1.25, 8), leg); l.position.set(u * (L - 0.2), 0.6, s * 0.18); l.rotation.x = s * 0.15; b.add(l); }
-    const sg = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.47), signM); sg.position.set(0, 1.55, 0.04); b.add(sg); const back = sg.clone(); back.rotation.y = Math.PI; back.position.z = -0.04; b.add(back);
+    const sg = new THREE.Mesh(new THREE.PlaneGeometry(1.5, tok ? 0.75 : 0.47), signM); sg.position.set(0, tok ? 1.7 : 1.55, 0.04); b.add(sg); const back = sg.clone(); back.rotation.y = Math.PI; back.position.z = -0.04; b.add(back);
     for (const u of [-0.5, 0.5]) { const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 8), new THREE.MeshStandardMaterial({ color: 0xffb030, emissive: 0xffa020, emissiveIntensity: 1 })); lamp.position.set(u * (L - 0.2), 1.32, 0); b.add(lamp); lamps.push(lamp); }
     b.position.set((p0[0] + p1[0]) / 2, y, (p0[1] + p1[1]) / 2); b.rotation.y = -Math.atan2(dz, dx); g.add(b); return b; }
    
@@ -36,9 +41,10 @@ export function placeBarriers({ THREE, scene, closed = [] }) {
     g.add(P, R); }
   
 
-  const board = (lines, w, h, bg = "#ffd36e", fg = "#1c1622") => { const c = document.createElement("canvas"); c.width = 512; c.height = Math.round(512 * h / w); const x = c.getContext("2d");
-    x.fillStyle = bg; x.fillRect(0, 0, c.width, c.height); x.fillStyle = fg; x.textAlign = "center"; x.textBaseline = "middle"; const fs = Math.round(c.height / (lines.length + 0.6));
-    lines.forEach((t, i) => { let f = fs; do { x.font = `700 ${f}px Helvetica, Arial, sans-serif`; f -= 2; } while (x.measureText(t).width > c.width * 0.9 && f > 8); x.fillText(t, 256, c.height * (i + 0.8) / (lines.length + 0.6)); });    
+  const board = (lines, w, h, band = C.gold, light = true) => {     const c = document.createElement("canvas"); c.width = 512; c.height = Math.round(512 * h / w); const x = c.getContext("2d"), bh = Math.round(c.height * 0.12);    
+    x.fillStyle = light ? C.ink : C.night; x.fillRect(0, 0, c.width, c.height); x.fillStyle = band; x.fillRect(0, c.height - bh, c.width, bh); x.strokeStyle = C.gold; x.lineWidth = 5; x.strokeRect(3, 3, c.width - 6, c.height - 6);
+    x.fillStyle = light ? C.night : C.ink; x.textAlign = "center"; x.textBaseline = "middle"; const fs = Math.round((c.height - bh) * 0.92 / lines.length);    
+    lines.forEach((t, i) => { let f = fs; do { x.font = tok ? `${f}px ${FONT}` : `700 ${f}px Helvetica, Arial, sans-serif`; f -= 2; } while (x.measureText(t).width > c.width * 0.92 && f > 8); x.fillText(t, 256, (c.height - bh) * (i + 0.55) / (lines.length + 0.1)); });    
     const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 4; return new THREE.MeshStandardMaterial({ map: tx, emissive: 0xffffff, emissiveMap: tx, emissiveIntensity: 0.9, roughness: 0.6 }); };
   const liftM = board(["LIFT ↑ CONCOURSE"], 3.6, 0.7), CORES = [0, 1, 2, 3].map((k) => Math.PI / 4 + k * Math.PI / 2);
   const hang = (a, t, m, w, h, y) => { const [x, z] = GT(a, t), [x2, z2] = GT(a, t + 0.01), dx = x2 - x, dz = z2 - z, b = new THREE.Group();    

@@ -10,10 +10,20 @@ let RACE_AT = null, PLAY_LOOP = null, STATIONS = null, RACE_CARS = null;
 const FILM = new URLSearchParams("walk=1&mode=skystart&canopy=0&dress=postamericana&act=band,joust,beam&still=1").get("film") === "1";
 const q = new URLSearchParams("walk=1&mode=skystart&canopy=0&dress=postamericana&act=band,joust,beam&still=1"), MODE = q.get("mode") || "tournament", VIEW = q.get("view") || "air", CANOPY = +(q.get("canopy") ?? (MODE === "skystart" ? 0 : 0.22));
 
+const TOK = q.get("walk") === "1" ? await import("./p3d/labs/shared/tokens.js") : null;
+if (TOK) { const st = document.createElement("style"); st.textContent = TOK.fontFaceCSS(); document.head.appendChild(st); try { await document.fonts.load('100px "League Gothic"'); } catch (e) {} }
+const SIGNFONT = TOK ? TOK.TYPE.display : "Helvetica, Arial, sans-serif";
+function SIGN(lines, { w = 512, h = 512, band = null, letter = null } = {}) {     const k = document.createElement("canvas"); k.width = w; k.height = h; const x = k.getContext("2d"), C = TOK.COLOR, rule = Math.max(3, Math.round(w / 90)), bh = Math.round(h * (letter ? 0.14 : 0.09));
+  x.fillStyle = C.night; x.fillRect(0, 0, w, h); x.fillStyle = band || C.gold; x.fillRect(0, h - bh, w, bh); x.strokeStyle = C.gold; x.lineWidth = rule; x.strokeRect(rule, rule, w - 2 * rule, h - 2 * rule);
+  const L = [].concat(lines), room = h - bh - 2 * rule, wts = L.map((_, i) => (i === 0 ? 1 : letter ? 0.24 : 0.34)), tot = wts.reduce((a, b) => a + b, 0); let y = rule + room * 0.06;
+  x.fillStyle = C.ink; x.textAlign = "center"; x.textBaseline = "middle";
+  L.forEach((t, i) => { const big = i === 0 && letter; x.fillStyle = big ? letter : C.ink; const lh = (room * 0.88) * wts[i] / tot; let f = Math.round(lh * (big ? 1.28 : 1.05)); do { x.font = `${f}px ${SIGNFONT}`; f -= 2; } while (x.measureText(t).width > w * 0.86 && f > 8); if (big) { x.strokeStyle = letter; x.lineWidth = f * 0.018; x.lineJoin = "round"; x.strokeText(t, w / 2, y + lh * 0.54); }     x.fillText(t, w / 2, y + lh * (big ? 0.54 : 0.5)); y += lh; });
+  const tx = new THREE.CanvasTexture(k); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 8; return tx; }
+
 if (q.get("walk") === "1" && (matchMedia("(pointer: coarse)").matches || Math.min(innerWidth, innerHeight) < 500)) {
   document.title = "The Colosseum";
-  const c = document.createElement("div"); c.style.cssText = "position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px 16px;box-sizing:border-box;background:#1d1530;color:#f6f2ee;font-family:Helvetica,Arial,sans-serif;text-align:center";
-  c.innerHTML = `<div style="font-size:13px;letter-spacing:.2em;text-transform:uppercase;opacity:.75">beta</div><h1 style="margin:0;font-size:clamp(28px,8vw,48px)">Explore the Colosseum</h1>`
+  const c = document.createElement("div"); c.style.cssText = `position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px 16px;box-sizing:border-box;background:${TOK.COLOR.night};color:${TOK.COLOR.ink};font-family:${TOK.TYPE.ui};text-align:center`;
+  c.innerHTML = `<div style="font-size:13px;letter-spacing:.2em;text-transform:uppercase;opacity:.75">beta</div><h1 style="margin:0;font-size:clamp(40px,11vw,68px);font-weight:400;letter-spacing:.02em;color:${TOK.COLOR.gold};font-family:${TOK.TYPE.display.replace(/"/g, "'")}">Explore the Colosseum</h1>`
     + `<img alt="The Colosseum's bowl with The Purrancers on the center stage" style="width:min(92vw,560px);border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.45)">`
     + `<p style="margin:0;max-width:26em;line-height:1.45;opacity:.9">Open this on a computer for now. Phones are coming.</p>`;
   c.querySelector("img").src = new URL("./data/colosseum-still.jpg", import.meta.url).href; document.body.appendChild(c);
@@ -33,7 +43,7 @@ const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffe
 renderer.shadowMap.enabled = q.get("shadows") !== "0"; renderer.shadowMap.type = THREE.PCFSoftShadowMap;     renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; document.body.appendChild(renderer.domElement);
  
-if (q.get("walk") === "1") { const c = document.createElement("div"); c.id = "cover"; c.style.cssText = "position:fixed;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;background:#1d1530;color:#f6f2ee;font:15px Helvetica,Arial,sans-serif;letter-spacing:.08em"; c.textContent = "The Colosseum is opening"; document.body.appendChild(c); }
+if (q.get("walk") === "1") { const c = document.createElement("div"); c.id = "cover"; c.style.cssText = `position:fixed;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;background:${TOK.COLOR.night};color:${TOK.COLOR.ink};font:15px ${TOK.TYPE.ui};letter-spacing:.08em`; c.textContent = "The Colosseum is opening"; document.body.appendChild(c); }
 const scene = new THREE.Scene(); scene.background = new THREE.Color("#5b3f6e"); scene.fog = new THREE.Fog("#eeb2a2", 320, 1150);
 
 const PAINT = { k: q.has("paint") ? +q.get("paint") : null, tv: +(q.get("tv") ?? 0), fade: 1 }; let ROOMHOOK = null;    
@@ -406,7 +416,7 @@ const SIGNC = ["#ff4f7a", "#6fd3ff", "#ffd36e", "#3fcf86"], LETTERS = "ABCDEFGHI
 for (let i = 0; i < 16; i++) { const t = AL(i), p = ell(CA0 + 0.6, CB0 + 0.6, t), g = new THREE.Group(); g.position.set(p.x, CY, p.y); g.lookAt(0, CY, 0); scene.add(g);
   const SY = q.get("walk") === "1" ? 1.75 : 3.6, PL = SY === 3.6 ? 3.2 : SY - 0.6;    
   const post = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, PL, 8), STONE2); post.position.y = PL / 2; g.add(post);
-  const tx = textTex([LETTERS[i], "SECTION"], { w: 256, h: 256, bg: SIGNC[i % 4], fg: "#1c1622", size: 150 }), m = new THREE.MeshStandardMaterial({ map: tx, emissive: "#ffffff", emissiveMap: tx, emissiveIntensity: 0.55, side: THREE.DoubleSide, roughness: 0.5 });
+  const tx = TOK ? SIGN([LETTERS[i], "SECTION"], { w: 256, h: 256, band: SIGNC[i % 4], letter: SIGNC[i % 4] }) : textTex([LETTERS[i], "SECTION"], { w: 256, h: 256, bg: SIGNC[i % 4], fg: "#1c1622", size: 150 }), m = new THREE.MeshStandardMaterial({ map: tx, emissive: "#ffffff", emissiveMap: tx, emissiveIntensity: 0.55, side: THREE.DoubleSide, roughness: 0.5 });
   if (FAB) { m.side = THREE.FrontSide; for (const ry of [0, Math.PI]) { const sg = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.4), m); sg.position.y = SY; sg.rotation.y = ry; g.add(sg); } }    
   else { const sg = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.4), m); sg.position.y = SY; g.add(sg); } }
  
@@ -433,7 +443,7 @@ if (FAB) {
     const k = document.createElement("canvas"); k.width = 384; k.height = 512; const x = k.getContext("2d"), c = SIGNC[i % 4];
     x.fillStyle = "#1c1622"; x.fillRect(0, 0, 384, 512); x.fillStyle = c; x.fillRect(0, 0, 384, 18); x.fillRect(0, 494, 384, 18);
     x.textAlign = "center"; x.textBaseline = "middle"; x.font = "bold 340px Helvetica, Arial, sans-serif"; x.fillText(LETTERS[i], 192, 228); x.font = "bold 54px Helvetica, Arial, sans-serif"; x.fillStyle = "#fbf8f4"; x.fillText("SECTION", 192, 440);
-    const tx = new THREE.CanvasTexture(k); tx.colorSpace = THREE.SRGBColorSpace;
+    const tx = TOK ? SIGN([LETTERS[i], "SECTION"], { w: 384, h: 512, band: c, letter: c }) : new THREE.CanvasTexture(k); tx.colorSpace = THREE.SRGBColorSpace;
     const bm = new THREE.MeshStandardMaterial({ map: tx, emissive: "#ffffff", emissiveMap: tx, emissiveIntensity: 0.85, roughness: 0.6 });
     for (const ry of [0, Math.PI]) { const bn = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 3.47), bm); bn.rotation.y = ry; g.add(bn); }    
     const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 3.0, 8), FAB.metal); bar.rotation.z = Math.PI / 2; bar.position.y = 1.8; g.add(bar); }
@@ -549,10 +559,10 @@ if (FAB) { const { at, inst, L0, HW, lit } = KIT, Y = new THREE.Vector3(0, 1, 0)
     const Zn = b0.Z.clone().add(b1.Z).normalize(), right = new THREE.Vector3().crossVectors(Zn.clone().negate(), Y), side = { l: [], r: [] };
     VOM.t.map((t, i) => ({ i, d: Math.atan2(Math.sin(t - tg), Math.cos(t - tg)) })).sort((p, q) => Math.abs(p.d) - Math.abs(q.d)).slice(0, 8).forEach(({ i }) => { const [ax, az] = GT(RCM, VOM.t[i]); ((ax - wx) * right.x + (az - wz) * right.z > 0 ? side.r : side.l).push(i); });
     const rng = (a) => { const s = a.map((i) => LETTERS_G[i]).sort(); return s[0] + "–" + s[s.length - 1]; };
-    const k = document.createElement("canvas"); k.width = 1024; k.height = 360; const x = k.getContext("2d"); x.fillStyle = "#1c1622"; x.fillRect(0, 0, 1024, 360); x.fillStyle = "#ffd36e"; x.fillRect(0, 0, 1024, 14); x.fillRect(0, 346, 1024, 14);
-    x.textAlign = "center"; x.textBaseline = "middle"; x.fillStyle = "#fbf8f4"; x.font = "bold 150px Helvetica, Arial, sans-serif"; x.fillText(name, 512, 140);
-    x.font = "bold 66px Helvetica, Arial, sans-serif"; x.fillStyle = "#ffe2b8"; x.textAlign = "left"; x.fillText("← " + rng(side.l), 48, 282); x.textAlign = "right"; x.fillText(rng(side.r) + " →", 976, 282);
-    x.textAlign = "center"; x.font = "bold 40px Helvetica, Arial, sans-serif"; x.fillStyle = "#b9aec8"; x.fillText("SECTIONS", 512, 282);
+    const k = document.createElement("canvas"); k.width = 1024; k.height = 360; const x = k.getContext("2d"); x.fillStyle = TOK ? TOK.COLOR.ink : "#1c1622"; x.fillRect(0, 0, 1024, 360);     x.fillStyle = "#ffd36e"; x.fillRect(0, 0, 1024, 14); x.fillRect(0, 346, 1024, 14);
+    x.textAlign = "center"; x.textBaseline = "middle"; x.fillStyle = TOK ? TOK.COLOR.night : "#fbf8f4"; x.font = TOK ? `200px ${SIGNFONT}` : "bold 150px Helvetica, Arial, sans-serif"; x.fillText(name, 512, 140);
+    x.font = TOK ? `86px ${SIGNFONT}` : "bold 66px Helvetica, Arial, sans-serif"; x.fillStyle = TOK ? TOK.COLOR.night : "#ffe2b8"; x.textAlign = "left"; x.fillText("← " + rng(side.l), 48, 282); x.textAlign = "right"; x.fillText(rng(side.r) + " →", 976, 282);
+    x.textAlign = "center"; x.font = TOK ? `52px ${SIGNFONT}` : "bold 40px Helvetica, Arial, sans-serif"; x.fillStyle = TOK ? TOK.alpha("night", "muted") : "#b9aec8"; x.fillText("SECTIONS", 512, 282);
     const tx = new THREE.CanvasTexture(k); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 8;
     const sg = new THREE.Group(); sg.position.set(wx + Zn.x * 0.32, tun ? 6.3 : 5.4, wz + Zn.z * 0.32); sg.lookAt(wx + Zn.x * 9, tun ? 6.3 : 5.4, wz + Zn.z * 9); scene.add(sg);
     const face = new THREE.Mesh(new THREE.PlaneGeometry(7.2, 2.53), new THREE.MeshStandardMaterial({ map: tx, emissive: "#ffffff", emissiveMap: tx, emissiveIntensity: 0.8, roughness: 0.5 })); face.position.z = 0.07; sg.add(face);
@@ -561,7 +571,7 @@ if (FAB) { const { at, inst, L0, HW, lit } = KIT, Y = new THREE.Vector3(0, 1, 0)
   const BAND = q.get("gatesign") === "band";
   for (const [tg, name] of GATES) { const p = ell(A, B, tg), g = new THREE.Group(); g.position.set(p.x, 0, p.y); g.lookAt(0, 0, 0); scene.add(g);    
     const sign = (bg, fg) => { const k = document.createElement("canvas"); k.width = 2048; k.height = 400; const x = k.getContext("2d"); if (bg) { x.fillStyle = bg; x.fillRect(0, 0, 2048, 400); }
-      x.textAlign = "center"; x.textBaseline = "middle"; x.fillStyle = fg; x.font = "bold 300px Helvetica, Arial, sans-serif"; if ("letterSpacing" in x) x.letterSpacing = "18px"; x.fillText(name, 1024, 214);
+      x.textAlign = "center"; x.textBaseline = "middle"; x.fillStyle = fg; x.font = TOK ? `360px ${SIGNFONT}` : "bold 300px Helvetica, Arial, sans-serif"; if ("letterSpacing" in x) x.letterSpacing = TOK ? "44px" : "18px"; x.fillText(name, 1024, 214);
       const tx = new THREE.CanvasTexture(k); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 8; return tx; };
     if (!BAND) {  
       const pn = new THREE.Mesh(FAB.pierBox(13.0, 3.0, 0.8, { unit: false }), FAB.stoneOut); pn.position.set(0, 13.45, -2.25); g.add(pn);
@@ -1321,6 +1331,6 @@ if (q.get("quality") === "film") { const sz = renderer.getDrawingBufferSize(new 
       renderer.copyFramebufferToTexture(grab); renderer.setRenderTarget(acc); const ac = renderer.autoClear; renderer.autoClear = false; renderer.render(ADD.sc, QC); renderer.autoClear = ac; renderer.setRenderTarget(null); }
     sun.position.copy(sun0); renderer.render(OUT.sc, QC); }; }
  
-if (q.get("walk") === "1") SHOW = (await import("./show.js")).startShow({ THREE, arena: window.arena, cam, renderer, song: q.get("song") || "./media/remix.m4a", setCheer: (k) => { CHEER = k; }, walk: import("./walk.js").then((w) => w.makeWalk({ THREE, scene, cam, renderer })) }); window.arena.show = SHOW;
+if (q.get("walk") === "1") SHOW = (await import("./show.js")).startShow({ THREE, tok: TOK, arena: window.arena, cam, renderer, song: q.get("song") || "./media/remix.m4a", setCheer: (k) => { CHEER = k; }, walk: import("./walk.js").then((w) => w.makeWalk({ THREE, scene, cam, renderer })) }); window.arena.show = SHOW;
 if (ANIM && typeof RACE_AT === "function") { const t0 = performance.now(); const loop = () => { RACE_AT((performance.now() - t0) / 1000); renderer.render(scene, cam); requestAnimationFrame(loop); }; loop(); }    
 </script></body></html>
