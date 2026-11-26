@@ -81,10 +81,18 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
     const inside = (geo, mw) => { const p = geo.attributes.position, n = p.count, step = Math.max(1, Math.floor(n / 120)); for (let i = 0; i < n; i += step) { V3.fromBufferAttribute(p, i).applyMatrix4(mw); const a = gtA3(V3.x, V3.z); if (a < 68 || a > 92.9 || V3.y > 11.2) return false; } return true; };
     scene.traverse((o) => { if (!o.isMesh || done.has(o.geometry)) return; const mats = [].concat(o.material); if (!mats.some((m) => m && m.vertexColors) || !o.geometry.attributes.color) return;
       let mw = o.matrixWorld; if (o.isInstancedMesh) { o.getMatrixAt(0, IM3); mw = WM3.multiplyMatrices(o.matrixWorld, IM3); } if (!inside(o.geometry, mw)) return;
-      const c = o.geometry.attributes.color; for (let i = 0; i < c.count; i++) { const g = (c.getX(i) + c.getY(i) + c.getZ(i)) / 3, t = Math.min(1, Math.max(0, (g - 0.42) / 0.5)), e = t * t * (3 - 2 * t), d = Math.pow(g, 1.35);
+      const c = o.geometry.attributes.color, KP = window.__tunnelPow || 1.8, K0 = window.__tunnelFloor ?? 0.2;     for (let i = 0; i < c.count; i++) { const g0 = (c.getX(i) + c.getY(i) + c.getZ(i)) / 3, g = K0 ? Math.max(0, (g0 - K0) / (1 - K0)) : g0, t = Math.min(1, Math.max(0, (g - 0.42) / 0.5)), e = t * t * (3 - 2 * t), d = Math.pow(g, KP);    
         c.setXYZ(i, d * (COOL[0] + (WARM[0] - COOL[0]) * e), d * (COOL[1] + (WARM[1] - COOL[1]) * e), d * (COOL[2] + (WARM[2] - COOL[2]) * e)); }
       c.needsUpdate = true; done.add(o.geometry); });
-    window.__tunnelLit = done.size; }
+    window.__tunnelLit = done.size;
+    
+
+    { let lan = null; scene.traverse((o) => { if (!lan && o.isInstancedMesh && o.geometry.type === "SphereGeometry" && Math.abs((o.geometry.parameters.radius || 0) - 0.34) < 1e-3 && o.count > 20) lan = o; });
+      if (lan) { const c = document.createElement("canvas"); c.width = c.height = 128; const x = c.getContext("2d"), gr = x.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.5, "rgba(255,255,255,.42)"); gr.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = gr; x.fillRect(0, 0, 128, 128);
+        const tx = new THREE.CanvasTexture(c), pm = new THREE.MeshBasicMaterial({ map: tx, color: 0xffc98e, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4, fog: true });
+        const pools = new THREE.InstancedMesh(new THREE.PlaneGeometry(5.2, 5.2).rotateX(-Math.PI / 2), pm, lan.count), M = new THREE.Matrix4(), P = new THREE.Vector3(), Q = new THREE.Quaternion(), Sc = new THREE.Vector3();
+        lan.updateMatrixWorld(true); for (let k = 0; k < lan.count; k++) { lan.getMatrixAt(k, M); M.premultiply(lan.matrixWorld); M.decompose(P, Q, Sc); pools.setMatrixAt(k, M.makeTranslation(P.x, 0.1, P.z)); }
+        pools.name = "lantern-pools"; pools.renderOrder = 2; scene.add(pools); window.__pools = lan.count; } } }
 
   
 
