@@ -7,8 +7,8 @@
 import * as THREE from "three";
 import { makeFabric } from "./fabric.js";
 let RACE_AT = null, PLAY_LOOP = null, STATIONS = null, RACE_CARS = null;    
-const FILM = new URLSearchParams("walk=1&mode=tournament&canopy=0&dress=postamericana&act=band,joust,beam&still=1").get("film") === "1";
-const q = new URLSearchParams("walk=1&mode=tournament&canopy=0&dress=postamericana&act=band,joust,beam&still=1"), MODE = q.get("mode") || "tournament", VIEW = q.get("view") || "air", CANOPY = +(q.get("canopy") ?? (MODE === "skystart" ? 0 : 0.22));
+const FILM = new URLSearchParams("walk=1&mode=skystart&canopy=0&dress=postamericana&act=band,joust,beam&still=1").get("film") === "1";
+const q = new URLSearchParams("walk=1&mode=skystart&canopy=0&dress=postamericana&act=band,joust,beam&still=1"), MODE = q.get("mode") || "tournament", VIEW = q.get("view") || "air", CANOPY = +(q.get("canopy") ?? (MODE === "skystart" ? 0 : 0.22));
 
 if (q.get("walk") === "1" && (matchMedia("(pointer: coarse)").matches || Math.min(innerWidth, innerHeight) < 500)) {
   document.title = "The Colosseum";
@@ -995,7 +995,7 @@ if (MODE === "skystart") {
     for (const s2 of [-4.5, 4.5]) { const rl = new THREE.Mesh(new THREE.BoxGeometry(len + 2, 0.3, 0.3), glow(s2 < 0 ? "#6fd3ff" : "#ffd36e", 2.4)); rl.position.copy(br.position).add(new THREE.Vector3(-Math.sin(dir) * s2, 0.5, Math.cos(dir) * s2)); rl.rotation.y = -dir; scene.add(rl); } }
   const yawAt = (t) => -Math.atan2(B * Math.cos(t), -A * Math.sin(t));    
   for (let k = 0; k < 10; k++) for (let r2 = 0; r2 < 2; r2++) { const r = R0 + (R1 - R0) * (k + 0.5) / 10, sq = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.06, 1.4), (k + r2) % 2 ? WHITE : mat("#111")); sq.position.copy(ON(r, TH + r2 * 0.018, 0.05)); sq.rotation.y = yawAt(TH); scene.add(sq); }    
-  const LAMPS = [], GUIDES = new THREE.Group(); scene.add(GUIDES); GUIDES.visible = q.get("guides") !== "0" && !q.has("t") && q.get("anim") !== "1" && !q.has("paint");    
+  const LAMPS = [], GUIDES = new THREE.Group(); scene.add(GUIDES); GUIDES.visible = q.get("guides") !== "0" && !q.has("t") && q.get("anim") !== "1" && !q.has("paint") && q.get("walk") !== "1";    
   const gant = new THREE.Group(), p0 = ON(R0 - 0.01, TH), p1 = ON(R1 + 0.01, TH);
   for (const p of [p0, p1]) { const post = new THREE.Mesh(new THREE.BoxGeometry(1.2, 13, 1.2), STONE); post.position.set(p.x, p.y + 6.5, p.z); gant.add(post); }
   const beamL = p0.distanceTo(p1), beam = new THREE.Mesh(new THREE.BoxGeometry(beamL, 1.6, 1.4), STONE2); beam.position.set((p0.x + p1.x) / 2, Math.max(p0.y, p1.y) + 12.5, (p0.z + p1.z) / 2); beam.rotation.y = -Math.atan2(p1.z - p0.z, p1.x - p0.x); gant.add(beam);
@@ -1059,7 +1059,7 @@ if (MODE === "skystart") {
   for (let i = 0; i < 8; i++) {
     const row = Math.floor(i / 2), lane = i % 2, t = TH - 0.05 - row * 0.13 - lane * 0.055, r = lane ? 1.0375 : 0.9825, team = TEAMS[i % 4], at = ON(r, t, 2.6);    
     const c = car(team[0], team[1], { num: i + 1, quirk: QUIRKS[i] }); c.position.copy(at); c.rotation.y = yawAt(t); scene.add(c); cars.push({ at, t, r });
-    const cat = await makeCat({ seed: "skycircus" + i, shells: 10 }); cat.holder.scale.setScalar(0.58); cat.holder.rotation.y = Math.PI / 2;
+    const cat = await makeCat({ seed: "skycircus" + i, shells: q.get("walk") === "1" ? 3 : 10 }); cat.holder.scale.setScalar(0.58); cat.holder.rotation.y = Math.PI / 2;    
     for (let k = 0; k < 30; k++) cat.step && cat.step(1 / 60, new THREE.Vector2(0, 0));
     cat.holder.position.set(0, 0.55, 0); c.add(cat.holder); cars.at(-1).c = c; cars.at(-1).cat = cat; seatCat(cat, c, 0, 1);
   }
@@ -1079,14 +1079,15 @@ if (MODE === "skystart") {
       const f0 = find(S[best]), n = new THREE.Vector3().crossVectors(f0.d, up).normalize(), off = ON(c.r, c.t, 2.6).sub(g).dot(n);
       return { c: c.c, s0: S[best], off, lane: i % 2 ? 1.8 : -1.8, vmax: 42 + ((i * 7) % 5 - 2) * 0.9, delay: i * 0.32 }; });    
     const dist = (w, t) => { const tt = t - GO - w.delay; if (tt <= 0) return 0; const t1 = w.vmax / ACC; return tt < t1 ? 0.5 * ACC * tt * tt : 0.5 * ACC * t1 * t1 + w.vmax * (tt - t1); };
-    function at(t) { if (CROWD_TICK) CROWD_TICK(t); LAMPS.forEach((l, i) => { l.material = t < GO ? (t >= 0.6 * (i + 1) ? RED : OFF) : t < GO + 1.6 ? GREEN : OFF; });
+    let seatN = 0; const WALKP = q.get("walk") === "1";
+    function at(t) { if (CROWD_TICK) { if (WALKP) CROWD_TICK(t, CHEER); else CROWD_TICK(t); }     LAMPS.forEach((l, i) => { l.material = t < GO ? (t >= 0.6 * (i + 1) ? RED : OFF) : t < GO + 1.6 ? GREEN : OFF; });
       { const order = who.map((w) => ({ w, s: w.s0 + dist(w, t) })).sort((a, b) => b.s - a.s), last = {}; for (const o of order) { const ln = o.w.lane, prev = last[ln]; if (prev != null && o.s > prev - 10) o.s = prev - 10; last[ln] = o.s; o.w.sNow = o.s; } }    
       for (const w of who) { const f = find(w.sNow), e = Math.min(1, Math.max(0, (t - GO - w.delay) / 4)), o = w.off + (w.lane - w.off) * (e * e * (3 - 2 * e));
         const n = new THREE.Vector3().crossVectors(new THREE.Vector3(f.d.x, 0, f.d.z).normalize(), up), pos = f.p.clone().add(n.multiplyScalar(o)), yaw = -Math.atan2(f.d.z, f.d.x), pitch = Math.atan2(f.d.y, Math.hypot(f.d.x, f.d.z));
         if (f.k.kind === "flight") flightPose(w.c, pos, f.d, f.k.u);
         else { w.c.position.copy(pos); w.c.rotation.set(0, yaw, f.k.kind === "oval" ? 0 : pitch);
           setJets(w.c, f.k.kind === "ramp" ? { lift: 0.4 + f.k.u * 0.6, boost: Math.max(0, f.k.u - 0.4) * 1.6 } : f.k.kind === "land" ? { lift: Math.max(0, 1 - f.k.u * 1.4), side: [0, 0.5, 0.5, 0, 0, 0.5, 0.5, 0] } : {}); } }
-      for (const w of who) { const cc = cars.find((x) => x.c === w.c); if (cc && cc.cat) seatCat(cc.cat, w.c, 0, t); }
+      seatN++; for (const [wi, w] of who.entries()) { if (WALKP && (seatN + wi) % 2) continue; const cc = cars.find((x) => x.c === w.c); if (cc && cc.cat) seatCat(cc.cat, w.c, 0, t); }    
       if (FILM) filmCam(t);
       if (VIEW === "chase") { const w = who[0], f = find(w.sNow), d = new THREE.Vector3(f.d.x, 0, f.d.z).normalize(); cam.fov = 58; cam.updateProjectionMatrix(); cam.position.copy(w.c.position).sub(d.clone().multiplyScalar(17)).add(new THREE.Vector3(0, 6, 0)); cam.lookAt(w.c.position.clone().add(d.multiplyScalar(12))); } }
 
@@ -1248,8 +1249,9 @@ const DRESS = q.get("dress") ? (await import("./dress.js")).dressArena(q.get("dr
 let SHOW = null; const ACT = q.get("act") ? await (await import("./acts.js")).stageActs(q.get("act"), { THREE, scene, MODE, FA, FB, car, seatCat, setJets, TEAMS, glow, mat, cam, follow: q.get("follow"), EUCZ, clock0: +(q.get("clock0") || 0), shells: q.get("walk") === "1" ? 6 : 10, bandTier: q.get("bandtier") || (q.get("walk") === "1" ? "low" : "high"), half: q.get("walk") === "1", viewH: () => renderer.domElement.height, schedule: (n, t) => (SHOW ? SHOW.schedule(n, t) : t), songFile: q.get("walk") === "1" || q.get("bandsong") === "remix" ? "./data/band-song-remix.json" : null }) : { tick() {} };
 
 if (VENUE) { scene.updateMatrixWorld(true); const hasCam = (o) => { let f = false; o.traverse((x) => { if (x.isCamera) f = true; }); return f; };
-  for (const c of VENUE) if (!hasCam(c)) { c.traverse((o) => { o.matrixAutoUpdate = false; }); c.matrixWorldAutoUpdate = false; }    
-  window.__frozen = VENUE.filter((c) => !hasCam(c)); }
+  const moving = new Set((RACE_CARS || []).map((c) => c.c));    
+  for (const c of VENUE) if (!hasCam(c) && !moving.has(c)) { c.traverse((o) => { o.matrixAutoUpdate = false; }); c.matrixWorldAutoUpdate = false; }    
+  window.__frozen = VENUE.filter((c) => !hasCam(c) && !moving.has(c)); }
 
 let POCHE = false;
 if (VIEW.startsWith("g-")) { const { makeCat } = await import("./home/next/cats/cast.js"), D = Math.PI / 180, v3 = (a, t, y) => { const [x, z] = GT(a, t); return new THREE.Vector3(x, y, z); };

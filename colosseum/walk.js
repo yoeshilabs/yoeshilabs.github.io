@@ -46,12 +46,12 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
   addEventListener("keydown", kd); addEventListener("keyup", ku); addEventListener("blur", () => keys.clear());
   const view = { yaw: START.face, pitch: 0 }; let drag = null;
   const pd = (e) => { if (e.target !== renderer.domElement || document.pointerLockElement === renderer.domElement) return; drag = [e.clientX, e.clientY]; }, pu = () => { drag = null; };
-  const pm = (e) => { if (!drag) return; view.yaw -= (e.clientX - drag[0]) * 0.005; view.pitch = Math.max(-0.6, Math.min(0.9, view.pitch - (e.clientY - drag[1]) * 0.005)); drag = [e.clientX, e.clientY]; };
+  const pm = (e) => { if (!drag) return; view.yaw -= (e.clientX - drag[0]) * 0.005; view.pitch = Math.max(-0.6, Math.min(1.2, view.pitch - (e.clientY - drag[1]) * 0.005)); drag = [e.clientX, e.clientY]; };
   
 
   const lock = () => { try { renderer.domElement.requestPointerLock?.()?.catch?.(() => {}); } catch (e) {} };
   renderer.domElement.addEventListener("click", () => { if (matchMedia("(pointer: fine)").matches && document.pointerLockElement !== renderer.domElement) lock(); });
-  addEventListener("mousemove", (e) => { if (document.pointerLockElement !== renderer.domElement) return; view.yaw -= e.movementX * 0.0022; view.pitch = Math.max(-0.6, Math.min(0.9, view.pitch - e.movementY * 0.0022)); });
+  addEventListener("mousemove", (e) => { if (document.pointerLockElement !== renderer.domElement) return; view.yaw -= e.movementX * 0.0022; view.pitch = Math.max(-0.6, Math.min(1.2, view.pitch - e.movementY * 0.0022)); });
    
   const leaveFP = (zoom) => { FP = false; FPsince = 0; ZOOM = zoom; camDist = 0; if (!m.air) { player.stand({ x: m.x, z: m.z, face: view.yaw }); m = player.tick({}); } };    
   const toggleFP = () => { if (FP) leaveFP(1); else { FP = true; FPsince = 1; } };    
@@ -97,7 +97,7 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
       aim.set(head.x + fx * 8, head.y, head.z + fz * 8); const look = WIDE_AT.clone().lerp(aim, k); aimed = look.clone(); cam.lookAt(look); me.holder.visible = true; if (cam.near > 0.1) { cam.near = 0.1; cam.updateProjectionMatrix(); } return; }
     cam.position.copy(cam3); if (cam.near > 0.1) { cam.near = 0.1; cam.updateProjectionMatrix(); }
     me.holder.visible = camDist > 1.2;    
-    aim.set(head.x + fx * 8, head.y + Math.sin(-view.pitch) * 3, head.z + fz * 8);
+    aim.set(head.x + fx * 8, head.y + Math.tan(view.pitch) * 8, head.z + fz * 8);    
     if (first || !aimed) { aimed = aim.clone(); first = false; } else aimed.lerp(aim, 1 - Math.exp(-dt * 14)); cam.lookAt(aimed); }
 
   
