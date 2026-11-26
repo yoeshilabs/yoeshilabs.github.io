@@ -1,18 +1,4 @@
-/* Prancer 3D: the coat. One material for every part of the cat, painting the Portraits genes in 3D: the body colour,
-   the pattern (every tabby, the tortie and brindle patches, colourpoints, the wild cats' stripes, spots and rosettes,
-   the spirits' constellations, embers, gilding, circuits, facets and void), white spotting (locket to van), the muzzle,
-   and the finish (lit, neon, gold, chrome). Patterns are worked out in the cat's own rest space, so a stripe runs on
-   from the body down the leg and stays put while the cat moves.
-   Fur is shell texturing: each furry part is drawn again as a stack of thin shells pushed out along its normals, and
-   every shell keeps only the strands that reach that high, so the coat has real depth, darker at the roots. */
-import * as THREE from "three";
-
-export const PATTERNS = ["Solid", "Mackerel", "Classic", "Spotted", "Ticked", "Marbled", "Shaded", "Rosetted", "Tortie", "Brindle", "Colorpoint", "Lynx Point",
-  "Stripes", "Spots", "Rosettes", "Jaguar Rosettes", "Freckles", "Clouds", "Chain", "King", "Plain", "Constellations", "Embers", "Gilded", "Circuits", "Facets", "Void"];
-export const WHITES = ["None", "Locket", "Mitts", "Tuxedo", "Bicolor", "Harlequin", "Van", "Solid White", "Blaze"];   // Blaze: the frontcat persona's inverted tuxedo (never rolled)
-export const PART = { torso: 0, head: 1, ear: 2, upper: 3, lower: 4, paw: 5, tail: 6, muzzle: 7, lid: 8 };
-
-export const NOISE = /* glsl */`
+import*as THREE from"three";export const PATTERNS=["Solid","Mackerel","Classic","Spotted","Ticked","Marbled","Shaded","Rosetted","Tortie","Brindle","Colorpoint","Lynx Point","Stripes","Spots","Rosettes","Jaguar Rosettes","Freckles","Clouds","Chain","King","Plain","Constellations","Embers","Gilded","Circuits","Facets","Void"];export const WHITES=["None","Locket","Mitts","Tuxedo","Bicolor","Harlequin","Van","Solid White","Blaze"];export const PART={torso:0,head:1,ear:2,upper:3,lower:4,paw:5,tail:6,muzzle:7,lid:8};export const NOISE=`
 float h31(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
 vec3 h33(vec3 p) { return vec3(h31(p), h31(p + 17.1), h31(p + 41.7)); }
 float vnoise(vec3 x) { vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
@@ -22,9 +8,7 @@ float fbm(vec3 p) { float a = 0.5, s = 0.0; for (int i = 0; i < 4; i++) { s += a
 vec2 worley(vec3 p) { vec3 i = floor(p), f = fract(p); float d1 = 8.0, d2 = 8.0;
   for (int z = -1; z <= 1; z++) for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) { vec3 g = vec3(x, y, z), o = h33(i + g); float d = length(g + o - f);
     if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) d2 = d; } return vec2(d1, d2); }
-`;
-
-export const COAT = /* glsl */`
+`;export const COAT=`
 uniform vec3 uBody, uMark, uPatch, uPoint, uWhite, uMuz, uRim, uEmis, uEar;
 uniform float uMarkO, uHasMark, uHasPatch, uHasPoint, uRimK, uFurLen, uShells, uAlong, uTime, uNeon;
 uniform int uPat, uWhiteMode, uPart;
@@ -69,7 +53,7 @@ float whiteMask(vec3 p, vec3 l) {
   float face = uPart == 1 ? smoothstep(0.42, 0.2, length(vec2(l.x * 1.3, l.y + 0.35))) * step(0.2, l.z) : 0.0;
   if (uWhiteMode == 1) return uPart == 0 ? smoothstep(0.22, 0.14, length(vec3(p.x, p.y - 1.85, p.z - 0.45) * vec3(1.0, 0.8, 2.0))) : 0.0;   // locket
   if (uWhiteMode == 2) return paw ? 1.0 : 0.0;   // mitts
-  ${globalThis.PRANCER_GEN ? "" : "if (uWhiteMode == 8 && uPart == 1 && l.z > 0.25) { float w = mix(0.06, 0.3, smoothstep(0.1, -0.42, l.y)), b = smoothstep(w + 0.05, w, abs(l.x)) * smoothstep(0.8, 0.62, l.y); if (b > 0.01) return b; }"}
+  ${globalThis.PRANCER_GEN?"":"if (uWhiteMode == 8 && uPart == 1 && l.z > 0.25) { float w = mix(0.06, 0.3, smoothstep(0.1, -0.42, l.y)), b = smoothstep(w + 0.05, w, abs(l.x)) * smoothstep(0.8, 0.62, l.y); if (b > 0.01) return b; }"}
   if (uWhiteMode == 3 || uWhiteMode == 8) return paw || muz ? 1.0 : lower ? step(0.5, uAlong) : uPart == 0 ? smoothstep(0.32, 0.2, abs(p.x)) * smoothstep(0.0, 0.2, p.z) * step(p.y, 2.05) : uPart == 1 ? face * 0.0 + smoothstep(0.25, 0.1, length(vec2(l.x, l.y + 0.55))) : 0.0;   // tuxedo
   if (uWhiteMode == 4) return paw || muz || lower ? 1.0 : uPart == 3 ? smoothstep(0.3, 0.7, uAlong) : uPart == 0 ? max(smoothstep(1.45, 1.1, p.y), smoothstep(0.35, 0.2, abs(p.x)) * smoothstep(0.0, 0.25, p.z)) : face;   // bicolor
   if (uWhiteMode == 5) { float v = uPart == 6 || uPart == 2 ? 0.0 : uPart == 1 ? step(l.y, 0.25) : 1.0; return uPart == 0 ? min(v, 1.0 - smoothstep(0.55, 0.6, fbm(p * 1.4 + 3.0))) : v; }   // harlequin: a van (colour on the crown, ears and tail) with a few patches on the body, as the Portraits draw it
@@ -111,96 +95,43 @@ vec3 coat(out vec3 emis) {
     c = mix(c, uBody * 0.55, 0.85 * f); }
   return c;
 }
-`;
-
-/* the fur: which strands reach this shell (a strand per cell of a fine 3D grid, tapering to its tip) */
-const FUR_FRAG = /* glsl */`
+`;const FUR_FRAG=`
 if (vShell > 0.0) {   /* a shell: the vertex shader knows it is instanced, the fragment shader learns it from vShell */
   { vec3 q = vBase * 70.0; vec3 cell = floor(q), o = h33(cell) * 0.6 + 0.2; float d = length((fract(q) - o).xz + (fract(q) - o).y * 0.3);
     float len = 0.55 + 0.45 * h31(cell + 5.0); if (vShell > len || d > 0.55 * (1.0 - vShell / len) + 0.05) discard; }
 }
-`;
-
-/* a coat material for one part of the cat. g: the genes, as colours and switches (see avatar.js) */
-export function coatMaterial(g, part, opts = {}) {
-  const u = {
-    uBody: { value: new THREE.Color(g.body) }, uMark: { value: new THREE.Color(g.mark || g.body) }, uPatch: { value: new THREE.Color(g.patch || g.body) },
-    uPoint: { value: new THREE.Color(g.point || g.body) }, uWhite: { value: new THREE.Color(g.white) }, uMuz: { value: new THREE.Color(g.muz || g.body) }, uEar: { value: new THREE.Color(g.ear || g.body) },
-    uRim: { value: new THREE.Color(g.rim) }, uEmis: { value: new THREE.Color(0) },
-    uMarkO: { value: g.markO }, uHasMark: { value: g.mark ? 1 : 0 }, uHasPatch: { value: g.patch ? 1 : 0 }, uHasPoint: { value: g.point ? 1 : 0 },
-    uRimK: { value: g.rimK }, uNeon: { value: g.neon ? 1 : 0 }, uFurLen: { value: opts.fur ?? g.furLen }, uShells: { value: g.shells }, uAlong: { value: opts.along ?? 0 },
-    uTime: { value: 0 }, uPat: { value: PATTERNS.indexOf(g.pattern) }, uWhiteMode: { value: WHITES.indexOf(g.whiteMode) }, uPart: { value: part },
-    uRest: { value: new THREE.Matrix4() }, uDroop: { value: g.droop },
-    uFade: { value: new THREE.Vector4(1e3, 1e3 + 1, 1e3, 1e3 + 1) },   // a limb's fur fading out toward a joint (avatar limb(): none on the elbow's balls): y from .x to .y at the near end, -y from .z to .w at the far end
-    uCovC: g.cov.c, uCovH: g.cov.h, uCovN: g.cov.n,
-    uCheek: { value: new THREE.Vector4(g.cheeks || 0, 0.6 * (g.cw || 1), -0.2, 0) },   // what the fur lies flat under (avatar.cover), shared by all the cat's coat
-    uGrip: { value: new THREE.Vector4(0, -0.08, 0, 2.3) },   // a paw closing round what it holds (avatar.grip): curvature, where the bend starts, the bend's axis, the most it curls
-  };
-  const mat = new THREE.MeshPhysicalMaterial({ roughness: g.rough, metalness: g.metal, sheen: g.metal ? 0 : 0.6, sheenRoughness: 0.6, sheenColor: new THREE.Color(g.body).lerp(new THREE.Color("#ffffff"), 0.5),
-    iridescence: g.irid || 0, transparent: !!g.ghost, opacity: g.ghost ? 0.82 : 1, flatShading: !!g.facets });
-  mat.userData.u = u;
-  /* opts.batch (bake.js batchCoat): every part of the coat in one skinned mesh, its part, fur, place along the limb and
-     rest position carried by each vertex; "shells" draws its fur, one instance per shell */
-  const B = !globalThis.PRANCER_GEN && opts.batch;
-  /* a batched coat (bake.js) carries both hands' grips: their uGrip (shared with the hands' own materials, so avatar.grip
-     reaches them) and each paw's rest rotation, to turn its bend from the paw's frame into the coat's */
-  if (B) Object.assign(u, { uGripL: { value: new THREE.Vector4(0, -0.08, 0, 2.3) }, uGripR: { value: new THREE.Vector4(0, -0.08, 0, 2.3) }, uGripRL: { value: new THREE.Matrix3() }, uGripRR: { value: new THREE.Matrix3() } });
-  const cov =`float fl = FUR; for (int i = 0; i < 12; i++) { if (i >= uCovN) break; vec3 q = abs(vCat - uCovC[i].xyz) - uCovH[i]; fl = min(fl, length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0) - uCovC[i].w); }
-      fl = max(fl, 0.004);   /* under a hat, round an eye: the fur lies pressed flat, as thick as the gap */`;
-  mat.onBeforeCompile = (s) => {
-    Object.assign(s.uniforms, u);
-    if (globalThis.PRANCER_GEN || !B) s.vertexShader = s.vertexShader.replace("#include <common>", `#include <common>
+`;export function coatMaterial(g,part,opts={}){const u={uBody:{value:new THREE.Color(g.body)},uMark:{value:new THREE.Color(g.mark||g.body)},uPatch:{value:new THREE.Color(g.patch||g.body)},uPoint:{value:new THREE.Color(g.point||g.body)},uWhite:{value:new THREE.Color(g.white)},uMuz:{value:new THREE.Color(g.muz||g.body)},uEar:{value:new THREE.Color(g.ear||g.body)},uRim:{value:new THREE.Color(g.rim)},uEmis:{value:new THREE.Color(0)},uMarkO:{value:g.markO},uHasMark:{value:g.mark?1:0},uHasPatch:{value:g.patch?1:0},uHasPoint:{value:g.point?1:0},uRimK:{value:g.rimK},uNeon:{value:g.neon?1:0},uFurLen:{value:opts.fur??g.furLen},uShells:{value:g.shells},uAlong:{value:opts.along??0},uTime:{value:0},uPat:{value:PATTERNS.indexOf(g.pattern)},uWhiteMode:{value:WHITES.indexOf(g.whiteMode)},uPart:{value:part},uRest:{value:new THREE.Matrix4},uDroop:{value:g.droop},uFade:{value:new THREE.Vector4(1e3,1e3+1,1e3,1e3+1)},uCovC:g.cov.c,uCovH:g.cov.h,uCovN:g.cov.n,uCheek:{value:new THREE.Vector4(g.cheeks||0,.6*(g.cw||1),-.2,0)},uGrip:{value:new THREE.Vector4(0,-.08,0,2.3)}};const mat=new THREE.MeshPhysicalMaterial({roughness:g.rough,metalness:g.metal,sheen:g.metal?0:.6,sheenRoughness:.6,sheenColor:new THREE.Color(g.body).lerp(new THREE.Color("#ffffff"),.5),iridescence:g.irid||0,transparent:!!g.ghost,opacity:g.ghost?.82:1,flatShading:!!g.facets});mat.userData.u=u;const B=!globalThis.PRANCER_GEN&&opts.batch;if(B)Object.assign(u,{uGripL:{value:new THREE.Vector4(0,-.08,0,2.3)},uGripR:{value:new THREE.Vector4(0,-.08,0,2.3)},uGripRL:{value:new THREE.Matrix3},uGripRR:{value:new THREE.Matrix3}});const cov=`float fl = FUR; for (int i = 0; i < 12; i++) { if (i >= uCovN) break; vec3 q = abs(vCat - uCovC[i].xyz) - uCovH[i]; fl = min(fl, length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0) - uCovC[i].w); }
+      fl = max(fl, 0.004);   /* under a hat, round an eye: the fur lies pressed flat, as thick as the gap */`;mat.onBeforeCompile=s=>{Object.assign(s.uniforms,u);if(globalThis.PRANCER_GEN||!B)s.vertexShader=s.vertexShader.replace("#include <common>",`#include <common>
       uniform mat4 uRest; uniform float uFurLen, uShells, uDroop; varying vec3 vCat, vLoc, vBase; varying float vShell;
       uniform vec4 uCovC[12]; uniform vec3 uCovH[12]; uniform int uCovN; uniform vec4 uGrip, uFade;
       /* the paw closing (uGrip, avatar.grip): below y the toes swing toward the pad about a hinge at (y, z), the turn
          growing with the distance down the toe (x: per unit) up to w; th is the turn at this vertex (its normal turns with it) */
       vec3 gripBend(vec3 p, out float th) { th = 0.0; if (uGrip.x == 0.0 || p.y >= uGrip.y) return p; th = min((uGrip.y - p.y) * uGrip.x, uGrip.w);
-        float s = sin(th), c = cos(th); vec2 q = vec2(p.y - uGrip.y, p.z - uGrip.z); return vec3(p.x, uGrip.y + q.x * c - q.y * s, uGrip.z + q.x * s + q.y * c); }`)
-      .replace("#include <beginnormal_vertex>", `#include <beginnormal_vertex>
-      { float th; gripBend(position, th); float gs = sin(th), gc = cos(th); objectNormal.yz = vec2(objectNormal.y * gc - objectNormal.z * gs, objectNormal.y * gs + objectNormal.z * gc); }`)
-      .replace("#include <begin_vertex>", `#include <begin_vertex>
+        float s = sin(th), c = cos(th); vec2 q = vec2(p.y - uGrip.y, p.z - uGrip.z); return vec3(p.x, uGrip.y + q.x * c - q.y * s, uGrip.z + q.x * s + q.y * c); }`).replace("#include <beginnormal_vertex>",`#include <beginnormal_vertex>
+      { float th; gripBend(position, th); float gs = sin(th), gc = cos(th); objectNormal.yz = vec2(objectNormal.y * gc - objectNormal.z * gs, objectNormal.y * gs + objectNormal.z * gc); }`).replace("#include <begin_vertex>",`#include <begin_vertex>
       { float th; transformed = gripBend(position, th); }
       vBase = position; vLoc = position; vCat = (uRest * vec4(position, 1.0)).xyz; vShell = 0.0;
-      ${cov.replace("FUR", "uFurLen")}
+      ${cov.replace("FUR","uFurLen")}
       if (uFade.x < 999.0) fl *= mix(0.35, 1.0, (1.0 - smoothstep(uFade.x, uFade.y, position.y)) * (1.0 - smoothstep(uFade.z, uFade.w, -position.y)));   /* a limb's fur thins to a third over the joint's ball (the elbow wore a double pom-pom) */
       #ifdef USE_INSTANCING
         vShell = (float(gl_InstanceID) + 1.0) / uShells; transformed += objectNormal * fl * vShell; transformed.y -= uDroop * fl * vShell * vShell;
-      #endif`);
-    else s.vertexShader = s.vertexShader.replace("#include <common>", `#include <common>
+      #endif`);else s.vertexShader=s.vertexShader.replace("#include <common>",`#include <common>
       attribute vec3 aRest, aLoc, aOff; attribute float aFur, aAlong, aPart, aGrip; varying float vFur, vAlong, vPart;
       uniform vec4 uGripL, uGripR; uniform mat3 uGripRL, uGripRR;
       vec3 gripBendB(vec3 p, vec4 G, out float th) { th = 0.0; if (G.x == 0.0 || p.y >= G.y) return p; th = min((G.y - p.y) * G.x, G.w);
         float s = sin(th), c = cos(th); vec2 q = vec2(p.y - G.y, p.z - G.z); return vec3(p.x, G.y + q.x * c - q.y * s, G.z + q.x * s + q.y * c); }
       uniform float uShells, uDroop; varying vec3 vCat, vLoc, vBase; varying float vShell;
-      uniform vec4 uCovC[12]; uniform vec3 uCovH[12]; uniform int uCovN;`)
-      .replace("#include <beginnormal_vertex>", `#include <beginnormal_vertex>
+      uniform vec4 uCovC[12]; uniform vec3 uCovH[12]; uniform int uCovN;`).replace("#include <beginnormal_vertex>",`#include <beginnormal_vertex>
       if (aGrip > 0.5) { vec4 G = aGrip < 1.5 ? uGripL : uGripR; mat3 R = aGrip < 1.5 ? uGripRL : uGripRR; float th; gripBendB(aLoc, G, th);
-        vec3 nl = transpose(R) * objectNormal; float gs = sin(th), gc = cos(th); nl.yz = vec2(nl.y * gc - nl.z * gs, nl.y * gs + nl.z * gc); objectNormal = R * nl; }`)
-      .replace("#include <begin_vertex>", `#include <begin_vertex>
+        vec3 nl = transpose(R) * objectNormal; float gs = sin(th), gc = cos(th); nl.yz = vec2(nl.y * gc - nl.z * gs, nl.y * gs + nl.z * gc); objectNormal = R * nl; }`).replace("#include <begin_vertex>",`#include <begin_vertex>
       if (aGrip > 0.5) { vec4 G = aGrip < 1.5 ? uGripL : uGripR; mat3 R = aGrip < 1.5 ? uGripRL : uGripRR; float th; transformed += R * (gripBendB(aLoc, G, th) - aLoc); }   /* a hand paw closing: bent in its own frame, carried into the coat's */
       vBase = aLoc; vLoc = aLoc; vCat = aRest; vFur = aFur; vAlong = aAlong; vPart = aPart; vShell = 0.0;
-      ${cov.replace("FUR", "aFur")}
-      ${B === "shells" ? "vShell = (float(gl_InstanceID) + 1.0) / uShells; transformed += aOff * fl * vShell; transformed.y -= uDroop * fl * vShell * vShell;" : ""}`);
-    const C = globalThis.PRANCER_GEN || !B ? COAT : COAT.replace("uRimK, uFurLen, uShells, uAlong, uTime", "uRimK, uShells, uTime").replace("uniform int uPat, uWhiteMode, uPart;", "uniform int uPat, uWhiteMode;\nvarying float vFur, vAlong, vPart;\n#define uFurLen vFur\n#define uAlong vAlong\n#define uPart int(vPart + 0.5)");
-    s.fragmentShader = s.fragmentShader.replace("#include <common>", `#include <common>\n${C}`)
-      .replace("#include <color_fragment>", `#include <color_fragment>
+      ${cov.replace("FUR","aFur")}
+      ${B==="shells"?"vShell = (float(gl_InstanceID) + 1.0) / uShells; transformed += aOff * fl * vShell; transformed.y -= uDroop * fl * vShell * vShell;":""}`);const C=globalThis.PRANCER_GEN||!B?COAT:COAT.replace("uRimK, uFurLen, uShells, uAlong, uTime","uRimK, uShells, uTime").replace("uniform int uPat, uWhiteMode, uPart;","uniform int uPat, uWhiteMode;\nvarying float vFur, vAlong, vPart;\n#define uFurLen vFur\n#define uAlong vAlong\n#define uPart int(vPart + 0.5)");s.fragmentShader=s.fragmentShader.replace("#include <common>",`#include <common>
+${C}`).replace("#include <color_fragment>",`#include <color_fragment>
       ${FUR_FRAG}
       vec3 coatEmis; vec3 coatCol = coat(coatEmis); diffuseColor.rgb *= coatCol;
       if (vShell > 0.0) diffuseColor.rgb *= mix(0.62, 1.08, vShell);   /* darker at the roots, bright at the tips */
-      else if (uFurLen > 0.0) diffuseColor.rgb *= 0.62;`)
-      .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>
+      else if (uFurLen > 0.0) diffuseColor.rgb *= 0.62;`).replace("#include <emissivemap_fragment>",`#include <emissivemap_fragment>
       float fres = pow(max(1.0 - abs(dot(normalize(normal), normalize(vViewPosition))), 0.0), 3.0);
-      totalEmissiveRadiance += coatEmis + uRim * fres * uRimK;`);
-  };
-  mat.customProgramCacheKey = () => (globalThis.PRANCER_GEN ? "coat" : "coat" + (B || ""));
-  return mat;
-}
-
-/* a furry part: the mesh itself, and (if the cat has fur) its shells as one instanced draw */
-export function furry(geo, mat, shells) {
-  const m = new THREE.Mesh(geo, mat); m.castShadow = true; m.receiveShadow = true;
-  if (shells > 0 && mat.userData.u.uFurLen.value > 0) {
-    const s = new THREE.InstancedMesh(geo, mat, shells); s.frustumCulled = false; s.castShadow = false; s.receiveShadow = true;
-    const I = new THREE.Matrix4(); for (let i = 0; i < shells; i++) s.setMatrixAt(i, I); m.add(s); m.userData.shells = s; }
-  return m;
-}
+      totalEmissiveRadiance += coatEmis + uRim * fres * uRimK;`)};mat.customProgramCacheKey=()=>globalThis.PRANCER_GEN?"coat":"coat"+(B||"");return mat}export function furry(geo,mat,shells){const m=new THREE.Mesh(geo,mat);m.castShadow=true;m.receiveShadow=true;if(shells>0&&mat.userData.u.uFurLen.value>0){const s=new THREE.InstancedMesh(geo,mat,shells);s.frustumCulled=false;s.castShadow=false;s.receiveShadow=true;const I=new THREE.Matrix4;for(let i=0;i<shells;i++)s.setMatrixAt(i,I);m.add(s);m.userData.shells=s}return m}
