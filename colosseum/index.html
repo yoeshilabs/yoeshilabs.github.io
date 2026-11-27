@@ -11,7 +11,7 @@ const FILM = new URLSearchParams("walk=1&mode=skystart&canopy=0&dress=postameric
 const q = new URLSearchParams("walk=1&mode=skystart&canopy=0&dress=postamericana&act=band,joust,beam&still=1"), MODE = q.get("mode") || "tournament", VIEW = q.get("view") || "air", CANOPY = +(q.get("canopy") ?? (MODE === "skystart" ? 0 : 0.22));
 
 const TOK = q.get("walk") === "1" ? await import("./p3d/labs/shared/tokens.js") : null;
-if (TOK) { const st = document.createElement("style"); st.textContent = TOK.fontFaceCSS(); document.head.appendChild(st); try { await document.fonts.load('100px "League Gothic"'); } catch (e) {} }
+if (TOK) { const st = document.createElement("style"); st.id = "tokens-fonts"; st.textContent = TOK.fontFaceCSS(); document.head.appendChild(st); try { await document.fonts.load('100px "League Gothic"'); } catch (e) {} }
 const SIGNFONT = TOK ? TOK.TYPE.display : "Helvetica, Arial, sans-serif";
 function SIGN(lines, { w = 512, h = 512, band = null, letter = null } = {}) {     const k = document.createElement("canvas"); k.width = w; k.height = h; const x = k.getContext("2d"), C = TOK.COLOR, rule = Math.max(3, Math.round(w / 90)), bh = Math.round(h * (letter ? 0.14 : 0.09));
   x.fillStyle = C.night; x.fillRect(0, 0, w, h); x.fillStyle = band || C.gold; x.fillRect(0, h - bh, w, bh); x.strokeStyle = C.gold; x.lineWidth = rule; x.strokeRect(rule, rule, w - 2 * rule, h - 2 * rule);
@@ -43,7 +43,7 @@ const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffe
 renderer.shadowMap.enabled = q.get("shadows") !== "0"; renderer.shadowMap.type = THREE.PCFSoftShadowMap;     renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; document.body.appendChild(renderer.domElement);
  
-if (q.get("walk") === "1") { const c = document.createElement("div"); c.id = "cover"; c.style.cssText = `position:fixed;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;background:${TOK.COLOR.night};color:${TOK.COLOR.ink};font:15px ${TOK.TYPE.ui};letter-spacing:.08em`; c.textContent = "The Colosseum is opening"; document.body.appendChild(c); }
+if (q.get("walk") === "1") { const { arrival } = await import("./p3d/labs/shared/arrival.js"); window.__arrival = arrival({ name: "The Colosseum", line: "The Purrancers on the center stage, a joust on every chorus.", expect: 40 }); }    
 const scene = new THREE.Scene(); scene.background = new THREE.Color("#5b3f6e"); scene.fog = new THREE.Fog("#eeb2a2", 320, 1150);
 
 const PAINT = { k: q.has("paint") ? +q.get("paint") : null, tv: +(q.get("tv") ?? 0), fade: 1 }; let ROOMHOOK = null;    
@@ -342,8 +342,8 @@ if (FAB) { const L0 = (2 * Math.PI * Math.sqrt((RCM * RCM + rcb(RCM) ** 2) / 2))
       const g = FAB.holedPanel(L0, CY, 14, 14, [[(xo - VOM.in) / sx, (xo + VOM.in) / sx, -CY / 2 - 1, -CY / 2 + 5.4]], (u, v) => (0.32 + 0.68 * lit((u - 0.5) * L0, 2.7) * (0.55 + 0.45 * lit(v * CY - 6.5, 3.5))) * (0.5 + 0.5 * Math.min(1, v * CY / 1.8)));
       const m = new THREE.Mesh(g, FAB.stoneShaded); m.matrixAutoUpdate = false; m.matrix.copy(at(b, 0, CY / 2, -HW + 0.03, sx)); m.receiveShadow = true; scene.add(m);
       for (const sd of [-1, 1]) jl.push(at(b, xo + sd * (VOM.in + 0.21), 2.8, -HW + 0.17)); ll.push(at(b, xo, 5.4 + 0.31, -HW + 0.18));
-      const tx = textTex([LETTERS_G[b.aisle], "SECTION"], { w: 256, h: 256, bg: SIGNC_G[b.aisle % 4], fg: "#1c1622", size: 150 }), sg = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 1.15), new THREE.MeshStandardMaterial({ map: tx, emissive: "#ffffff", emissiveMap: tx, emissiveIntensity: 0.6, roughness: 0.5 }));
-      sg.matrixAutoUpdate = false; sg.matrix.copy(at(b, xo, 6.85, -HW + 0.38)); scene.add(sg); }
+      const tx = TOK ? SIGN([LETTERS_G[b.aisle], "SECTION"], { w: 256, h: 256, band: SIGNC_G[b.aisle % 4], letter: SIGNC_G[b.aisle % 4] }) : textTex([LETTERS_G[b.aisle], "SECTION"], { w: 256, h: 256, bg: SIGNC_G[b.aisle % 4], fg: "#1c1622", size: 150 }), sg = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 1.15), new THREE.MeshStandardMaterial({ map: tx, emissive: "#ffffff", emissiveMap: tx, emissiveIntensity: 0.6, roughness: 0.5 }));
+      sg.matrixAutoUpdate = false; sg.matrix.copy(at(b, xo, 6.85, -HW + 0.38)); if (TOK && sg.matrix.determinant() < 0) sg.matrix.multiply(new THREE.Matrix4().makeScale(-1, 1, 1));     scene.add(sg); }
     inst(jambG, FAB.stone, jl); inst(lintelG, FAB.stone, ll); }
    
   inst(FAB.pierBox(1.7, CY, 0.6, { unit: false }), FAB.stone, bays.filter((b) => !CORE.some((c) => Math.abs(b.t0 - c.t) < 0.01)).map((b) => at(b, -b.L / 2, CY / 2, -HW + 0.3)));
@@ -1094,14 +1094,18 @@ if (MODE === "skystart") {
       return { c: c.c, s0: S[best], off, lane: i % 2 ? 1.8 : -1.8, vmax: 42 + ((i * 7) % 5 - 2) * 0.9, delay: i * 0.32 }; });    
     const dist = (w, t) => { const tt = t - GO - w.delay; if (tt <= 0) return 0; const t1 = w.vmax / ACC; return tt < t1 ? 0.5 * ACC * tt * tt : 0.5 * ACC * t1 * t1 + w.vmax * (tt - t1); };
     let seatN = 0; const WALKP = q.get("walk") === "1";
-    function at(t) { if (CROWD_TICK) { if (WALKP) CROWD_TICK(t, CHEER); else CROWD_TICK(t); }     LAMPS.forEach((l, i) => { l.material = t < GO ? (t >= 0.6 * (i + 1) ? RED : OFF) : t < GO + 1.6 ? GREEN : OFF; });
+    let coverWas = false; const FRU = new THREE.Frustum(), PV = new THREE.Matrix4(), SPH = new THREE.Sphere();
+    function at(t) { const cover = WALKP && !!(window.arena && window.arena.cover); if (cover !== coverWas) { coverWas = cover; for (const w of who) w.c.visible = !cover; }    
+      if (cover) return;
+      if (CROWD_TICK) { if (!WALKP) CROWD_TICK(t); else if (!(window.arena && window.arena.plaza)) CROWD_TICK(t, CHEER); }         LAMPS.forEach((l, i) => { l.material = t < GO ? (t >= 0.6 * (i + 1) ? RED : OFF) : t < GO + 1.6 ? GREEN : OFF; });
       { const order = who.map((w) => ({ w, s: w.s0 + dist(w, t) })).sort((a, b) => b.s - a.s), last = {}; for (const o of order) { const ln = o.w.lane, prev = last[ln]; if (prev != null && o.s > prev - 10) o.s = prev - 10; last[ln] = o.s; o.w.sNow = o.s; } }    
       for (const w of who) { const f = find(w.sNow), e = Math.min(1, Math.max(0, (t - GO - w.delay) / 4)), o = w.off + (w.lane - w.off) * (e * e * (3 - 2 * e));
         const n = new THREE.Vector3().crossVectors(new THREE.Vector3(f.d.x, 0, f.d.z).normalize(), up), pos = f.p.clone().add(n.multiplyScalar(o)), yaw = -Math.atan2(f.d.z, f.d.x), pitch = Math.atan2(f.d.y, Math.hypot(f.d.x, f.d.z));
         if (f.k.kind === "flight") flightPose(w.c, pos, f.d, f.k.u);
         else { w.c.position.copy(pos); w.c.rotation.set(0, yaw, f.k.kind === "oval" ? 0 : pitch);
           setJets(w.c, f.k.kind === "ramp" ? { lift: 0.4 + f.k.u * 0.6, boost: Math.max(0, f.k.u - 0.4) * 1.6 } : f.k.kind === "land" ? { lift: Math.max(0, 1 - f.k.u * 1.4), side: [0, 0.5, 0.5, 0, 0, 0.5, 0.5, 0] } : {}); } }
-      seatN++; for (const [wi, w] of who.entries()) { if (WALKP && (seatN + wi) % 2) continue; const cc = cars.find((x) => x.c === w.c); if (cc && cc.cat) seatCat(cc.cat, w.c, 0, t); }    
+      seatN++; if (WALKP) { cam.updateMatrixWorld(); FRU.setFromProjectionMatrix(PV.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse)); }
+      for (const [wi, w] of who.entries()) { if (WALKP && seatN > 4 && ((seatN + wi) % 2 || w.c.position.distanceToSquared(cam.position) > 8100 || !FRU.intersectsSphere(SPH.set(w.c.position, 5)))) continue;     const cc = cars.find((x) => x.c === w.c); if (cc && cc.cat) seatCat(cc.cat, w.c, 0, t); }    
       if (FILM) filmCam(t);
       if (VIEW === "chase") { const w = who[0], f = find(w.sNow), d = new THREE.Vector3(f.d.x, 0, f.d.z).normalize(); cam.fov = 58; cam.updateProjectionMatrix(); cam.position.copy(w.c.position).sub(d.clone().multiplyScalar(17)).add(new THREE.Vector3(0, 6, 0)); cam.lookAt(w.c.position.clone().add(d.multiplyScalar(12))); } }
 

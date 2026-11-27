@@ -23,7 +23,7 @@ export function startShow({ THREE, arena, cam, renderer, song, setCheer, walk = 
   document.head.appendChild(css);
   const door = document.createElement("div"); door.id = "door";
   door.innerHTML = `<div class="b">${beta}</div><h1>Explore the Colosseum</h1><p>The Purrancers on the center stage, a joust on every chorus. You come in as a cat of your own, at the mouth of an aisle.</p><p class="s">W A S D to walk, Shift to run, click and move the mouse to look, You see through your cat's eyes; C or V steps out behind it. Walk down the stair to the ring corridor: it runs all the way round, with an aisle up to the stands in every section, a gate out to the plaza on every side, and a glass lift at each corner up to the concourse and its food stalls (E takes it). More of the building opens as it is finished. Sound on.</p><button id="enter">Enter</button>`;
-  document.body.appendChild(door); document.getElementById("cover")?.remove();    
+  document.body.appendChild(door); document.getElementById("cover")?.remove(); window.__arrival?.done();    
   const audio = new Audio(song); audio.preload = "auto"; audio.crossOrigin = "anonymous";
   const gate = document.createElement("button"); gate.id = "gate"; gate.textContent = "Tap for sound"; gate.hidden = true; document.body.appendChild(gate);
   let live = false;

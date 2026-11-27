@@ -2,7 +2,8 @@
 
 import { makePlayer, TICK } from "./p3d/labs/shared/player.js";
 import { makeStick } from "./p3d/labs/shared/stick.js";
-import * as TOK from "./p3d/labs/shared/tokens.js";    
+import * as TOK from "./p3d/labs/shared/tokens.js";
+import { controlBar } from "./p3d/labs/shared/controlbar.js";    
 
 const K = 0.58 / 0.133;    
 const RISE = 0.42, BODY = 0.34;    
@@ -45,7 +46,8 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
   const OWN = new Set(["KeyW", "KeyA", "KeyS", "KeyD", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "ShiftLeft", "ShiftRight", "Space", "Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6"]);
   const kd = (e) => { if (!OWN.has(e.code) || e.target.closest?.("input,textarea")) return; keys.add(e.code); e.preventDefault(); }, ku = (e) => keys.delete(e.code);
   addEventListener("keydown", kd); addEventListener("keyup", ku); addEventListener("blur", () => keys.clear());
-  const view = { yaw: START.face, pitch: 0 }; let drag = null;
+  const PITCH0 = 0.09;    
+  const view = { yaw: START.face, pitch: PITCH0 }; let drag = null;
   const pd = (e) => { if (e.target !== renderer.domElement || document.pointerLockElement === renderer.domElement) return; drag = [e.clientX, e.clientY]; }, pu = () => { drag = null; };
   const pm = (e) => { if (!drag) return; view.yaw -= (e.clientX - drag[0]) * 0.005; view.pitch = Math.max(-0.6, Math.min(1.2, view.pitch - (e.clientY - drag[1]) * 0.005)); drag = [e.clientX, e.clientY]; };
   
@@ -63,9 +65,8 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
   addEventListener("pointerdown", pd); addEventListener("pointerup", pu); addEventListener("pointercancel", pu); addEventListener("pointermove", pm);
 
    
-  const hud = document.createElement("div"); hud.style.cssText = `position:fixed;right:16px;bottom:16px;padding:8px 12px;border-radius:10px;background:${TOK.alpha("night", "panel")};color:${TOK.COLOR.ink};font:13px/1.45 ${TOK.TYPE.ui};pointer-events:none;z-index:2;max-width:46vw`;
-  const touch = matchMedia("(pointer: coarse)").matches; hud.textContent = touch ? "Stick to walk, push far to run, drag to look" : "W A S D walk, Shift runs, click and move the mouse to look (Esc lets go), C, V or the wheel to see your cat, E takes a lift, Space jumps on the plaza"; document.body.appendChild(hud);
-  setTimeout(() => { hud.style.transition = "opacity 1.2s"; hud.style.opacity = "0.35"; }, 12000);
+   
+  const bar = controlBar({ show: ["move", "run", "jump", "use", "firstPerson"], words: { use: "lift" }, extra: [{ keys: ["1 to 6"], word: "moves" }] });
   const barriers = (await import("./barriers.js")).placeBarriers({ THREE, scene, closed: W.closed || [], tok: TOK });
 
   
@@ -99,9 +100,16 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
 
   let nearKey = null; const NB = new THREE.Box3(), NV = new THREE.Vector3();
   const refreshNear = (x, z) => { const key = Math.floor(x / 6) + "," + Math.floor(z / 6); if (key === nearKey) return; nearKey = key; NB.setFromCenterAndSize(NV.set(x, 6, z), NV.clone().set(28, 30, 28)); near.length = 0; for (const [o, bx] of ALL) if (bx.intersectsBox(NB)) near.push(o); };
+  const cray = new THREE.Raycaster(), CD = new THREE.Vector3(); let coverN = 0, coverRun = 0, barFP = false;
   function placeCamera(dt, m) {
     const el = Math.max(0.05, Math.min(1.1, 0.28 - view.pitch * 0.95)), ce = Math.cos(el), fx = Math.sin(view.yaw), fz = Math.cos(view.yaw);
     head.set(m.x * K, m.y * K + EYE, m.z * K); dir.set(-fx * ce, Math.sin(el), -fz * ce);
+    { const fpShown = !!(FP && (FPsince || (intro0 !== null && m.t - intro0 >= 4))); if (fpShown !== barFP) { barFP = fpShown; bar.words({ use: "lift", firstPerson: fpShown ? "third person" : "first person" }); } }    
+    
+
+    if ((coverN = (coverN + 1) % 12) === 0 && window.arena) { let open = false; const hr = Math.hypot(head.x, head.z) || 1;
+      for (const up of [null, 0.7, 1.7]) { if (up === null) CD.set(0, 1, 0); else CD.set(-head.x / hr, up, -head.z / hr).normalize(); cray.set(head, CD); cray.far = 13; if (!cray.intersectObjects(near, false).length) { open = true; break; } }
+      coverRun = open ? 0 : coverRun + 1; window.arena.cover = coverRun >= 2; window.arena.plaza = partAt(head.x, head.z) === 1; }
     
 
     if (FP && (FPsince || (intro0 !== null && m.t - intro0 >= 4))) {     const cp = Math.cos(view.pitch); cam3.copy(head); camDist = 0; cam.position.copy(head); me.holder.visible = false;
@@ -130,7 +138,7 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
       if (![[BODY, 0], [-BODY, 0], [0, BODY], [0, -BODY]].every(([ex, ez]) => heightAt(x + ex, z + ez, h) !== null)) continue; const d = Math.hypot(dx, dz); if (d < bd && free(x, h, z)) { bd = d; best = { x, z, y: h }; } } return best; };    
   const LIFTS = [0, 1, 2, 3].map((k) => { const t = Math.PI / 4 + k * Math.PI / 2, x0 = 85.2 * Math.cos(t), z0 = 67.2 * Math.sin(t), up = near1(x0, z0, 11.7), dn = near1(x0, z0, 0.1);
     return up && dn ? { k, x: up.x, z: up.z, y: up.y, gx: dn.x, gz: dn.z, ground: dn.y } : null; }).filter(Boolean);    
-  const liftHint = document.createElement("button"); liftHint.style.cssText = `position:fixed;left:50%;bottom:64px;transform:translateX(-50%);padding:10px 18px;border-radius:999px;border:0;background:${TOK.COLOR.gold};color:${TOK.COLOR.night};font:${TOK.WEIGHT ? TOK.WEIGHT.control : 600} 15px ${TOK.TYPE.ui};cursor:pointer;z-index:3;display:none`; document.body.appendChild(liftHint);
+  const liftHint = document.createElement("button"); liftHint.style.cssText = `position:fixed;left:50%;bottom:78px;transform:translateX(-50%);padding:10px 18px;border-radius:999px;border:0;background:${TOK.COLOR.gold};color:${TOK.COLOR.night};font:${TOK.WEIGHT ? TOK.WEIGHT.control : 600} 15px ${TOK.TYPE.ui};cursor:pointer;z-index:3;display:none`; document.body.appendChild(liftHint);
   const fade = document.createElement("div"); fade.style.cssText = "position:fixed;inset:0;background:" + TOK.COLOR.night + ";opacity:0;pointer-events:none;transition:opacity .3s;z-index:4"; document.body.appendChild(fade);
   let liftNear = null, riding = false;
   const ride = () => { if (!liftNear || riding) return; const l = liftNear, up = m.y * K < 6, y = up ? l.y : l.ground; if (y === null || y === undefined) return; riding = true; fade.style.opacity = "1";
@@ -149,6 +157,6 @@ export async function makeWalk({ THREE, scene, cam, renderer }) {
     me.holder.position.set(m.x * K, m.y * K, m.z * K); me.holder.rotation.set(0, m.yaw, 0);
     me.step(dt, undefined, { speed: m.speed, phase: m.phase, air: m.air, vy: m.vy, land: m.land, emote: m.emote, emoteT: m.emoteT, emoteLen: m.emoteLen });
     placeCamera(dt, m); liftCheck(); barriers.tick(nowMs / 1000); }
-  function reset() { YREF = W.start ? W.start.y : 4.8; player.stand({ x: START.x / K, z: START.z / K, face: START.face }); view.yaw = START.face; view.pitch = 0; here = null; first = true; aimed = null; intro0 = null; m = player.tick({}); }
+  function reset() { YREF = W.start ? W.start.y : 4.8; player.stand({ x: START.x / K, z: START.z / K, face: START.face }); view.yaw = START.face; view.pitch = PITCH0; here = null; first = true; aimed = null; intro0 = null; m = player.tick({}); }
   return { frame, reset, auto(fn) { AUTO = fn; }, firstPerson(v) { if (v) { FP = true; FPsince = 1; } else if (FP) leaveFP(1); }, get fp() { return FP; }, place(x, z, face = 0, y = 0) { YREF = y; player.stand({ x: x / K, z: z / K, face }); here = null; cur = null; m = player.tick({}); YREF = m.y * K; }, K, map: W, partAt, heightAt, near, lifts: LIFTS, ride: () => { liftCheck(); ride(); }, get riding() { return riding; }, get where() { return { x: m.x * K, y: m.y * K, z: m.z * K, part: partAt(m.x * K, m.z * K) }; }, player, view, keys, me };
 }
