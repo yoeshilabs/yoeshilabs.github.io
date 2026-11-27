@@ -12,21 +12,35 @@
 
    gem.js imports this through the gem file's paths:
      makeKiosk({ THREE, works, logo, conf }) -> { group, screen, update(T), setTheme(colors | null), select(i), pick(uv) -> -1, open(), close(), isOpen }
-   conf is the gem file's "kiosk" object; its events name each work's tags (from the posters and Mal's timeline). */
+   conf is the gem file's "kiosk" object; its events name each work's tags (from the posters and Mal's timeline). An event may also name
+   the wall work that opens it (`wall`, else `work`) and carry its own `about` and `link` when no wall work is its plaque. A gem may add
+   `sets`: fixed lists of mints from anywhere on Tezos (each { work, sub, about, link, linkText, source, tokens }), written into the gem
+   file from the indexer when it is built (Yoeshi, 2026-11-27: "showcase hp's curation/giveaway"); each token links to its own page.
+   `heading`, `marquee`, `site`, `allLabel`, `cta` and `source` rename the screen for a gem that is not Teia's winter events. */
 const API = "https://teztok.teia.rocks/v1/graphql", IPFS = "https://cache.teia.rocks/ipfs/", LISTS = "https://lists.teia.art/", HEN = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton";
 const EVENTS = [   /* used only when the gem file names none */
   { work: "ZERO on Teia", tags: ["ZEROonTeia"] }, { work: "Teia Onboarder", tags: ["TeiaOnboarder"] }, { work: "Letters To The Machine", tags: ["LTTMTeia"] },
   { work: "Teia Africa: Sip and Paint", tags: ["TeiaAfrica"] }, { work: "Circus Maximus", tags: ["PostAmericana"] }, { work: "The Wall Today", tags: ["TheWallToday", "XmassClash"] }, { work: "Cross Pollination", tags: ["CrossPollination"] }, { work: "26POV", tags: ["26POV"] }];
 const FONT = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace";
 const TZ = /^(tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$/, cid = (u) => { const m = typeof u === "string" && u.match(/^ipfs:\/\/([A-Za-z0-9]{40,80})(\/[\w.\-\/%]*)?$/); return m ? IPFS + m[1] + (m[2] || "") : ""; };
+/* a set's pictures may also come from objkt's own resized copies (old hic et nunc mints carry only a placeholder thumbnail) */
+const img = (v) => cid(v) || (typeof v === "string" && /^https:\/\/assets\.objkt\.media\/file\/[\w-]+\/[A-Za-z0-9]{40,80}\/(thumb400|display)$/.test(v) ? v : "");
 const short = (a) => (TZ.test(a || "") ? a.slice(0, 5) + "…" + a.slice(-4) : "");
 const when = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }); };
 
 export function makeKiosk({ THREE, works, logo, conf }) {
   const list = (works || []).slice(0, 8);
-  const EV = ((conf && Array.isArray(conf.events) && conf.events.length ? conf.events : EVENTS)).map((e) => ({ work: String(e.work || ""), tags: (Array.isArray(e.tags) ? e.tags : []).map(String).filter((t) => /^[\w-]{1,40}$/.test(t)) }))
-    .filter((e) => e.tags.length).map((e) => ({ ...e, i: list.findIndex((w) => w.title === e.work), low: e.tags.map((t) => t.toLowerCase()) })).map((e) => ({ ...e, w: list[e.i] || null }));
+  const C = conf || {}, str = (v, n) => (typeof v === "string" ? v.slice(0, n) : ""), url = (v) => (typeof v === "string" && /^https:\/\//.test(v) ? v : "");
+  const HEAD = str(C.heading, 80) || "Teia winter events", SITE = str(C.site, 40) || "teia.art", ALL = str(C.allLabel, 40) || "All events", CTA = str(C.cta, 80) || "Tap to browse the events' mints", SRC = str(C.source, 60) || "live from Teia";
+  const SETS = (Array.isArray(C.sets) ? C.sets : []).filter((s) => s && Array.isArray(s.tokens) && s.tokens.length);
+  const EV = [...(Array.isArray(C.events) && C.events.length ? C.events : SETS.length ? [] : EVENTS).map((e) => ({ work: String(e.work || ""), wall: str(e.wall, 160), about: str(e.about, 600), link: url(e.link), linkText: str(e.linkText, 80),
+      tags: (Array.isArray(e.tags) ? e.tags : []).map(String).filter((t) => /^[\w-]{1,40}$/.test(t)) })).filter((e) => e.tags.length),
+    ...SETS.map((s) => ({ work: str(s.work, 80), wall: str(s.wall, 160), sub: str(s.sub, 80), about: str(s.about, 600), link: url(s.link), linkText: str(s.linkText, 80), source: str(s.source, 60), tags: [], fixed: s.tokens }))]
+    .map((e) => ({ ...e, i: list.findIndex((w) => w.title === (e.wall || e.work)), low: e.tags.map((t) => t.toLowerCase()) })).map((e) => ({ ...e, w: list[e.i] || null }));
   const ALLTAGS = [...new Set(EV.flatMap((e) => e.tags))];
+  const subOf = (e) => e.sub || e.tags.map((t) => "#" + t).join("  ");
+  /* the plaque for an event's info box: its own words, else the wall work's */
+  const info = (e) => (!e ? null : e.about ? { title: e.work, by: "", about: e.about, link: e.link, text: e.linkText } : e.w ? { title: e.w.title, by: e.w.by, about: e.w.about, link: e.w.link, text: `Read the announcement${e.w.platform ? " on " + e.w.platform : ""}` } : null);
   /* ---- the data: one query for every event's tags; Teia's moderation lists once */
   const D = { tokens: [], at: 0, busy: null, mod: null };
   const mod = () => (D.mod ??= Promise.all(["restricted.json", "under_review.json", "restricted_objkt.json", "nsfw.json", "photosensitive.json"].map((f) => fetch(LISTS + f).then((r) => (r.ok ? r.json() : [])).catch(() => [])))
@@ -36,13 +50,16 @@ export function makeKiosk({ THREE, works, logo, conf }) {
     token_id name description editions minted_at mime_type thumbnail_uri display_uri artist_address artist_profile { name } teia_meta { content_rating accessibility } tags { tag } } }`;
   let filmed = false;   /* a film freezes the data once it has it, so every take is the same */
   const load = () => (filmed && D.at ? Promise.resolve() : D.busy ??= (async () => { try {
-      const m = await mod(), r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: Q }) });
-      const j = await r.json(), T = (j && j.data && j.data.tokens) || [];
-      D.tokens = T.filter((t) => t && /^\d+$/.test(String(t.token_id)) && !m.wallet.has(t.artist_address) && !m.objkt.has(String(t.token_id)) && !m.nsfw.has(String(t.token_id)) && !(t.teia_meta && t.teia_meta.content_rating === "mature"))
+      const m = await mod(), j = ALLTAGS.length ? await (await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: Q }) })).json() : { data: { tokens: [] } }, T = (j && j.data && j.data.tokens) || [];
+      /* a set's mints, as the gem file wrote them; Teia's lists still apply (its object list only to Teia's own contract) */
+      const fixed = EV.flatMap((e, k) => (e.fixed || []).filter((t) => t && /^\d+$/.test(String(t.id)) && TZ.test(String(t.fa || "")) && !m.wallet.has(t.artist) && !(t.fa === HEN && (m.objkt.has(String(t.id)) || m.nsfw.has(String(t.id)))))
+        .map((t) => ({ id: String(t.id), fa: t.fa, name: str(t.name, 200), about: str(t.about, 2000), editions: +t.editions || 0, at: str(t.at, 40), mime: str(t.mime, 60), thumb: img(t.thumb), still: img(t.still) || img(t.thumb), big: img(t.big), video: /^video\//.test(t.mime) ? cid(t.video) : undefined,
+          artist: TZ.test(t.artist || "") ? t.artist : "", by: str(t.by, 80) || short(t.artist), url: url(t.url), profile: url(t.profile), site: str(t.site, 40), flash: t.fa === HEN && m.flash.has(String(t.id)), ev: [k] })));
+      D.tokens = [...T.filter((t) => t && /^\d+$/.test(String(t.token_id)) && !m.wallet.has(t.artist_address) && !m.objkt.has(String(t.token_id)) && !m.nsfw.has(String(t.token_id)) && !(t.teia_meta && t.teia_meta.content_rating === "mature"))
         .map((t) => { const tags = (t.tags || []).map((x) => String(x.tag || "").toLowerCase()), hz = t.teia_meta && t.teia_meta.accessibility && t.teia_meta.accessibility.hazards;
           return { id: String(t.token_id), name: typeof t.name === "string" ? t.name : "", about: typeof t.description === "string" ? t.description.slice(0, 2000) : "", editions: +t.editions || 0, at: t.minted_at, mime: String(t.mime_type || ""),
             thumb: cid(t.display_uri) || cid(t.thumbnail_uri), still: cid(t.thumbnail_uri), artist: TZ.test(t.artist_address || "") ? t.artist_address : "", by: (t.artist_profile && typeof t.artist_profile.name === "string" && t.artist_profile.name.trim()) || short(t.artist_address),
-            flash: m.flash.has(String(t.token_id)) || (Array.isArray(hz) && hz.includes("flashing")), ev: EV.map((e, k) => (e.low.some((x) => tags.includes(x)) ? k : -1)).filter((k) => k >= 0) }; });
+            flash: m.flash.has(String(t.token_id)) || (Array.isArray(hz) && hz.includes("flashing")), ev: EV.map((e, k) => (e.low.some((x) => tags.includes(x)) ? k : -1)).filter((k) => k >= 0) }; }), ...fixed];
       D.at = Date.now(); screenDirty = true; if (ui) ui.render();
     } catch (e) { D.err = true; if (ui) ui.render(); } finally { D.busy = null; } })());
   const of = (k) => (k < 0 ? D.tokens : D.tokens.filter((t) => t.ev.includes(k)));
@@ -59,9 +76,9 @@ export function makeKiosk({ THREE, works, logo, conf }) {
     g.fillStyle = "#0a0a0a"; g.fillRect(0, 0, W, H);
     let lx = 36; if (logo && (logo.naturalWidth || logo.width)) { const lw = logo.naturalWidth || logo.width, lh = logo.naturalHeight || logo.height, h = 110; g.drawImage(logo, 36, 30, h * lw / lh, h); lx += h * lw / lh + 30; }
     const k = curEv(), e = EV[k], toks = of(k);
-    g.textBaseline = "middle"; g.fillStyle = "#f2f2f2"; g.fillText(fit(e ? e.work : "Teia winter events", W - lx - 300, `700 52px ${FONT}`), lx, 66);
-    g.fillStyle = accent; g.fillText(fit((e ? e.tags : ALLTAGS).map((t) => "#" + t).join("  "), W - lx - 300, `400 30px ${FONT}`), lx, 120);
-    g.fillStyle = "#f2f2f2"; g.font = `600 44px ${FONT}`; g.textAlign = "right"; g.fillText("teia.art", W - 36, 66); g.fillStyle = "#9a9a9a"; g.font = `400 24px ${FONT}`; g.fillText("live mints · beta", W - 36, 116); g.textAlign = "left";
+    g.textBaseline = "middle"; g.fillStyle = "#f2f2f2"; g.fillText(fit(e ? e.work : HEAD, W - lx - 300, `700 52px ${FONT}`), lx, 66);
+    g.fillStyle = accent; g.fillText(fit(e ? subOf(e) : ALLTAGS.map((t) => "#" + t).join("  "), W - lx - 300, `400 30px ${FONT}`), lx, 120);
+    g.fillStyle = "#f2f2f2"; g.font = `600 44px ${FONT}`; g.textAlign = "right"; g.fillText(SITE, W - 36, 66); g.fillStyle = "#9a9a9a"; g.font = `400 24px ${FONT}`; g.fillText(C.site ? "beta" : "live mints · beta", W - 36, 116); g.textAlign = "left";
     g.fillStyle = "#2a2a2a"; g.fillRect(36, 166, W - 72, 2);
     const PER = 10, pages = Math.max(1, Math.ceil(toks.length / PER)), p = page % pages, CW = (W - 72 - 4 * 20) / 5, CH = 350;
     if (!toks.length) { g.fillStyle = "#9a9a9a"; g.font = `400 40px ${FONT}`; g.fillText(D.at ? "No mints under this tag yet" : D.err ? "Teia's indexer did not answer" : "Loading the newest mints…", 36, 260); }
@@ -71,11 +88,11 @@ export function makeKiosk({ THREE, works, logo, conf }) {
       g.fillStyle = "#f2f2f2"; g.textBaseline = "alphabetic"; g.fillText(fit(t.name || "Untitled", CW, `700 26px ${FONT}`), x, y + IH + 34);
       g.fillStyle = "#9a9a9a"; g.fillText(fit(t.by, CW, `400 22px ${FONT}`), x, y + IH + 66); g.textBaseline = "middle"; });
     /* few mints yet: the rest of the screen tells the event, from its plaque */
-    if (e && e.w && e.w.about && toks.length <= 5) { const y0 = toks.length ? 190 + CH + 40 : 230, words = e.w.about.split(/\s+/), lines = []; let ln = ""; g.font = `400 38px ${FONT}`;
+    const pl = info(e); if (pl && pl.about && toks.length <= 5) { const y0 = toks.length ? 190 + CH + 40 : 230, words = pl.about.split(/\s+/), lines = []; let ln = ""; g.font = `400 38px ${FONT}`;
       for (const w of words) { const t = ln ? ln + " " + w : w; if (g.measureText(t).width > W - 72 && ln) { lines.push(ln); ln = w; } else ln = t; } if (ln) lines.push(ln);
       g.fillStyle = accent; g.fillRect(36, y0, 6, Math.min(5, lines.length) * 54 + 6); g.fillStyle = "#e8e8e8"; lines.slice(0, 5).forEach((l, j) => g.fillText(l, 64, y0 + 30 + j * 54)); }
     g.fillStyle = accent; g.fillRect(0, H - 120, W, 120); g.fillStyle = lum(accent) > 140 ? "#0a0a0a" : "#ffffff"; g.font = `700 44px ${FONT}`; g.textAlign = "left";
-    g.fillText("Tap to browse the events' mints", 36, H - 60); g.font = `400 28px ${FONT}`; g.textAlign = "right"; g.fillText(`${toks.length} mint${toks.length === 1 ? "" : "s"} · live from Teia${pages > 1 ? ` · page ${p + 1} of ${pages}` : ""}`, W - 36, H - 60); g.textAlign = "left";
+    g.fillText(CTA, 36, H - 60); g.font = `400 28px ${FONT}`; g.textAlign = "right"; g.fillText(`${toks.length} mint${toks.length === 1 ? "" : "s"} · ${(e && e.source) || SRC}${pages > 1 ? ` · page ${p + 1} of ${pages}` : ""}`, W - 36, H - 60); g.textAlign = "left";
     tex.needsUpdate = true; screenDirty = false;
   };
   function lum(h) { const n = parseInt(h.slice(1), 16); return 0.2126 * (n >> 16) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255); }
@@ -93,7 +110,7 @@ export function makeKiosk({ THREE, works, logo, conf }) {
   const mc = document.createElement("canvas"); mc.width = 1024; mc.height = 192; const mx = mc.getContext("2d"), mtex = new THREE.CanvasTexture(mc); mtex.colorSpace = THREE.SRGBColorSpace;
   const marquee = () => { mx.clearRect(0, 0, 1024, 192); mx.fillStyle = "#0a0a0a"; mx.beginPath(); mx.roundRect(4, 4, 1016, 184, 30); mx.fill(); mx.strokeStyle = accent; mx.lineWidth = 8; mx.stroke();
     for (let i = 0; i < 26; i++) { mx.fillStyle = i % 2 ? accent : "#fff6e8"; mx.beginPath(); mx.arc(40 + i * 37.7, 22, 6, 0, Math.PI * 2); mx.arc(40 + i * 37.7, 170, 6, 0, Math.PI * 2); mx.fill(); }
-    mx.shadowColor = accent; mx.shadowBlur = 28; mx.fillStyle = "#ffffff"; mx.font = `700 104px ${FONT}`; mx.textAlign = "center"; mx.textBaseline = "middle"; mx.fillText("teia.art", 512, 100); mx.shadowBlur = 0; mtex.needsUpdate = true; };
+    mx.shadowColor = accent; mx.shadowBlur = 28; mx.fillStyle = "#ffffff"; mx.font = `700 104px ${FONT}`; mx.textAlign = "center"; mx.textBaseline = "middle"; mx.fillText(str(C.marquee, 24) || "teia.art", 512, 100); mx.shadowBlur = 0; mtex.needsUpdate = true; };
   const sign = add(new THREE.PlaneGeometry(2.8, 0.525), new THREE.MeshBasicMaterial({ map: mtex, transparent: true, toneMapped: false }), [0, CY + SH / 2 + 0.48, 0.03]); sign.castShadow = false;
   marquee();
 
@@ -112,33 +129,33 @@ export function makeKiosk({ THREE, works, logo, conf }) {
     #tk .one h2{margin:0 0 6px;font-size:22px} #tk .one .ab{white-space:pre-wrap;opacity:.85;max-height:30vh;overflow:auto;margin:14px 0} #tk .one .go{display:inline-block;margin-top:10px;padding:10px 16px;background:var(--ac);color:var(--on);text-decoration:none;border-radius:4px;font-weight:700}
     @media (max-width:700px){#tk{inset:0;border-radius:0}#tk .one{grid-template-columns:1fr}}`;
   const el = (tag, cls, txt, parent) => { const d = document.createElement(tag); if (cls) d.className = cls; if (txt != null) d.textContent = txt; if (parent) parent.appendChild(d); return d; };
-  const build = () => { const st = el("style", null, css, document.head), root = el("div"); root.id = "tk"; root.setAttribute("role", "dialog"); root.setAttribute("aria-label", "Teia winter events: mints");
+  const build = () => { const st = el("style", null, css, document.head), root = el("div"); root.id = "tk"; root.setAttribute("role", "dialog"); root.setAttribute("aria-label", HEAD + ": mints");
     for (const ev of ["keydown", "keyup", "keypress"]) root.addEventListener(ev, (e) => { if (ev === "keydown" && e.key === "Escape") api.close(); e.stopPropagation(); });
     for (const ev of ["pointerdown", "pointerup", "click", "wheel"]) root.addEventListener(ev, (e) => e.stopPropagation());
-    const hd = el("div", "hd", null, root); if (logo && logo.src) { const im = el("img", null, null, hd); im.src = logo.src; im.alt = "Teia"; } el("span", "ad", "teia.art", hd); el("span", "beta", "BETA", hd); el("span", "bn", "An experimental build in beta: it may change frequently.", hd); el("span", "sp", null, hd);
+    const hd = el("div", "hd", null, root); if (logo && logo.src) { const im = el("img", null, null, hd); im.src = logo.src; im.alt = "Teia"; } el("span", "ad", SITE, hd); el("span", "beta", "BETA", hd); el("span", "bn", "An experimental build in beta: it may change frequently.", hd); el("span", "sp", null, hd);
     const x = el("button", null, "Close (Esc)", hd); x.addEventListener("click", () => api.close());
     const tabs = el("div", "tabs", null, root), stl = el("div", "st", null, root), body = el("div", "grid", null, root);
     const S = { tab: -1, one: null };
     const render = () => { root.style.setProperty("--ac", accent); root.style.setProperty("--on", lum(accent) > 140 ? "#0a0a0a" : "#ffffff");
-      tabs.innerHTML = ""; [[-1, "All events", ALLTAGS.length + " tags"], ...EV.map((e, k) => [k, e.work, e.tags.map((t) => "#" + t).join(" ")])].forEach(([k, name, sub]) => { const b = el("button", "tab" + (S.tab === k ? " on" : ""), name, tabs); el("small", null, `${sub} · ${of(k).length}`, b); b.addEventListener("click", () => { S.tab = k; S.one = null; render(); }); });
-      stl.textContent = D.at ? `Live from Teia's indexer · updated ${new Date(D.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · collect on teia.art` : D.err ? "Teia's indexer did not answer. Trying again shortly." : "Loading…";
+      tabs.innerHTML = ""; [[-1, ALL, ALLTAGS.length ? ALLTAGS.length + (ALLTAGS.length === 1 ? " tag" : " tags") : "everything"], ...EV.map((e, k) => [k, e.work, subOf(e)])].forEach(([k, name, sub]) => { const b = el("button", "tab" + (S.tab === k ? " on" : ""), name, tabs); el("small", null, `${sub} · ${of(k).length}`, b); b.addEventListener("click", () => { S.tab = k; S.one = null; render(); }); });
+      stl.textContent = D.at ? (EV[S.tab] && EV[S.tab].fixed ? EV[S.tab].source || "" : `Live from Teia's indexer · updated ${new Date(D.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · collect on teia.art`) : D.err ? "Teia's indexer did not answer. Trying again shortly." : "Loading…";
       body.innerHTML = ""; body.className = S.one ? "one" : "grid";
       if (S.one) return one(S.one);
-      const e = EV[S.tab]; if (e && e.w) { const box = el("div", "ev", null, body); el("b", null, e.w.title, box); if (e.w.by) box.append("  ·  " + e.w.by); if (e.w.about) el("p", null, e.w.about, box);   /* the event, from its plaque */
-        if (e.w.link) { const a = el("a", null, `Read the announcement${e.w.platform ? " on " + e.w.platform : ""}`, box); a.href = e.w.link; a.target = "_blank"; a.rel = "noopener noreferrer"; } }
+      const pl = info(EV[S.tab]); if (pl) { const box = el("div", "ev", null, body); el("b", null, pl.title, box); if (pl.by) box.append("  ·  " + pl.by); if (pl.about) el("p", null, pl.about, box);   /* the event, from its plaque */
+        if (pl.link) { const a = el("a", null, pl.text || "Read more", box); a.href = pl.link; a.target = "_blank"; a.rel = "noopener noreferrer"; } }
       const toks = of(S.tab); if (D.at && !toks.length) el("div", "note", "No mints under this tag yet.", body);
       for (const t of toks) { const c = el("div", "card", null, body), box = el("div", "im", null, c), im = el("img", null, null, box); im.loading = "lazy"; im.decoding = "async"; im.alt = t.name; im.src = t.flash ? t.still || t.thumb : t.thumb;
         el("div", "t", t.name || "Untitled", c); el("div", "b", t.by, c); el("div", "note", [`${t.editions} edition${t.editions === 1 ? "" : "s"}`, when(t.at), t.flash ? "flashing: still shown" : ""].filter(Boolean).join(" · "), c);
         c.tabIndex = 0; c.addEventListener("click", () => { S.one = t; render(); }); c.addEventListener("keydown", (e) => { if (e.key === "Enter") { S.one = t; render(); } }); } };
     const one = (t) => { const m = el("div", "m", null, body), side = el("div", null, null, body);
       if (/^video\//.test(t.mime) && !t.flash && t.video) { const v = el("video", null, null, m); v.muted = true; v.loop = true; v.playsInline = true; v.controls = true; v.poster = t.thumb; v.src = t.video; v.play().catch(() => {}); }
-      else { const im = el("img", null, null, m); im.src = t.flash ? t.still || t.thumb : t.thumb; im.alt = t.name; if (/^video\//.test(t.mime) && !t.flash && t.video === undefined) video(t).then(() => { if (ui && ui.S.one === t && t.video) render(); }); }
+      else { const im = el("img", null, null, m); im.src = t.flash ? t.still || t.thumb : t.big || t.thumb; im.alt = t.name; if (/^video\//.test(t.mime) && !t.flash && t.video === undefined) video(t).then(() => { if (ui && ui.S.one === t && t.video) render(); }); }
       const back = el("button", null, "← Back", side); back.addEventListener("click", () => { S.one = null; render(); });
-      el("h2", null, t.name || "Untitled", side); const by = el("div", null, "by ", side); if (t.artist) { const a = el("a", null, t.by, by); a.href = "https://teia.art/tz/" + t.artist; a.target = "_blank"; a.rel = "noopener noreferrer"; } else by.append(t.by);
-      el("div", "note", [`OBJKT #${t.id}`, `${t.editions} edition${t.editions === 1 ? "" : "s"}`, "minted " + when(t.at), t.mime].filter(Boolean).join(" · "), side);
+      el("h2", null, t.name || "Untitled", side); const by = el("div", null, "by ", side); if (t.artist) { const a = el("a", null, t.by, by); a.href = t.profile || "https://teia.art/tz/" + t.artist; a.target = "_blank"; a.rel = "noopener noreferrer"; } else by.append(t.by);
+      el("div", "note", [t.fa && t.fa !== HEN ? `Token #${t.id}` : `OBJKT #${t.id}`, `${t.editions} edition${t.editions === 1 ? "" : "s"}`, "minted " + when(t.at), t.mime].filter(Boolean).join(" · "), side);
       if (t.flash) el("div", "note", "Flagged for flashing images: shown as a still here. Open it on teia.art to see it in full.", side);
-      else if (!/^(image|video)\//.test(t.mime)) el("div", "note", "This work is interactive or another kind of file: open it on teia.art to see it in full.", side);
-      el("div", "ab", t.about, side); const go = el("a", "go", "View on teia.art", side); go.href = "https://teia.art/objkt/" + t.id; go.target = "_blank"; go.rel = "noopener noreferrer"; };
+      else if (!/^(image|video)\//.test(t.mime)) el("div", "note", `This work is interactive or another kind of file: open it on ${t.site || "teia.art"} to see it in full.`, side);
+      el("div", "ab", t.about, side); const go = el("a", "go", `View on ${t.site || "teia.art"}`, side); go.href = t.url || "https://teia.art/objkt/" + t.id; go.target = "_blank"; go.rel = "noopener noreferrer"; };
     return { root, st, render, S }; };
   /* a video mint plays from its artifact; asked for only when it is opened, so the grid stays light */
   const video = async (t) => { if (t.video !== undefined) return; t.video = ""; try { const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: `{ tokens(where: { fa2_address: { _eq: "${HEN}" }, token_id: { _eq: "${t.id}" } }) { artifact_uri } }` }) }); const j = await r.json(); t.video = cid(j.data.tokens[0].artifact_uri); } catch (e) {} };
