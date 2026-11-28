@@ -24,6 +24,10 @@ const EVENTS = [   /* used only when the gem file names none */
 const FONT = "ui-monospace, 'SF Mono', Menlo, Consolas, monospace";
 const TZ = /^(tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$/, cid = (u) => { const m = typeof u === "string" && u.match(/^ipfs:\/\/([A-Za-z0-9]{40,80})(\/[\w.\-\/%]*)?$/); return m ? IPFS + m[1] + (m[2] || "") : ""; };
 /* a set's pictures may also come from objkt's own resized copies (old hic et nunc mints carry only a placeholder thumbnail) */
+/* the screen in the room draws its pictures into a canvas, which needs each server's leave (CORS): objkt's resized copies always give it, Teia's
+   cache not for every file (Yoeshi, 2026-11-27, in Brave: "the ui in the lounges center monitor has mostly broken preview thumbnails"), so the
+   screen asks objkt's small copy first and Teia's cache after it */
+const OBJKT = "https://assets.objkt.media/file/assets-003/", small = (u) => { const m = typeof u === "string" && u.match(/^ipfs:\/\/([A-Za-z0-9]{40,80})$/); return m ? OBJKT + m[1] + "/thumb400" : ""; };
 const img = (v) => cid(v) || (typeof v === "string" && /^https:\/\/assets\.objkt\.media\/file\/[\w-]+\/[A-Za-z0-9]{40,80}\/(thumb400|display)$/.test(v) ? v : "");
 const short = (a) => (TZ.test(a || "") ? a.slice(0, 5) + "…" + a.slice(-4) : "");
 const when = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }); };
@@ -58,7 +62,7 @@ export function makeKiosk({ THREE, works, logo, conf }) {
       D.tokens = [...T.filter((t) => t && /^\d+$/.test(String(t.token_id)) && !m.wallet.has(t.artist_address) && !m.objkt.has(String(t.token_id)) && !m.nsfw.has(String(t.token_id)) && !(t.teia_meta && t.teia_meta.content_rating === "mature"))
         .map((t) => { const tags = (t.tags || []).map((x) => String(x.tag || "").toLowerCase()), hz = t.teia_meta && t.teia_meta.accessibility && t.teia_meta.accessibility.hazards;
           return { id: String(t.token_id), name: typeof t.name === "string" ? t.name : "", about: typeof t.description === "string" ? t.description.slice(0, 2000) : "", editions: +t.editions || 0, at: t.minted_at, mime: String(t.mime_type || ""),
-            thumb: cid(t.display_uri) || cid(t.thumbnail_uri), still: cid(t.thumbnail_uri), artist: TZ.test(t.artist_address || "") ? t.artist_address : "", by: (t.artist_profile && typeof t.artist_profile.name === "string" && t.artist_profile.name.trim()) || short(t.artist_address),
+            thumb: cid(t.display_uri) || cid(t.thumbnail_uri), still: cid(t.thumbnail_uri), screen: small(t.display_uri) || small(t.thumbnail_uri), artist: TZ.test(t.artist_address || "") ? t.artist_address : "", by: (t.artist_profile && typeof t.artist_profile.name === "string" && t.artist_profile.name.trim()) || short(t.artist_address),
             flash: m.flash.has(String(t.token_id)) || (Array.isArray(hz) && hz.includes("flashing")), ev: EV.map((e, k) => (e.low.some((x) => tags.includes(x)) ? k : -1)).filter((k) => k >= 0) }; }), ...fixed];
       D.at = Date.now(); screenDirty = true; if (ui) ui.render();
     } catch (e) { D.err = true; if (ui) ui.render(); } finally { D.busy = null; } })());
@@ -68,7 +72,9 @@ export function makeKiosk({ THREE, works, logo, conf }) {
   const W = 1920, H = 1080, cv = document.createElement("canvas"); cv.width = W; cv.height = H; const g = cv.getContext("2d");
   const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   let accent = "#ffffff", sel = -1, last = -1, screenDirty = true, page = 0, pageT = 0;
-  const pics = new Map(), pic = (u) => { if (!u) return null; if (!pics.has(u)) { const im = new Image(); im.crossOrigin = "anonymous"; im.decoding = "async"; im.onload = () => { screenDirty = true; }; im.src = u; pics.set(u, im); } return pics.get(u); };
+  const pics = new Map(), pic = (list) => { const us = (Array.isArray(list) ? list : [list]).filter(Boolean); if (!us.length) return null; const key = us.join(" ");
+    if (!pics.has(key)) { const im = new Image(); let n = 0; im.crossOrigin = "anonymous"; im.decoding = "async"; im.onload = () => { screenDirty = true; }; im.onerror = () => { if (++n < us.length) im.src = us[n]; else { im.failed = true; screenDirty = true; } }; im.src = us[0]; pics.set(key, im); }
+    return pics.get(key); }, shot = (t) => (t.flash ? [t.still] : [t.screen, t.thumb]);
   const fit = (s, max, font) => { g.font = font; if (g.measureText(s).width <= max) return s; while (s.length > 1 && g.measureText(s + "…").width > max) s = s.slice(0, -1); return s + "…"; };
   const curEv = () => EV.findIndex((e) => e.i === sel && sel >= 0);
   /* wide, to fill the arch behind the dais: a header, then ten mints in two rows of five, then the bar that asks for a tap */
@@ -82,7 +88,7 @@ export function makeKiosk({ THREE, works, logo, conf }) {
     g.fillStyle = "#2a2a2a"; g.fillRect(36, 166, W - 72, 2);
     const PER = 10, pages = Math.max(1, Math.ceil(toks.length / PER)), p = page % pages, CW = (W - 72 - 4 * 20) / 5, CH = 350;
     if (!toks.length) { g.fillStyle = "#9a9a9a"; g.font = `400 40px ${FONT}`; g.fillText(D.at ? "No mints under this tag yet" : D.err ? "Teia's indexer did not answer" : "Loading the newest mints…", 36, 260); }
-    toks.slice(p * PER, p * PER + PER).forEach((t, i) => { const x = 36 + (i % 5) * (CW + 20), y = 190 + Math.floor(i / 5) * (CH + 18), im = pic(t.flash ? t.still : t.thumb), IH = CH - 80;
+    toks.slice(p * PER, p * PER + PER).forEach((t, i) => { const x = 36 + (i % 5) * (CW + 20), y = 190 + Math.floor(i / 5) * (CH + 18), im = pic(shot(t)), IH = CH - 80;
       g.fillStyle = "#151515"; g.fillRect(x, y, CW, IH);
       if (im && im.complete && im.naturalWidth) { const s = Math.min((CW - 12) / im.naturalWidth, (IH - 12) / im.naturalHeight), iw = im.naturalWidth * s, ih = im.naturalHeight * s; g.drawImage(im, x + (CW - iw) / 2, y + (IH - ih) / 2, iw, ih); }
       g.fillStyle = "#f2f2f2"; g.textBaseline = "alphabetic"; g.fillText(fit(t.name || "Untitled", CW, `700 26px ${FONT}`), x, y + IH + 34);
@@ -171,7 +177,7 @@ export function makeKiosk({ THREE, works, logo, conf }) {
     film(st, T) { filmed = true; if (!ui || !st) return; const tab = typeof st.tab === "number" ? st.tab : -1, one = st.one ? D.tokens.find((t) => t.id === String(st.one)) || null : null;
       if (tab !== ui.S.tab || one !== ui.S.one) { ui.S.tab = tab; ui.S.one = one; ui.render(); } },
     /* true once the data is in and the screen's current page of pictures has loaded */
-    settled() { if (!D.at) return false; const k = curEv(), toks = of(k), pages = Math.max(1, Math.ceil(toks.length / 10)), p = page % pages; return toks.slice(p * 10, p * 10 + 10).every((t) => { const im = pic(t.flash ? t.still : t.thumb); return !im || im.complete; }); },   /* the whole screen opens the browser */
+    settled() { if (!D.at) return false; const k = curEv(), toks = of(k), pages = Math.max(1, Math.ceil(toks.length / 10)), p = page % pages; return toks.slice(p * 10, p * 10 + 10).every((t) => { const im = pic(shot(t)); return !im || im.failed || im.complete; }); },   /* the whole screen opens the browser */
     open() { if (api.isOpen) return; ui ??= build(); document.addEventListener("keydown", esc, true); ui.S.tab = curEv(); ui.S.one = null; document.body.appendChild(ui.root); api.isOpen = true; ui.render(); load(); clearInterval(poll); if (!filmed) poll = setInterval(load, 60000); },
     close() { if (!api.isOpen) return; api.isOpen = false; document.removeEventListener("keydown", esc, true); clearInterval(poll); poll = 0; ui.root.querySelectorAll("video").forEach((v) => v.pause()); ui.root.remove(); } };
   load(); draw(0);
