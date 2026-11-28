@@ -233,14 +233,33 @@ function sectorRing(a0, b0, a1, b1, y, h, m, g) { const s = new THREE.Shape(), u
   sectorRing(a0, b0, a0 + 2.4, b0 + 2.4, y0 - 0.15, 0.12, glow("#ff9fd0", 0.9), BGAP); }                              
 
 const STALL = ["#ff5fa8", "#ffd36e", "#6fd3ff", "#9b7bff"], SHOPS = [];
-for (let i = 0; i < 42; i++) { const th = (i / 42) * Math.PI * 2 + 0.04; if ([0, Math.PI / 2, Math.PI, Math.PI * 1.5].some((g) => Math.abs(Math.atan2(Math.sin(th - g), Math.cos(th - g))) < 0.12)) continue;
-  const p = ell(CA1, CB1, th), g = new THREE.Group(), kind = i % 7 === 3 ? "stair" : i % 7 === 6 ? "wc" : "stall", c = STALL[i % 4];
+
+const SLOTS = []; { const OLD = []; for (let i = 0; i < 42; i++) { const th = (i / 42) * Math.PI * 2 + 0.04; if ([0, Math.PI / 2, Math.PI, Math.PI * 1.5].some((g) => Math.abs(Math.atan2(Math.sin(th - g), Math.cos(th - g))) < 0.12)) continue;
+    OLD.push({ th, kind: i % 7 === 3 ? "stair" : i % 7 === 6 ? "wc" : "stall", ci: i % 4 }); }
+  if (q.get("walk") !== "1" && q.get("shops") !== "wall") SLOTS.push(...OLD);    
+  else { const NS = 4096, TAU2 = Math.PI * 2, S = [0]; for (let i = 1; i <= NS; i++) { const p0 = ell(CA1, CB1, (i - 1) / NS * TAU2), p1 = ell(CA1, CB1, i / NS * TAU2); S.push(S[i - 1] + p0.distanceTo(p1)); }
+    const PER = S[NS], sOf = (t) => { const u = ((t % TAU2) + TAU2) % TAU2 / TAU2 * NS, i = Math.min(NS - 1, Math.floor(u)); return S[i] + (S[i + 1] - S[i]) * (u - i); },
+      tOf = (sv) => { const v = ((sv % PER) + PER) % PER; let lo = 0, hi = NS; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (S[m] <= v) lo = m; else hi = m; } return (lo + (v - S[lo]) / (S[lo + 1] - S[lo])) / NS * TAU2; };
+    const liftT = (k) => { const c = CORE[k]; let bt = c.t, bd = 1e9; for (let j = -400; j <= 400; j++) { const t = c.t + j * 0.0005, pp = ell(CA1, CB1, t), d = Math.hypot(pp.x - c.x, pp.y - c.z); if (d < bd) { bd = d; bt = t; } } return bt; };    
+    const HALF = { gate: 9, stair: 3.8, lift: 3.8 }, PITCH = 10.7;    
+    const anchors = [...[0, Math.PI / 2, Math.PI, Math.PI * 1.5].map((t) => ({ kind: "gate", s: sOf(t) })), ...OLD.filter((o) => o.kind === "stair").map((o) => ({ kind: "stair", th: o.th, s: sOf(o.th) })), ...[0, 1, 2, 3].map((k) => { const t = liftT(k); return { kind: "lift", th: t, s: sOf(t), core: k }; })].sort((x, y) => x.s - y.s);
+    let n = 0; anchors.forEach((an, i) => { if (an.kind !== "gate") SLOTS.push({ th: an.th, kind: an.kind, ci: n % 4, core: an.core });
+      const nx = anchors[(i + 1) % anchors.length], s0 = an.s + HALF[an.kind], s1 = (nx.s > an.s ? nx.s : nx.s + PER) - HALF[nx.kind], free = s1 - s0, m = Math.max(free >= 7 ? 1 : 0, Math.floor(free / PITCH + 0.5));
+      for (let j = 0; j < m; j++) { SLOTS.push({ th: tOf(s0 + (j + 0.5) * free / m), kind: n % 6 === 4 ? "wc" : "stall", ci: n % 4 }); n++; } });
+    for (const sl of SLOTS) sl.normal = true; window.__shops = { stalls: SLOTS.filter((x) => x.kind === "stall").length, wc: SLOTS.filter((x) => x.kind === "wc").length, stairs: SLOTS.filter((x) => x.kind === "stair").length, lifts: SLOTS.filter((x) => x.kind === "lift").length }; } }
+for (const SL of SLOTS) { const th = SL.th, p = ell(CA1, CB1, th), g = new THREE.Group(), kind = SL.kind, c = STALL[SL.ci];
   const put = (geo, m, x, y, z, rx = 0) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.rotation.x = rx; o.castShadow = true; g.add(o); return o; };
   for (const x of [-2.4, 2.4]) put(new THREE.BoxGeometry(0.4, 4.4, 0.5), FAB ? FAB.metal : STONE2, x, 2.2, 0.2);                                   
   put(new THREE.BoxGeometry(5.2, 0.5, 0.5), FAB ? FAB.metal : STONE2, 0, 4.2, 0.2);    
   if (kind === "stair") { put(new THREE.PlaneGeometry(4.4, 3.9), new THREE.MeshStandardMaterial({ color: "#0d1a24", emissive: "#6fd3ff", emissiveIntensity: 0.45 }), 0, 1.95, 0.03);
     put(new THREE.TorusGeometry(1.9, 0.14, 6, 20, Math.PI), glow("#6fd3ff", 2.4), 0, 1.9, 0.3);
     for (let k = 0; k < 5; k++) put(new THREE.BoxGeometry(3.6, 0.12, 0.5), glow("#bff3ff", 0.9), 0, 0.15 + k * 0.32, -0.2 - k * 0.45); }    
+  else if (kind === "lift") {  
+    put(new THREE.PlaneGeometry(4.4, 3.9), new THREE.MeshStandardMaterial({ color: "#163040", emissive: "#6fd3ff", emissiveIntensity: 0.4, roughness: 0.08 }), 0, 1.95, 0.2);    
+    for (const x of [-0.8, 0.8]) put(new THREE.PlaneGeometry(1.5, 3.0), new THREE.MeshStandardMaterial({ color: "#1d4257", emissive: "#bff3ff", emissiveIntensity: 0.55, roughness: 0.05 }), x, 1.5, 0.24);    
+    put(new THREE.BoxGeometry(0.06, 3.0, 0.04), FAB ? FAB.metal : STONE2, 0, 1.5, 0.27);
+    for (const x of [-1.65, 1.65]) put(new THREE.BoxGeometry(0.16, 3.2, 0.12), glow("#ffd36e", 1.6), x, 1.6, 0.3); put(new THREE.BoxGeometry(3.46, 0.16, 0.12), glow("#ffd36e", 1.6), 0, 3.2, 0.3);
+    { const tx = TOK ? SIGN(["LIFT \u2193 CORRIDOR"], { w: 512, h: 96, band: TOK.COLOR.gold })     : null; if (tx) put(new THREE.PlaneGeometry(3.8, 0.7), new THREE.MeshStandardMaterial({ map: tx, emissive: "#ffffff", emissiveMap: tx, emissiveIntensity: 0.8 }), 0, 3.72, 0.47); } }
   else if (kind === "wc") { put(new THREE.PlaneGeometry(4.4, 3.9), mat("#fbf8f4", { roughness: 0.25 }), 0, 1.95, 0.03);
     for (const x of [-1.1, 1.1]) put(new THREE.PlaneGeometry(1.6, 3), glow("#bcd8ff", 0.7), x, 1.5, 0.05);
     put(new THREE.BoxGeometry(4.4, 0.4, 0.2), glow("#3f8cff", 1.6), 0, 3.5, 0.35); }
@@ -249,7 +268,7 @@ for (let i = 0; i < 42; i++) { const th = (i / 42) * Math.PI * 2 + 0.04; if ([0,
     put(new THREE.BoxGeometry(4.2, 1.25, 0.9), mat("#fbf8f4", { roughness: 0.25 }), 0, 0.62, 1.6);                                  
     put(new THREE.BoxGeometry(4.3, 0.08, 1.0), glow(c, 1.4), 0, 1.29, 1.6);
     put(new THREE.BoxGeometry(5.2, 0.18, 1.7), glow(c, 0.9), 0, 4.55, 0.95, -0.28); }                                                
-  g.position.set(p.x, CY, p.y); g.lookAt(0, CY, 0); scene.add(g); SHOPS.push({ th, kind, g }); }
+  g.position.set(p.x, CY, p.y); if (SL.normal) { const nx = Math.cos(th) / CA1, nz = Math.sin(th) / CB1, nl = Math.hypot(nx, nz); g.lookAt(p.x - nx / nl * 10, CY, p.y - nz / nl * 10); } else g.lookAt(0, CY, 0); scene.add(g); SHOPS.push({ th, kind, g, core: SL.core }); }
  
 ring(CA0, CB0, CA0 + 0.15, CB0 + 0.15, CY, 1.3, new THREE.MeshStandardMaterial({ color: "#cfefff", transparent: true, opacity: 0.35, roughness: 0.05 }));
 ring(CA0 - 0.05, CB0 - 0.05, CA0 + 0.2, CB0 + 0.2, CY + 1.3, 0.12, glow("#ffd36e", 1.8));
@@ -266,12 +285,12 @@ const AL = (i) => (i + 0.5) / 16 * Math.PI * 2, AU = (i) => i / 16 * Math.PI * 2
   for (let i = 0; i < 16; i++) { aisle(...LOW, AL(i), FAB ? VOM.rows : []); aisle(...UPP, AU(i)); if (Math.abs(Math.atan2(Math.sin(AL(i) - Math.PI * 1.5), Math.cos(AL(i) - Math.PI * 1.5))) > BGAP + 0.06) aisle(...BAL, AL(i)); } }
  
 let SEATS = 0, CROWD_AT = [];
-{ const pan = new THREE.BoxGeometry(1.25, 0.28, 1.05), back = new THREE.BoxGeometry(1.25, 1.05, 0.2), list = [];
+{ const pan = new THREE.BoxGeometry(1.25, 0.28, 1.05), back = new THREE.BoxGeometry(1.25, 1.05, 0.2), list = [], HOLES = q.get("walk") === "1" || q.get("shops") === "wall";
   for (const row of ROWS) { const n = 2400, pts = []; let L = 0, prev = ell(row.a, row.b, 0); for (let i = 1; i <= n; i++) { const t = i / n * Math.PI * 2, p = ell(row.a, row.b, t); L += p.distanceTo(prev); prev = p; pts.push([L, t]); }
     const al = row.upper ? AU : AL, gap = (t) => { if (row.balc && Math.abs(Math.atan2(Math.sin(t - Math.PI * 1.5), Math.cos(t - Math.PI * 1.5))) < BGAP + 0.02) return true; for (let i = 0; i < 16; i++) { const d = Math.atan2(Math.sin(t - al(i)), Math.cos(t - al(i))); if (Math.abs(d) * Math.hypot(row.a, row.b) / Math.SQRT2 < 2.1) return true; } return false; };
-    let k = 0; for (let d = 0.8; d < L - 0.8; d += 1.6) { while (pts[k][0] < d) k++; const t = pts[k][1]; if (gap(t)) continue; list.push({ t, row }); } }
+    let k = 0; for (let d = 0.8; d < L - 0.8; d += 1.6) { while (pts[k][0] < d) k++; const t = pts[k][1]; if (gap(t)) continue; const sp = HOLES ? ell(row.a, row.b, t) : null; list.push({ t, row, hole: !!sp && CORE.some((c) => Math.hypot(sp.x - c.x, sp.y - c.z) < 4.0) }); } }    
   SEATS = list.length; CROWD_AT = list; const cols = ["#ff9fcf", "#ffd36e", "#8fdcff", "#b9a3ff", "#ffb8a8", "#9fe8c4"];
-  const byRow = new Map(); for (const it of list) { const key = (it.row.balc ? 8 : it.row.upper ? 6 : 0) + it.row.r; byRow.has(key) || byRow.set(key, []); byRow.get(key).push(it); }
+  const byRow = new Map(); for (const it of list) { if (it.hole) continue; const key = (it.row.balc ? 8 : it.row.upper ? 6 : 0) + it.row.r; byRow.has(key) || byRow.set(key, []); byRow.get(key).push(it); }
   const o = new THREE.Object3D();
   for (const [key, items] of byRow) { const m = mat(cols[key % 6], { roughness: 0.4 }), P = new THREE.InstancedMesh(pan, m, items.length), Bk = new THREE.InstancedMesh(back, m, items.length);
     items.forEach((it, i) => { const p = ell(it.row.a, it.row.b, it.t); o.position.set(p.x, it.row.y + 0.55, p.y); o.rotation.set(0, 0, 0); o.lookAt(0, it.row.y + 0.55, 0); o.updateMatrix(); P.setMatrixAt(i, o.matrix);
@@ -282,7 +301,7 @@ let SEATS = 0, CROWD_AT = [];
 }
 
 let CROWD_TICK = null;
-if (q.get("crowd") !== "0") { const pick = CROWD_AT.filter((_, i) => ((i * 2654435761) >>> 0) % 100 < 62), n = pick.length, CM = new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: 0.8 });
+if (q.get("crowd") !== "0") { const pick = CROWD_AT.filter((it, i) => ((i * 2654435761) >>> 0) % 100 < 62 && !it.hole), n = pick.length, CM = new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: 0.8 });
   const body = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.42, 0.55, 4, 10), CM, n), head = new THREE.InstancedMesh(new THREE.SphereGeometry(0.4, 14, 10), CM, n), ears = new THREE.InstancedMesh(new THREE.ConeGeometry(0.15, 0.36, 4), CM, n * 2), arms = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.11, 0.55, 3, 6), CM, n * 2);
   const COATS = ["#e8964a", "#9a9aa6", "#2a2428", "#f6f2ee", "#f2dcb8", "#8a5a3c", "#c98a5e", "#5c5c66"], o = new THREE.Object3D(), col = new THREE.Color();
   const P = pick.map((it, i) => ({ p: ell(it.row.a, it.row.b, it.t), y: it.row.y, th: it.t, c: COATS[((i * 40503) >>> 0) % COATS.length], lean: (((i * 97) % 21) - 10) * 0.012, ph: (i * 0.37) % (Math.PI * 2) }));
